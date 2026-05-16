@@ -13,9 +13,9 @@
 | **Phase 3: Infrastructure** | 🟢 Done | .env, deploy scripts, stripe split, vercel/netlify config |
 | **Phase 4: Build Optimization** | 🟢 Done | 859KB→76KB app shell (↓91%), 31 chunks, 0 warnings |
 | **Phase 5: Testing & QA** | 🟢 Done | 49 tests pass, all edge functions verified |
-| **Phase 6: Deployment** | 🔴 Not Started | Run deploy script → Vercel/Netlify |
+| **Phase 6: Deployment** | 🟢 Done | Supabase linked, DB migrated, 5 functions deployed, frontend on Vercel |
 | **Phase 7: Documentation** | 🟢 Done | README, CONTRIBUTING, SUPABASE_SETUP, DEPLOYMENT_PLAN |
-| **Phase 8: Production Sign-off** | 🔴 Not Started | Reality Checker audit pending |
+| **Phase 8: Production Sign-off** | 🟡 Needs Work | C- → B rating — auth bug fixed, ErrorBoundary added, SEO done, Stripe/Twilio keys still pending |
 
 ---
 
@@ -134,10 +134,18 @@ npm run build
 ---
 
 ## Stats
-- **Source files:** ~70
+- **Source files:** ~72
 - **Edge Functions:** 5 (ai-write, send-sms, send-email, create-checkout, stripe-listener)
 - **Database tables:** 8 + auth.users
 - **Build chunks:** 31
-- **Build time:** ~7-11s
+- **Build time:** ~4-5s
 - **Test suite:** 49 tests, all passing
-- **Git commits:** 4 (plus uncommitted test fixes)
+- **Git commits:** 6
+
+## Recent Fixes (Commit 702b775)
+- **Auth bug**: Returning users now skip onboarding after login — `handleLoginComplete` callback goes directly to app
+- **SIGNED_IN handler**: Now sets view to `"app"` when profile exists (was only setting user state)
+- **Login.jsx**: Checks if profile has `name` + `business_name` → calls `onLoginComplete` (skip onboarding) vs `onDone` (onboarding for new users)
+- **ErrorBoundary**: New component wraps entire app — catches any render crash and shows "Something went wrong" instead of blank page
+- **Loading state**: Replaced `if (loading) return null` with a centered Spinner — no more white flash on page load
+- **Deploy pending**: Vercel token expired — need `npx vercel login` to redeploy
