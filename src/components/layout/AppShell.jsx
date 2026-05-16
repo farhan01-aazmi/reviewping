@@ -178,7 +178,7 @@ export default function AppShell({ user: initUser, onLogout }) {
       text: null,
       sentAt: sentAt || Date.now(),
       status: "pending",
-      ch: channel,
+      channel,
       reply: null,
     };
     setReviews((p) => [newReview, ...p]);

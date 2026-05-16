@@ -1,12 +1,24 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "authorization, content-type",
+  "Content-Type": "application/json",
+};
+
 serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  }
+
   try {
     // Only allow POST
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), {
         status: 405,
-        headers: { "Content-Type": "application/json" },
+        headers: CORS_HEADERS,
       });
     }
 
@@ -17,7 +29,7 @@ serve(async (req) => {
         JSON.stringify({
           error: "Missing required fields: 'to', 'subject', and 'message'",
         }),
-        { status: 400, headers: { "Content-Type": "application/json" } },
+        { status: 400, headers: CORS_HEADERS },
       );
     }
 
@@ -51,13 +63,13 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, id: result.id }),
-      { headers: { "Content-Type": "application/json" } },
+      { headers: CORS_HEADERS },
     );
   } catch (err) {
     console.error("send-email error:", err);
     return new Response(JSON.stringify({ error: "Failed to send email. Please try again." }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: CORS_HEADERS,
     });
   }
 });

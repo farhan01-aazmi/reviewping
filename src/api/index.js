@@ -6,14 +6,17 @@ async function api(path, options = {}) {
   const { data: { session } } = await supabase.auth.getSession();
   const token = session?.access_token;
 
+  const { headers: extraHeaders, ...restOptions } = options;
+
   const url = `${API_BASE}${path}`;
   const res = await fetch(url, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
+      ...extraHeaders,
     },
-    ...options,
+    ...restOptions,
   });
   if (!res.ok) {
     const errBody = await res.text().catch(() => "");

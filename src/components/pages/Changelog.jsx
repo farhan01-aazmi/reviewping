@@ -46,7 +46,7 @@ const CLOG = [
     tag: "Improved",
     tc: G.purple,
     items: [
-      "AI messages using Claude claude-sonnet-4-20250514 — more natural and personal",
+      "AI messages using Gemini 2.0 Flash — faster and more natural",
       "Send via SMS, Email, or Both",
       "Notifications centre with badge",
       "Settings — API keys, notifications",

@@ -1,6 +1,13 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "authorization, content-type",
+  "Content-Type": "application/json",
+};
+
 /**
  * Stripe Webhook Listener
  *
@@ -14,12 +21,17 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
  *   - customer.subscription.deleted
  */
 serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  }
+
   try {
     // Only allow POST
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), {
         status: 405,
-        headers: { "Content-Type": "application/json" },
+        headers: CORS_HEADERS,
       });
     }
 
@@ -50,7 +62,7 @@ serve(async (req) => {
       if (!verified) {
         return new Response(JSON.stringify({ error: "Invalid signature" }), {
           status: 401,
-          headers: { "Content-Type": "application/json" },
+          headers: CORS_HEADERS,
         });
       }
     }
@@ -176,13 +188,13 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ received: true }), {
-      headers: { "Content-Type": "application/json" },
+      headers: CORS_HEADERS,
     });
   } catch (err) {
     console.error("stripe-listener error:", err);
     return new Response(JSON.stringify({ error: "Webhook processing failed" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: CORS_HEADERS,
     });
   }
 });

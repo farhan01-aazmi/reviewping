@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { G } from "../../data/theme";
-import { D } from "../../data/constants";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Pill from "../ui/Pill";

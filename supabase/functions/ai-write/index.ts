@@ -1,19 +1,31 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "authorization, content-type",
+  "Content-Type": "application/json",
+};
+
 serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  }
+
   try {
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), {
         status: 405,
-        headers: { "Content-Type": "application/json" },
+        headers: CORS_HEADERS,
       });
     }
 
     const { name, service, business } = await req.json();
-    if (!name) {
+    if (!name || typeof name !== "string") {
       return new Response(
         JSON.stringify({ error: "Customer name is required" }),
-        { status: 400, headers: { "Content-Type": "application/json" } },
+        { status: 400, headers: CORS_HEADERS },
       );
     }
 
@@ -48,13 +60,13 @@ serve(async (req) => {
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 
     return new Response(JSON.stringify({ message: text }), {
-      headers: { "Content-Type": "application/json" },
+      headers: CORS_HEADERS,
     });
   } catch (err) {
     console.error("ai-write error:", err);
     return new Response(JSON.stringify({ error: "Failed to generate message. Please try again." }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: CORS_HEADERS,
     });
   }
 });

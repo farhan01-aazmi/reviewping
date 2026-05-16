@@ -1,5 +1,12 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "authorization, content-type",
+  "Content-Type": "application/json",
+};
+
 /**
  * Stripe Checkout Session Creator
  *
@@ -8,12 +15,17 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
  * Requires JWT authentication — the user_id is extracted from the verified token.
  */
 serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  }
+
   try {
     // Only allow POST
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), {
         status: 405,
-        headers: { "Content-Type": "application/json" },
+        headers: CORS_HEADERS,
       });
     }
 
@@ -22,7 +34,7 @@ serve(async (req) => {
     if (!userId) {
       return new Response(JSON.stringify({ error: "Authentication required" }), {
         status: 401,
-        headers: { "Content-Type": "application/json" },
+        headers: CORS_HEADERS,
       });
     }
 
@@ -36,7 +48,7 @@ serve(async (req) => {
     if (!price_id) {
       return new Response(
         JSON.stringify({ error: "Missing required field: 'price_id'" }),
-        { status: 400, headers: { "Content-Type": "application/json" } },
+        { status: 400, headers: CORS_HEADERS },
       );
     }
 
@@ -64,13 +76,13 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ url: session.url }), {
-      headers: { "Content-Type": "application/json" },
+      headers: CORS_HEADERS,
     });
   } catch (err) {
     console.error("create-checkout error:", err);
     return new Response(JSON.stringify({ error: "Failed to create checkout session. Please try again." }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: CORS_HEADERS,
     });
   }
 });
