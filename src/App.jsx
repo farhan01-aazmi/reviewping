@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./config/supabase";
-import { FONTS } from "./data/constants";
 import { G } from "./data/theme";
 import Landing from "./components/layout/Landing";
 import Signup from "./components/layout/Signup";
@@ -107,7 +106,6 @@ export default function App() {
 
   return (
     <>
-      <link rel="stylesheet" href={FONTS} />
       <style>{`
         @keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}

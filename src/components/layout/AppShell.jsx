@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 
 // Data imports
 import { G } from "../../data/theme";
@@ -21,29 +21,31 @@ import { useToast } from "../../hooks/useToast";
 // UI
 import { ToastContainer, Wordmark, Pill, Btn, Card } from "../ui";
 
-// Pages — created separately under ../pages/
-import Dashboard from "../pages/Dashboard";
-import SendReq from "../pages/SendReq";
-import ReviewsPage from "../pages/ReviewsPage";
-import Analytics from "../pages/Analytics";
-import Templates from "../pages/Templates";
-import Automations from "../pages/Automations";
-import Contacts from "../pages/Contacts";
-import QRCode from "../pages/QRCode";
-import WidgetEmbed from "../pages/WidgetEmbed";
-import Integrations from "../pages/Integrations";
-import Notifications from "../pages/Notifications";
-import Billing from "../pages/Billing";
-import Settings from "../pages/Settings";
-import Team from "../pages/Team";
-import Help from "../pages/Help";
-import More from "../pages/More";
-import SentLog from "../pages/SentLog";
-import Referral from "../pages/Referral";
-import Changelog from "../pages/Changelog";
-import BulkSend from "../pages/BulkSend";
+// Pages — lazily loaded for code splitting
+const Dashboard = lazy(() => import("../pages/Dashboard"));
+const SendReq = lazy(() => import("../pages/SendReq"));
+const ReviewsPage = lazy(() => import("../pages/ReviewsPage"));
+const Analytics = lazy(() => import("../pages/Analytics"));
+const Templates = lazy(() => import("../pages/Templates"));
+const Automations = lazy(() => import("../pages/Automations"));
+const Contacts = lazy(() => import("../pages/Contacts"));
+const QRCode = lazy(() => import("../pages/QRCode"));
+const WidgetEmbed = lazy(() => import("../pages/WidgetEmbed"));
+const Integrations = lazy(() => import("../pages/Integrations"));
+const Notifications = lazy(() => import("../pages/Notifications"));
+const Billing = lazy(() => import("../pages/Billing"));
+const Settings = lazy(() => import("../pages/Settings"));
+const Team = lazy(() => import("../pages/Team"));
+const Help = lazy(() => import("../pages/Help"));
+const More = lazy(() => import("../pages/More"));
+const SentLog = lazy(() => import("../pages/SentLog"));
+const Referral = lazy(() => import("../pages/Referral"));
+const Changelog = lazy(() => import("../pages/Changelog"));
+const BulkSend = lazy(() => import("../pages/BulkSend"));
 import AppPrivacyPolicy from "./PrivacyPolicy";
 import AppTerms from "./Terms";
+
+import { Spinner } from "../ui";
 
 export default function AppShell({ user: initUser, onLogout }) {
   const [screen, setScreen] = useState("dashboard");
@@ -358,97 +360,112 @@ export default function AppShell({ user: initUser, onLogout }) {
           boxSizing: "border-box",
         }}
       >
-        {screen === "dashboard" && (
-          <Dashboard
-            reviews={reviews}
-            biz={biz}
-            onSend={() => navigate("send")}
-            onNav={navigate}
-          />
-        )}
-        {screen === "send" && (
-          <SendReq
-            onBack={goBack}
-            onSent={handleSent}
-            templates={templates}
-            biz={biz}
-            toast={toast}
-          />
-        )}
-        {screen === "reviews" && (
-          <ReviewsPage
-            reviews={reviews}
-            setReviews={setReviews}
-            onSend={() => navigate("send")}
-            toast={toast}
-          />
-        )}
-        {screen === "analytics" && <Analytics reviews={reviews} />}
-        {screen === "templates" && (
-          <Templates
-            templates={templates}
-            setTemplates={setTemplates}
-            toast={toast}
-          />
-        )}
-        {screen === "automations" && <Automations toast={toast} />}
-        {screen === "contacts" && (
-          <Contacts
-            contacts={contacts}
-            setContacts={setContacts}
-            onSend={(c) => {
-              navigate("send");
-            }}
-            toast={toast}
-          />
-        )}
-        {screen === "qrcode" && <QRCode biz={biz} toast={toast} />}
-        {screen === "widget" && <WidgetEmbed biz={biz} />}
-        {screen === "integrations" && <Integrations plan={plan} toast={toast} />}
-        {screen === "notifications" && (
-          <Notifications notifs={notifs} setNotifs={setNotifs} onBack={goBack} />
-        )}
-        {screen === "billing" && (
-          <Billing plan={plan} setPlan={setPlanAndSync} toast={toast} />
-        )}
-        {screen === "settings" && (
-          <Settings
-            biz={biz}
-            setBiz={setBizAndSync}
-            user={user}
-            setUser={setUserAndSync}
-            toast={toast}
-          />
-        )}
-        {screen === "team" && (
-          <Team
-            plan={plan}
-            team={team}
-            setTeam={setTeam}
-            toast={toast}
-          />
-        )}
-        {screen === "help" && <Help />}
-        {screen === "privacy" && (
-          <AppPrivacyPolicy onBack={goBack} />
-        )}
-        {screen === "terms" && (
-          <AppTerms onBack={goBack} />
-        )}
-        {screen === "more" && (
-          <More onNav={navigate} onLogout={onLogout} unreadCount={unread} />
-        )}
-        {screen === "sentlog" && <SentLog reviews={reviews} />}
-        {screen === "referral" && <Referral user={user} toast={toast} />}
-        {screen === "changelog" && <Changelog />}
-        {screen === "bulk" && (
-          <BulkSend
-            biz={biz}
-            templates={templates}
-            toast={toast}
-            onSent={handleSent}
-          />
-        )}
+        <Suspense
+          fallback={
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: 200,
+              }}
+            >
+              <Spinner size={36} />
+            </div>
+          }
+        >
+          {screen === "dashboard" && (
+            <Dashboard
+              reviews={reviews}
+              biz={biz}
+              onSend={() => navigate("send")}
+              onNav={navigate}
+            />
+          )}
+          {screen === "send" && (
+            <SendReq
+              onBack={goBack}
+              onSent={handleSent}
+              templates={templates}
+              biz={biz}
+              toast={toast}
+            />
+          )}
+          {screen === "reviews" && (
+            <ReviewsPage
+              reviews={reviews}
+              setReviews={setReviews}
+              onSend={() => navigate("send")}
+              toast={toast}
+            />
+          )}
+          {screen === "analytics" && <Analytics reviews={reviews} />}
+          {screen === "templates" && (
+            <Templates
+              templates={templates}
+              setTemplates={setTemplates}
+              toast={toast}
+            />
+          )}
+          {screen === "automations" && <Automations toast={toast} />}
+          {screen === "contacts" && (
+            <Contacts
+              contacts={contacts}
+              setContacts={setContacts}
+              onSend={(c) => {
+                navigate("send");
+              }}
+              toast={toast}
+            />
+          )}
+          {screen === "qrcode" && <QRCode biz={biz} toast={toast} />}
+          {screen === "widget" && <WidgetEmbed biz={biz} />}
+          {screen === "integrations" && <Integrations plan={plan} toast={toast} />}
+          {screen === "notifications" && (
+            <Notifications notifs={notifs} setNotifs={setNotifs} onBack={goBack} />
+          )}
+          {screen === "billing" && (
+            <Billing plan={plan} setPlan={setPlanAndSync} toast={toast} />
+          )}
+          {screen === "settings" && (
+            <Settings
+              biz={biz}
+              setBiz={setBizAndSync}
+              user={user}
+              setUser={setUserAndSync}
+              toast={toast}
+            />
+          )}
+          {screen === "team" && (
+            <Team
+              plan={plan}
+              team={team}
+              setTeam={setTeam}
+              toast={toast}
+            />
+          )}
+          {screen === "help" && <Help />}
+          {screen === "privacy" && (
+            <AppPrivacyPolicy onBack={goBack} />
+          )}
+          {screen === "terms" && (
+            <AppTerms onBack={goBack} />
+          )}
+          {screen === "more" && (
+            <More onNav={navigate} onLogout={onLogout} unreadCount={unread} />
+          )}
+          {screen === "sentlog" && <SentLog reviews={reviews} />}
+          {screen === "referral" && <Referral user={user} toast={toast} />}
+          {screen === "changelog" && <Changelog />}
+          {screen === "bulk" && (
+            <BulkSend
+              biz={biz}
+              templates={templates}
+              toast={toast}
+              onSent={handleSent}
+            />
+          )}
+        </Suspense>
       </div>
 
       {/* BOTTOM NAV */}

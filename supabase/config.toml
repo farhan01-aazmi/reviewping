@@ -22,7 +22,7 @@ verify_jwt = true
 [EDGE_FUNCTIONS.send-email]
 verify_jwt = true
 
-[EDGE_FUNCTIONS.stripe-webhook]
+[EDGE_FUNCTIONS.create-checkout]
 verify_jwt = true
 
 [EDGE_FUNCTIONS.stripe-listener]

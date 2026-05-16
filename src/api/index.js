@@ -44,7 +44,7 @@ export function sendEmail({ to, subject, message }) {
 }
 
 export function createSubscription({ price_id, return_url }) {
-  return api("/stripe-webhook", {
+  return api("/create-checkout", {
     method: "POST",
     body: JSON.stringify({ price_id, return_url }),
   });
