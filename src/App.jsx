@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./config/supabase";
 import { G } from "./data/theme";
+import { Spinner } from "./components/ui";
 import Landing from "./components/layout/Landing";
 import Signup from "./components/layout/Signup";
 import Login from "./components/layout/Login";
@@ -64,6 +65,10 @@ export default function App() {
                 biz: data.business_name,
                 id: data.id,
               });
+              // Transition to app if still on a pre-auth page
+              setView((prev) =>
+                ["landing", "login", "signup"].includes(prev) ? "app" : prev
+              );
             }
           });
       }
@@ -75,6 +80,11 @@ export default function App() {
   const handleAuth = (u) => {
     setUser(u);
     setView("onboarding");
+  };
+
+  const handleLoginComplete = (u) => {
+    setUser(u);
+    setView("app");
   };
 
   const handleOnboard = (bizData) => {
@@ -102,7 +112,21 @@ export default function App() {
     setView("landing");
   };
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div
+        style={{
+          background: G.bg,
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Spinner size={40} />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -132,6 +156,7 @@ export default function App() {
       {view === "login" && (
         <Login
           onDone={handleAuth}
+          onLoginComplete={handleLoginComplete}
           onSignup={() => setView("signup")}
           onBack={() => setView("landing")}
           onForgot={() => setView("forgot")}

@@ -3,7 +3,7 @@ import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Card, Field, Btn, LogoMark } from "../ui";
 
-export default function Login({ onDone, onSignup, onBack, onForgot }) {
+export default function Login({ onDone, onLoginComplete, onSignup, onBack, onForgot }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -41,6 +41,19 @@ export default function Login({ onDone, onSignup, onBack, onForgot }) {
       .single();
 
     setLoading(false);
+
+    // Returning user with complete profile → skip onboarding
+    if (profile?.name && profile?.business_name && onLoginComplete) {
+      onLoginComplete({
+        name: profile.name,
+        email,
+        biz: profile.business_name,
+        id: data.user.id,
+      });
+      return;
+    }
+
+    // New or incomplete profile → go through onboarding
     onDone({
       name: profile?.name || email,
       email,

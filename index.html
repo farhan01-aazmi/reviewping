@@ -3,9 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="canonical" href="https://reviewping-seven.vercel.app" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ReviewPing — Automate Your Google Reviews</title>
     <meta name="description" content="Send AI-personalised review requests via SMS or email. No chasing. No copy-pasting. Built for small businesses." />
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="ReviewPing — Automate Your Google Reviews" />
+    <meta property="og:description" content="Send AI-personalised review requests via SMS or email. No chasing. No copy-pasting. Built for small businesses." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://reviewping-seven.vercel.app" />
+    <meta property="og:image" content="https://reviewping-seven.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ReviewPing — Automate Your Google Reviews" />
+    <meta name="twitter:description" content="Send AI-personalised review requests via SMS or email. No chasing. No copy-pasting. Built for small businesses." />
 
     <!-- ⚡ Google Fonts: preconnect to reduce latency -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -18,6 +32,14 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;text-align:center;padding:2rem;">
+        <div>
+          <h1 style="font-size:1.5rem;margin-bottom:0.5rem;">ReviewPing</h1>
+          <p style="color:#666;">ReviewPing requires JavaScript to run. Please enable it in your browser.</p>
+        </div>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
