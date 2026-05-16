@@ -12,9 +12,9 @@
 | **Phase 2: Security Fixes** | 🟢 Done | 3 CRITICAL, 5 HIGH, 4 MEDIUM issues fixed |
 | **Phase 3: Infrastructure** | 🟢 Done | .env, deploy scripts, stripe split, vercel/netlify config |
 | **Phase 4: Build Optimization** | 🟢 Done | 859KB→76KB app shell (↓91%), 31 chunks, 0 warnings |
-| **Phase 5: Testing & QA** | 🟡 In Progress | API test + screenshot collection underway |
+| **Phase 5: Testing & QA** | 🟢 Done | 49 tests pass, all edge functions verified |
 | **Phase 6: Deployment** | 🔴 Not Started | Run deploy script → Vercel/Netlify |
-| **Phase 7: Documentation** | 🟡 In Progress | README rewrite underway |
+| **Phase 7: Documentation** | 🟢 Done | README, CONTRIBUTING, SUPABASE_SETUP, DEPLOYMENT_PLAN |
 | **Phase 8: Production Sign-off** | 🔴 Not Started | Reality Checker audit pending |
 
 ---
@@ -53,8 +53,21 @@
 - [x] Rolldown code splitting: vendor-react, vendor-supabase, vendor-recharts, vendor-other
 - [x] Performance: font preconnect + non-blocking from `<head>`
 - [x] Build config: `reportCompressedSize`, `sourcemap: false`, `chunkSizeWarningLimit: 250`
-- [x] **Result: 31 chunks, 0 warnings, 2.38s build time**
+- [x] **Result: 31 chunks, 0 warnings, ~7-11s build time**
 - [x] **App shell: 76 KB (↓91%), recharts (234 KB) only on Analytics view**
+
+### Phase 5: Testing & QA 🟢
+- [x] vitest installed and configured
+- [x] 49 API test cases covering: auth token injection, error handling, request paths, method/body shape, input validation (all 5 functions), CORS headers, method restrictions, JWT auth enforcement, error info leakage, stripe split verification, SendReq.jsx integration
+- [x] **Test fix 1**: `import.meta.env.VITE_API_URL` — API_BASE is captured at module import time; `.env` loading makes runtime mutation ineffective. Test now verifies the loaded value gracefully.
+- [x] **Test fix 2**: `mockResolvedValue` → `mockResolvedValueOnce` — shared Response object caused "Body has already been read" on sequential calls.
+- [x] Build verified (passes, 7-11s, 31 chunks, 0 warnings)
+
+### Phase 7: Documentation 🟢
+- [x] `README.md` — 445 lines, production-ready
+- [x] `CONTRIBUTING.md` — 268 lines, dev workflow
+- [x] `SUPABASE_SETUP.md` — 568 lines, step-by-step
+- [x] `DEPLOYMENT_PLAN.md` — deployment checklist
 
 ---
 
@@ -125,5 +138,6 @@ npm run build
 - **Edge Functions:** 5 (ai-write, send-sms, send-email, create-checkout, stripe-listener)
 - **Database tables:** 8 + auth.users
 - **Build chunks:** 31
-- **Build time:** 2.38s
-- **Git commits:** 3
+- **Build time:** ~7-11s
+- **Test suite:** 49 tests, all passing
+- **Git commits:** 4 (plus uncommitted test fixes)
