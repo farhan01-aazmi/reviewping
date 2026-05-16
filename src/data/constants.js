@@ -39,6 +39,7 @@ export const PLANS = [
     id: "starter",
     name: "Starter",
     price: 19,
+    price_id: "price_starter_monthly", // 👈 Replace with your Stripe Price ID
     sub: "Solo owners",
     f: ["50 requests/month", "SMS & email", "Dashboard", "Google link"],
   },
@@ -46,6 +47,7 @@ export const PLANS = [
     id: "growth",
     name: "Growth",
     price: 39,
+    price_id: "price_growth_monthly", // 👈 Replace with your Stripe Price ID
     sub: "Most popular",
     f: [
       "Unlimited requests",
@@ -58,6 +60,7 @@ export const PLANS = [
     id: "agency",
     name: "Agency",
     price: 79,
+    price_id: "price_agency_monthly", // 👈 Replace with your Stripe Price ID
     sub: "Multi-location",
     f: [
       "Everything in Growth",

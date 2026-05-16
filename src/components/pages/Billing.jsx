@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { G } from "../../data/theme";
 import { PLANS } from "../../data/constants";
+import { createSubscription } from "../../api";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Pill from "../ui/Pill";
@@ -9,25 +10,25 @@ import ConfirmModal from "../ui/ConfirmModal";
 export default function Billing({ plan, setPlan, toast }) {
   const cur = PLANS.find((p) => p.id === plan) || PLANS[1];
   const [confirm, setConfirm] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const doSwitch = (p) => {
-    setPlan(p.id);
+  const doSwitch = async (p) => {
+    setLoading(true);
+    try {
+      const result = await createSubscription({ price_id: p.price_id, return_url: window.location.href });
+      // Redirect to Stripe Checkout
+      if (result?.url) {
+        window.location.href = result.url;
+      }
+    } catch (err) {
+      toast(err.message || "Failed to start checkout", "error");
+    }
+    setLoading(false);
     setConfirm(null);
-    toast(`Switched to ${p.name} plan`);
   };
 
   return (
     <div>
-      {confirm && (
-        <ConfirmModal
-          title={`Switch to ${confirm.name}?`}
-          body={`Your billing will change to $${confirm.price}/month starting next billing cycle.`}
-          confirmLabel={`Switch to ${confirm.name}`}
-          onConfirm={() => doSwitch(confirm)}
-          onCancel={() => setConfirm(null)}
-          danger={confirm.price < cur.price}
-        />
-      )}
       <h2
         style={{
           fontFamily: "'Instrument Serif',serif",
@@ -185,13 +186,15 @@ export default function Billing({ plan, setPlan, toast }) {
                 {p.f.slice(0, 2).join(" · ")}
               </div>
             </div>
-            {p.id === plan ? (
+                {p.id === plan ? (
               <Pill color={G.success}>Current</Pill>
             ) : (
               <Btn
                 size="sm"
                 variant="secondary"
                 onClick={() => setConfirm(p)}
+                loading={loading}
+                disabled={loading}
               >
                 {p.price > cur.price ? "Upgrade →" : "Downgrade"}
               </Btn>

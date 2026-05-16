@@ -179,7 +179,8 @@ serve(async (req) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error("stripe-listener error:", err);
+    return new Response(JSON.stringify({ error: "Webhook processing failed" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
@@ -191,12 +192,17 @@ serve(async (req) => {
  * Update these with your actual Stripe price IDs.
  */
 function getPlanNameFromPriceId(priceId: string | undefined): string {
+  // ⚠️ IMPORTANT: Update these with your actual Stripe Price IDs before deploying.
+  // Get them from: Stripe Dashboard → Products → [Product] → API ID
   const PLAN_MAP: Record<string, string> = {
-    // "price_growth_monthly": "growth",
-    // "price_pro_monthly":    "pro",
-    // "price_enterprise_yearly": "enterprise",
+    // "price_starter_monthly_xxxx": "starter",
+    // "price_growth_monthly_xxxx":  "growth",
+    // "price_agency_monthly_xxxx":  "agency",
   };
-  return priceId && PLAN_MAP[priceId] ? PLAN_MAP[priceId] : "growth";
+  const plan = priceId && PLAN_MAP[priceId];
+  if (plan) return plan;
+  console.warn(`Unknown price ID: ${priceId}, defaulting to "growth"`);
+  return "growth";
 }
 
 /**

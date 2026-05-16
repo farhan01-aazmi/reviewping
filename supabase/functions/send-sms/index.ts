@@ -51,7 +51,8 @@ serve(async (req) => {
       { headers: { "Content-Type": "application/json" } },
     );
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error("send-sms error:", err);
+    return new Response(JSON.stringify({ error: "Failed to send SMS. Please try again." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

@@ -51,7 +51,8 @@ serve(async (req) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error("ai-write error:", err);
+    return new Response(JSON.stringify({ error: "Failed to generate message. Please try again." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

@@ -122,13 +122,14 @@ export default function AppShell({ user: initUser, onLogout }) {
     [userId]
   );
 
-  // Sync plan changes to Supabase
+  // Sync plan changes to Supabase — ONLY called after Stripe webhook confirms payment
   const setPlanAndSync = useCallback(
     (updater) => {
       setPlan((prev) => {
         const next = typeof updater === "function" ? updater(prev) : updater;
-        if (userId)
-          supabase.from("profiles").update({ plan: next }).eq("id", userId);
+        // Plan changes now go through Stripe Checkout — the webhook listener
+        // updates the DB server-side. This function only updates local state
+        // for UI responsiveness after the webhook fires.
         return next;
       });
     },

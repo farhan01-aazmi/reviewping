@@ -1,42 +1,51 @@
+import { supabase } from "../config/supabase";
+
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
 async function api(path, options = {}) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+
   const url = `${API_BASE}${path}`;
   const res = await fetch(url, {
-    headers: { "Content-Type": "application/json", ...options.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
     ...options,
   });
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err || `API error: ${res.status}`);
+    const errBody = await res.text().catch(() => "");
+    throw new Error(errBody || `API error: ${res.status}`);
   }
   return res.json();
 }
 
 export function aiWriteMessage({ name, service, business }) {
-  return api("/api/ai-write", {
+  return api("/ai-write", {
     method: "POST",
     body: JSON.stringify({ name, service, business }),
   });
 }
 
 export function sendSMS({ to, message }) {
-  return api("/api/send-sms", {
+  return api("/send-sms", {
     method: "POST",
     body: JSON.stringify({ to, message }),
   });
 }
 
 export function sendEmail({ to, subject, message }) {
-  return api("/api/send-email", {
+  return api("/send-email", {
     method: "POST",
     body: JSON.stringify({ to, subject, message }),
   });
 }
 
-export function createSubscription(priceId) {
-  return api("/api/create-subscription", {
+export function createSubscription({ price_id, return_url }) {
+  return api("/stripe-webhook", {
     method: "POST",
-    body: JSON.stringify({ price_id: priceId }),
+    body: JSON.stringify({ price_id, return_url }),
   });
 }

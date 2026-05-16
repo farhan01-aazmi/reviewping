@@ -54,7 +54,8 @@ serve(async (req) => {
       { headers: { "Content-Type": "application/json" } },
     );
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    console.error("send-email error:", err);
+    return new Response(JSON.stringify({ error: "Failed to send email. Please try again." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

@@ -12,3 +12,18 @@ port = 54321
 enabled = true
 verify_jwt = false
 import_map = "./import_map.json"
+
+[EDGE_FUNCTIONS.ai-write]
+verify_jwt = true
+
+[EDGE_FUNCTIONS.send-sms]
+verify_jwt = true
+
+[EDGE_FUNCTIONS.send-email]
+verify_jwt = true
+
+[EDGE_FUNCTIONS.stripe-webhook]
+verify_jwt = true
+
+[EDGE_FUNCTIONS.stripe-listener]
+verify_jwt = false
