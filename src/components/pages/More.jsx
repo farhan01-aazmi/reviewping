@@ -1,0 +1,93 @@
+import { G } from "../../data/theme";
+import Btn from "../ui/Btn";
+import Card from "../ui/Card";
+
+export default function More({ onNav, onLogout, unreadCount }) {
+  const items = [
+    { e: "🔔", l: "Notifications", s: "notifications", badge: unreadCount > 0 ? unreadCount : null },
+    { e: "🤖", l: "Automations", s: "automations" },
+    { e: "📒", l: "Contact Book", s: "contacts" },
+    { e: "📱", l: "QR Code Generator", s: "qrcode" },
+    { e: "🖼️", l: "Review Widget", s: "widget" },
+    { e: "🔌", l: "Integrations", s: "integrations" },
+    { e: "👥", l: "Team Members", s: "team" },
+    { e: "💳", l: "Billing & Plan", s: "billing" },
+    { e: "⚙️", l: "Settings", s: "settings" },
+    { e: "❓", l: "Help & Support", s: "help" },
+  ];
+
+  return (
+    <div>
+      <h2
+        style={{
+          fontFamily: "'Instrument Serif',serif",
+          fontSize: 26,
+          fontWeight: 400,
+          margin: "0 0 20px",
+          letterSpacing: "-0.5px",
+        }}
+      >
+        More
+      </h2>
+      {items.map((i) => (
+        <Card
+          key={i.s}
+          sx={{ marginBottom: 8, cursor: "pointer", padding: "13px 16px" }}
+          hoverable
+          onClick={() => onNav(i.s)}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontSize: 19 }}>{i.e}</span>
+            <span
+              style={{
+                fontWeight: 600,
+                fontSize: 14,
+                color: G.inkSoft,
+                flex: 1,
+              }}
+            >
+              {i.l}
+            </span>
+            {i.badge && (
+              <div
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: "50%",
+                  background: G.accent,
+                  color: "white",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {i.badge}
+              </div>
+            )}
+            <span style={{ color: G.mutedLo, fontSize: 16 }}>›</span>
+          </div>
+        </Card>
+      ))}
+      <div
+        style={{
+          marginTop: 14,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+        }}
+      >
+        <Btn variant="secondary" full onClick={() => onNav("privacy")}>
+          Privacy Policy
+        </Btn>
+        <Btn variant="secondary" full onClick={() => onNav("terms")}>
+          Terms of Service
+        </Btn>
+        <Btn variant="danger" full onClick={onLogout}>
+          Sign out
+        </Btn>
+      </div>
+    </div>
+  );
+}
