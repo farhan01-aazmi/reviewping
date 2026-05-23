@@ -142,13 +142,13 @@ export default function Automations({ toast }) {
           <Field
             label="Rule name"
             value={nName}
-            onChange={setNName}
+            onChange={(e) => setNName(e.target.value)}
             placeholder="e.g. Post-appointment SMS"
           />
           <Sel
             label="Send after"
             value={nDelay}
-            onChange={setNDelay}
+            onChange={(e) => setNDelay(e.target.value)}
             options={[
               "30 minutes",
               "1 hour",
@@ -161,7 +161,7 @@ export default function Automations({ toast }) {
           <Sel
             label="Channel"
             value={nCh}
-            onChange={setNCh}
+            onChange={(e) => setNCh(e.target.value)}
             options={["SMS", "Email", "Both"]}
           />
           <div style={{ display: "flex", gap: 8 }}>

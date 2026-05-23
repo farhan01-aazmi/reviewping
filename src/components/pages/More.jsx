@@ -1,8 +1,10 @@
 import { G } from "../../data/theme";
+import { useTheme } from "../../data/ThemeProvider";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 
 export default function More({ onNav, onLogout, unreadCount }) {
+  const { isDark, toggleDark } = useTheme();
   const items = [
     { e: "🔔", l: "Notifications", s: "notifications", badge: unreadCount > 0 ? unreadCount : null },
     { e: "🤖", l: "Automations", s: "automations" },
@@ -14,6 +16,7 @@ export default function More({ onNav, onLogout, unreadCount }) {
     { e: "💳", l: "Billing & Plan", s: "billing" },
     { e: "⚙️", l: "Settings", s: "settings" },
     { e: "❓", l: "Help & Support", s: "help" },
+    { e: isDark ? "☀️" : "🌙", l: isDark ? "Light Mode" : "Dark Mode", s: "_dark", toggle: toggleDark },
   ];
 
   return (
@@ -34,7 +37,7 @@ export default function More({ onNav, onLogout, unreadCount }) {
           key={i.s}
           sx={{ marginBottom: 8, cursor: "pointer", padding: "13px 16px" }}
           hoverable
-          onClick={() => onNav(i.s)}
+          onClick={() => (i.toggle ? i.toggle() : onNav(i.s))}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ fontSize: 19 }}>{i.e}</span>
@@ -78,13 +81,13 @@ export default function More({ onNav, onLogout, unreadCount }) {
           gap: 8,
         }}
       >
-        <Btn variant="secondary" full onClick={() => onNav("privacy")}>
+        <Btn variant="secondary" fullWidth onClick={() => onNav("privacy")}>
           Privacy Policy
         </Btn>
-        <Btn variant="secondary" full onClick={() => onNav("terms")}>
+        <Btn variant="secondary" fullWidth onClick={() => onNav("terms")}>
           Terms of Service
         </Btn>
-        <Btn variant="danger" full onClick={onLogout}>
+        <Btn variant="danger" fullWidth onClick={onLogout}>
           Sign out
         </Btn>
       </div>

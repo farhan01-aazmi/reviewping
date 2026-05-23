@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewPing — Agent Pipeline Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0a0a0f;color:#e2e2e8;font-family:'Inter',sans-serif;padding:24px;min-height:100vh}
+  .container{max-width:960px;margin:0 auto}
+
+  /* Header */
+  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+  .title{font-size:20px;font-weight:700;letter-spacing:-0.3px}
+  .title span{color:#6366f1}
+  .status-badge{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:100px;font-size:13px;font-weight:600}
+  .status-badge.live{background:#1a1a2e;border:1px solid #6366f1;color:#818cf8}
+  .status-badge.live .dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+  /* Stats row */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  .stat-card{background:#12121a;border:1px solid #1e1e2e;border-radius:12px;padding:16px}
+  .stat-card .num{font-size:28px;font-weight:800;color:#f1f1f7;font-family:'JetBrains Mono',monospace}
+  .stat-card .label{font-size:12px;color:#6b6b80;margin-top:4px;font-weight:500}
+  .stat-card .num.green{color:#22c55e}
+  .stat-card .num.red{color:#ef4444}
+  .stat-card .num.yellow{color:#eab308}
+  .stat-card .num.blue{color:#6366f1}
+
+  /* Agent cards */
+  .section-title{font-size:13px;font-weight:700;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+  .agent-grid{display:grid;gap:12px;margin-bottom:32px}
+  .agent-card{background:#12121a;border:1px solid #1e1e2e;border-radius:14px;padding:18px 20px;transition:all 0.2s}
+  .agent-card.pending{opacity:0.5}
+  .agent-card.running{border-color:#6366f1;box-shadow:0 0 20px rgba(99,102,241,0.08)}
+  .agent-card.done{border-color:#22c55e40;background:#121a12}
+  .agent-card.failed{border-color:#ef444440;background:#1a1212}
+  .agent-card.issues{border-color:#eab30840;background:#1a1a12}
+  .agent-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .agent-name{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
+  .agent-name .icon{font-size:18px}
+  .agent-status{font-size:12px;font-weight:600;padding:4px 12px;border-radius:100px}
+  .agent-status.pending{background:#1e1e2e;color:#6b6b80}
+  .agent-status.running{background:#1e1e3e;color:#818cf8;animation:pulse 1.5s infinite}
+  .agent-status.done{background:#122a12;color:#4ade80}
+  .agent-status.failed{background:#2a1212;color:#f87171}
+  .agent-status.issues{background:#2a2a12;color:#facc15}
+  .agent-desc{font-size:13px;color:#6b6b80;margin-bottom:6px;line-height:1.5}
+  .agent-detail{font-size:12.5px;color:#a1a1b5;font-family:'JetBrains Mono',monospace;background:#0a0a0f;border-radius:8px;padding:12px;margin-top:8px;line-height:1.6;display:none;white-space:pre-wrap}
+  .agent-detail.visible{display:block}
+  .toggle{color:#6366f1;font-size:12px;cursor:pointer;font-weight:600;margin-top:4px;display:inline-block}
+  .toggle:hover{text-decoration:underline}
+
+  /* Progress bar */
+  .progress-wrap{background:#1e1e2e;border-radius:100px;height:6px;margin-bottom:24px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#6366f1,#22c55e);border-radius:100px;transition:width 0.5s ease;width:0%}
+
+  /* Timeline */
+  .timeline{margin-top:24px}
+  .timeline-item{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #1a1a2a}
+  .timeline-time{font-size:11px;color:#6b6b80;font-family:'JetBrains Mono',monospace;min-width:70px;padding-top:2px}
+  .timeline-icon{font-size:14px;flex-shrink:0;padding-top:1px}
+  .timeline-text{font-size:13px;color:#a1a1b5;line-height:1.5}
+
+  /* Footer */
+  .footer{text-align:center;margin-top:40px;font-size:12px;color:#4a4a60}
+
+  /* Responsive */
+  @media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="title">Agent Pipeline <span>Dashboard</span></div>
+    <div class="status-badge live">
+      <div class="dot"></div>
+      LIVE · refresh to update
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card"><div class="num blue" id="totalAgents">7</div><div class="label">Total Agents</div></div>
+    <div class="stat-card"><div class="num green" id="doneAgents">0</div><div class="label">Completed</div></div>
+    <div class="stat-card"><div class="num yellow" id="issuesCount">0</div><div class="label">Issues Found</div></div>
+    <div class="stat-card"><div class="num red" id="blockersCount">0</div><div class="label">Blockers</div></div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+
+  <!-- Phase 1: AUDIT -->
+  <div class="section-title">Phase 1 — Deep Audit</div>
+  <div class="agent-grid" id="phase1">
+
+    <div class="agent-card pending" id="agent-reality-checker">
+      <div class="agent-header">
+        <div class="agent-name"><span class="icon">🔍</span> Reality Checker</div>
+        <span class="agent-status pending">⏳ Pending</span>
+      </div>
+      <div class="agent-desc">Live site audit — bundle, console errors, CSP headers, SEO, Supabase connectivity, table existence, RLS policies, edge function responses</div>
+      <div class="agent-detail" id="detail-reality-checker"></div>
+      <span class="toggle" onclick="toggleDetail('reality-checker')">Show details</span>
+    </div>
+
+    <div class="agent-card pending" id="agent-api-tester">
+      <div class="agent-header">
+        <div class="agent-name"><span class="icon">🔌</span> API Tester</div>
+        <span class="agent-status pending">⏳ Pending</span>
+      </div>
+      <div class="agent-desc">Actual Supabase connection test — profiles table exists?, business_settings exists?, RLS working?, edge functions (ai-write, send-sms, send-email, create-checkout, stripe-listener) responding?</div>
+      <div class="agent-detail" id="detail-api-tester"></div>
+      <span class="toggle" onclick="toggleDetail('api-tester')">Show details</span>
+    </div>
+
+    <div class="agent-card pending" id="agent-evidence-collector">
+      <div class="agent-header">
+        <div class="agent-name"><span class="icon">📸</span> Evidence Collector</div>
+        <span class="agent-status pending">⏳ Pending</span>
+      </div>
+      <div class="agent-desc">Screenshot each issue — console errors, broken pages, missing elements, failed API calls</div>
+      <div class="agent-detail" id="detail-evidence-collector"></div>
+      <span class="toggle" onclick="toggleDetail('evidence-collector')">Show details</span>
+    </div>
+
+  </div>
+
+  <!-- Phase 2: FIX -->
+  <div class="section-title">Phase 2 — Fix All Issues</div>
+  <div class="agent-grid" id="phase2">
+
+    <div class="agent-card pending" id="agent-fixer">
+      <div class="agent-header">
+        <div class="agent-name"><span class="icon">🛠️</span> Bug Fixer</div>
+        <span class="agent-status pending">⏳ Pending</span>
+      </div>
+      <div class="agent-desc">Fix all issues found in Phase 1 — database, code, config, deployment</div>
+      <div class="agent-detail" id="detail-fixer"></div>
+      <span class="toggle" onclick="toggleDetail('fixer')">Show details</span>
+    </div>
+
+  </div>
+
+  <!-- Phase 3: VERIFY -->
+  <div class="section-title">Phase 3 — Final Verification</div>
+  <div class="agent-grid" id="phase3">
+
+    <div class="agent-card pending" id="agent-test-suite">
+      <div class="agent-header">
+        <div class="agent-name"><span class="icon">🧪</span> Test Suite</div>
+        <span class="agent-status pending">⏳ Pending</span>
+      </div>
+      <div class="agent-desc">Run all 49 tests + build — must pass 100%</div>
+      <div class="agent-detail" id="detail-test-suite"></div>
+      <span class="toggle" onclick="toggleDetail('test-suite')">Show details</span>
+    </div>
+
+    <div class="agent-card pending" id="agent-deployer">
+      <div class="agent-header">
+        <div class="agent-name"><span class="icon">🚀</span> Deployer</div>
+        <span class="agent-status pending">⏳ Pending</span>
+      </div>
+      <div class="agent-desc">Deploy to Vercel production — verify live site works end-to-end</div>
+      <div class="agent-detail" id="detail-deployer"></div>
+      <span class="toggle" onclick="toggleDetail('deployer')">Show details</span>
+    </div>
+
+    <div class="agent-card pending" id="agent-signoff">
+      <div class="agent-header">
+        <div class="agent-name"><span class="icon">✅</span> Final Reality Checker Sign-off</div>
+        <span class="agent-status pending">⏳ Pending</span>
+      </div>
+      <div class="agent-desc">Final audit — overwhelming proof required. A-grade or bust.</div>
+      <div class="agent-detail" id="detail-signoff"></div>
+      <span class="toggle" onclick="toggleDetail('signoff')">Show details</span>
+    </div>
+
+  </div>
+
+  <!-- Timeline -->
+  <div class="section-title">Activity Log</div>
+  <div class="timeline" id="timeline">
+    <div class="timeline-item">
+      <div class="timeline-time">--:--</div>
+      <div class="timeline-icon">🚀</div>
+      <div class="timeline-text">Dashboard created. Waiting for agents to start...</div>
+    </div>
+  </div>
+
+  <div class="footer">ReviewPing Agent Pipeline · Refresh page to see latest status</div>
+</div>
+
+<script>
+  function toggleDetail(id) {
+    const el = document.getElementById('detail-' + id);
+    el.classList.toggle('visible');
+    const toggle = el.parentElement.querySelector('.toggle');
+    toggle.textContent = el.classList.contains('visible') ? 'Hide details' : 'Show details';
+  }
+
+  // Auto-refresh every 5 seconds
+  setTimeout(() => location.reload(), 5000);
+</script>
+</body>
+</html>

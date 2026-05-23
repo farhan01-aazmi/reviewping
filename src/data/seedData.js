@@ -277,36 +277,16 @@ export const SEED_REVIEWS = [
 ];
 
 export const SEED_TEMPLATES = [
-  {
-    id: 1,
-    name: "Standard",
-    text: "Hi {name}! Thanks for visiting us today. A quick Google review means the world — just 30 seconds: {link}",
-    service: "All",
-  },
-  {
-    id: 2,
-    name: "Dental / Medical",
-    text: "Hi {name}, hope your appointment went smoothly! A quick Google review would really help us: {link}",
-    service: "Dental Appointment",
-  },
-  {
-    id: 3,
-    name: "Restaurant",
-    text: "Hi {name}! It was great having you with us. We'd love to hear what you thought: {link}",
-    service: "Restaurant Dining",
-  },
-  {
-    id: 4,
-    name: "Trades / Home",
-    text: "Hi {name}, glad we could help today! If you're happy with the work, a Google review really helps: {link}",
-    service: "Plumbing Repair",
-  },
-  {
-    id: 5,
-    name: "Salon / Beauty",
-    text: "So lovely to see you today, {name}! Hope you're loving the results — a quick review would be amazing: {link}",
-    service: "Hair & Beauty",
-  },
+  { id: 1, name: "Standard", text: "Hi {name}! Thanks for visiting us today. A quick Google review means the world — just 30 seconds: {link}", service: "All" },
+  { id: 2, name: "Dental / Medical", text: "Hi {name}, hope your appointment went smoothly! A quick Google review would really help us: {link}", service: "Dental Appointment" },
+  { id: 3, name: "Restaurant", text: "Hi {name}! It was great having you with us. We'd love to hear what you thought: {link}", service: "Restaurant Dining" },
+  { id: 4, name: "Trades / Home", text: "Hi {name}, glad we could help today! If you're happy with the work, a Google review really helps: {link}", service: "Plumbing Repair" },
+  { id: 5, name: "Salon / Beauty", text: "So lovely to see you today, {name}! Hope you're loving the results — a quick review would be amazing: {link}", service: "Hair & Beauty" },
+  { id: 6, name: "Healthcare / Clinic", text: "Hi {name}! We hope your visit went well. Your feedback helps us provide better care. Leave a quick review: {link}", service: "Physiotherapy" },
+  { id: 7, name: "Automotive", text: "Hi {name}! Thanks for choosing us for your {service}. We'd love your feedback: {link}", service: "Car Service" },
+  { id: 8, name: "E-commerce", text: "Hi {name}! Thanks for shopping with us. We'd love to hear about your experience: {link}", service: "Retail Purchase" },
+  { id: 9, name: "Fitness / Gym", text: "Great session today, {name}! A quick review helps others find us: {link}", service: "Gym / Fitness" },
+  { id: 10, name: "Hospitality", text: "Dear {name}, thank you for staying with us. We'd love your feedback: {link}", service: "Hotel Stay" },
 ];
 
 export const SEED_TEAM = [

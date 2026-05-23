@@ -41,6 +41,7 @@ const Btn = forwardRef(function Btn(
     style,
     fullWidth,
     type = "button",
+    ariaLabel,
     ...rest
   },
   ref
@@ -71,6 +72,7 @@ const Btn = forwardRef(function Btn(
       role="button"
       aria-disabled={disabled || loading}
       aria-busy={loading}
+      aria-label={ariaLabel}
       {...rest}
     >
       {loading ? (

@@ -9,14 +9,15 @@ import ConfirmModal from "../ui/ConfirmModal";
 
 export default function Billing({ plan, setPlan, toast }) {
   const cur = PLANS.find((p) => p.id === plan) || PLANS[1];
+  const [annual, setAnnual] = useState(false);
   const [confirm, setConfirm] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const doSwitch = async (p) => {
     setLoading(true);
     try {
-      const result = await createSubscription({ price_id: p.price_id, return_url: window.location.href });
-      // Redirect to Stripe Checkout
+      const price_id = annual ? p.annual_price_id : p.price_id;
+      const result = await createSubscription({ price_id, return_url: window.location.href });
       if (result?.url) {
         window.location.href = result.url;
       }
@@ -91,7 +92,7 @@ export default function Billing({ plan, setPlan, toast }) {
                 color: G.ink,
               }}
             >
-              ${cur.price}
+              ${annual ? Math.round(cur.annual / 12) : cur.price}
             </div>
             <div style={{ fontSize: 12, color: G.muted }}>/month</div>
           </div>
@@ -145,6 +146,17 @@ export default function Billing({ plan, setPlan, toast }) {
           </div>
         ))}
       </Card>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+        <span style={{ fontSize: 13.5, color: annual ? G.muted : G.ink, fontWeight: annual ? 400 : 700, cursor: "pointer" }} onClick={() => setAnnual(false)}>
+          Monthly
+        </span>
+        <div onClick={() => setAnnual((a) => !a)} style={{ width: 44, height: 24, borderRadius: 12, background: annual ? G.accent : G.border, position: "relative", cursor: "pointer", transition: "background 0.2s" }}>
+          <div style={{ position: "absolute", top: 3, left: annual ? "unset" : "3px", right: annual ? "3px" : "unset", width: 18, height: 18, borderRadius: "50%", background: "white", transition: "all 0.2s" }} />
+        </div>
+        <span style={{ fontSize: 13.5, color: annual ? G.ink : G.muted, fontWeight: annual ? 700 : 400, cursor: "pointer" }} onClick={() => setAnnual(true)}>
+          Annual <span style={{ color: G.success, fontWeight: 700, fontSize: 11 }}>Save ~17%</span>
+        </span>
+      </div>
       <div
         style={{
           fontSize: 10.5,
@@ -180,7 +192,7 @@ export default function Billing({ plan, setPlan, toast }) {
                   marginBottom: 2,
                 }}
               >
-                {p.name} — ${p.price}/mo
+                {p.name} — ${annual ? Math.round(p.annual / 12) : p.price}/mo
               </div>
               <div style={{ fontSize: 12, color: G.muted }}>
                 {p.f.slice(0, 2).join(" · ")}

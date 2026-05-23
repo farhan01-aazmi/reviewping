@@ -89,7 +89,7 @@ export default function Settings({ biz, setBiz, user, setUser, toast }) {
               color: G.accent,
             }}
           >
-            {user.name[0]}
+            {user.name?.[0] || "?"}
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontWeight: 700, fontSize: 14 }}>{user.name}</div>
@@ -117,19 +117,19 @@ export default function Settings({ biz, setBiz, user, setUser, toast }) {
         <Field
           label="Business name"
           value={bn}
-          onChange={setBn}
+          onChange={(e) => setBn(e.target.value)}
           placeholder="Your Business"
         />
         <Sel
           label="Primary service"
           value={bt}
-          onChange={setBt}
+          onChange={(e) => setBt(e.target.value)}
           options={SERVICES}
         />
         <Field
           label="Google review link"
           value={gl}
-          onChange={setGl}
+          onChange={(e) => setGl(e.target.value)}
           placeholder="https://g.page/r/..."
           note="Google Maps → Your Business → Share → Copy review link"
         />
@@ -232,7 +232,7 @@ export default function Settings({ biz, setBiz, user, setUser, toast }) {
           </Btn>
         </div>
       </Card>
-      <Btn onClick={save} full size="lg">
+      <Btn onClick={save} fullWidth size="lg">
         Save changes
       </Btn>
     </div>

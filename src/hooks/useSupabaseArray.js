@@ -19,7 +19,7 @@ export function useSupabaseArray(table, userId, defaultVal) {
         if (err) {
           console.error(`Error loading ${table}:`, err);
           setError(err.message);
-        } else if (data?.length) {
+        } else if (data) {
           setVal(data);
         }
         setLoading(false);
@@ -36,39 +36,53 @@ export function useSupabaseArray(table, userId, defaultVal) {
         const prevItems = Array.isArray(prev) ? prev : [prev];
         const nextItems = Array.isArray(next) ? next : [next];
 
+        // Use a stable key for comparison (id if available, else _tempKey or index)
+        const keyOf = (item, idx) =>
+          item.id != null ? item.id : item._tempKey ?? `__new_${idx}`;
+
         // Find added items (in next but not in prev)
         const added = nextItems.filter(
-          (n) => !prevItems.find((p) => p.id === n.id)
+          (n, ni) => !prevItems.some((p, pi) => keyOf(p, pi) === keyOf(n, ni))
         );
         // Find removed items (in prev but not in next)
         const removed = prevItems.filter(
-          (p) => !nextItems.find((n) => n.id === p.id)
+          (p, pi) => !nextItems.some((n, ni) => keyOf(n, ni) === keyOf(p, pi))
         );
         // Find updated items (in both but changed)
-        const updated = nextItems.filter((n) => {
-          const prevItem = prevItems.find((p) => p.id === n.id);
+        const updated = nextItems.filter((n, ni) => {
+          const prevItem = prevItems.find((p, pi) => keyOf(p, pi) === keyOf(n, ni));
           return prevItem && JSON.stringify(prevItem) !== JSON.stringify(n);
         });
 
         // Batch operations
         const ops = [];
         if (removed.length > 0) {
-          ops.push(
-            supabase
-              .from(table)
-              .delete()
-              .in("id", removed.map((r) => r.id))
-          );
+          const removable = removed.filter((r) => r.id != null);
+          if (removable.length > 0) {
+            ops.push(
+              supabase
+                .from(table)
+                .delete()
+                .in("id", removable.map((r) => r.id))
+            );
+          }
         }
         if (added.length > 0) {
+          // Strip undefined id and _tempKey before insert so Supabase auto-generates the id
+          const insertPayload = added.map((r) => {
+            const { id, _tempKey, ...rest } = r;
+            return id != null ? { id, ...rest, user_id: userId } : { ...rest, user_id: userId };
+          });
           ops.push(
             supabase
               .from(table)
-              .insert(added.map((r) => ({ ...r, user_id: userId })))
+              .insert(insertPayload)
+              .select()
           );
         }
         // Update each changed item individually
         updated.forEach((item) => {
+          if (item.id == null) return; // skip items without an id
           ops.push(
             supabase
               .from(table)

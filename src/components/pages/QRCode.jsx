@@ -40,19 +40,19 @@ export default function QRCode({ biz, toast }) {
         <Field
           label="Google review link"
           value={url}
-          onChange={setUrl}
+          onChange={(e) => setUrl(e.target.value)}
           placeholder="https://g.page/r/..."
         />
         <Field
           label="Label text (printed below QR)"
           value={label}
-          onChange={setLabel}
+          onChange={(e) => setLabel(e.target.value)}
           placeholder="Scan to leave us a review!"
         />
         <Sel
           label="QR code size"
           value={size}
-          onChange={setSize}
+          onChange={(e) => setSize(e.target.value)}
           options={[
             { value: "150", label: "Small — 150×150px" },
             { value: "200", label: "Medium — 200×200px" },
@@ -60,7 +60,7 @@ export default function QRCode({ biz, toast }) {
             { value: "400", label: "Extra large — 400×400px" },
           ]}
         />
-        <Btn full onClick={() => setGenerated(true)}>
+        <Btn fullWidth onClick={() => setGenerated(true)}>
           Generate QR Code →
         </Btn>
       </Card>
@@ -107,9 +107,9 @@ export default function QRCode({ biz, toast }) {
               flexWrap: "wrap",
             }}
           >
-            <a href={qrSrc} download="reviewping-qr.png">
-              <Btn>↓ Download PNG</Btn>
-            </a>
+            <Btn onClick={() => { const a = document.createElement("a"); a.href = qrSrc; a.download = "reviewping-qr.png"; a.click(); }}>
+              ↓ Download PNG
+            </Btn>
             <Btn
               variant="secondary"
               onClick={() => {

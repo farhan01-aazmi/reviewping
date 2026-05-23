@@ -64,7 +64,8 @@ export default function SentLog({ reviews }) {
             padding: "10px 14px 10px 36px",
             fontSize: 13.5,
             color: G.ink,
-            outline: "none",
+            outline: "2px solid transparent",
+            outlineOffset: "2px",
             boxSizing: "border-box",
             fontFamily: "'Manrope',sans-serif",
           }}

@@ -52,3 +52,27 @@ export function createSubscription({ price_id, return_url }) {
     body: JSON.stringify({ price_id, return_url }),
   });
 }
+
+export async function getGbpAuthUrl() {
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  const url = `${API_BASE}/gpb-connect?step=init`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || "Failed to get auth URL");
+  return data;
+}
+
+export function disconnectGbp() {
+  return api("/gpb-connect?action=disconnect", { method: "POST" });
+}
+
+export function syncGbpReviews() {
+  return api("/gpb-sync", { method: "POST" });
+}

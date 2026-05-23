@@ -1,5 +1,6 @@
 import { G } from "../../data/theme";
 import { Wordmark, Btn, Pill } from "../ui";
+import SEO from "../SEO";
 
 const sections = [
   {
@@ -38,13 +39,15 @@ const sections = [
 
 export default function Terms({ onBack }) {
   return (
-    <div
-      style={{
-        background: G.bg,
-        minHeight: "100vh",
-        fontFamily: "'Manrope',sans-serif",
-        color: G.ink,
-      }}
+    <>
+      <SEO title="Terms of Service" description="ReviewPing Terms of Service — the legal agreement between you and ReviewPing." path="/terms" />
+      <div
+        style={{
+          background: G.bg,
+          minHeight: "100vh",
+          fontFamily: "'Manrope',sans-serif",
+          color: G.ink,
+        }}
     >
       <header
         style={{
@@ -108,5 +111,6 @@ export default function Terms({ onBack }) {
         ))}
       </div>
     </div>
+    </>
   );
 }

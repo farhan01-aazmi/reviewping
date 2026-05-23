@@ -1,16 +1,15 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
+import { toast as sonner } from "sonner";
 
 export function useToast() {
-  const [toasts, setToasts] = useState([]);
-
-  const toast = useCallback((message, type = "success") => {
-    const id = Date.now() + Math.random();
-    setToasts((p) => [...p, { id, message, type }]);
-    setTimeout(
-      () => setToasts((p) => p.filter((t) => t.id !== id)),
-      3500
-    );
+  const toast = useCallback((message, type) => {
+    if (type === "error") {
+      sonner.error(message);
+    } else if (type === "info") {
+      sonner.info(message);
+    } else {
+      sonner.success(message);
+    }
   }, []);
-
-  return { toasts, toast };
+  return { toast, toasts: [] };
 }

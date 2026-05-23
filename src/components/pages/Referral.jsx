@@ -176,7 +176,7 @@ export default function Referral({ user, toast }) {
                 flexShrink: 0,
               }}
             >
-              {r.name[0]}
+              {r.name?.[0] || "?"}
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 600, fontSize: 13.5 }}>

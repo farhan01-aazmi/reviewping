@@ -1,16 +1,10 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "authorization, content-type",
-  "Content-Type": "application/json",
-};
+import { CORS, verifyAuth } from "../_shared/auth.ts";
 
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: CORS_HEADERS });
+    return new Response(null, { status: 204, headers: CORS });
   }
 
   try {
@@ -18,18 +12,33 @@ serve(async (req) => {
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), {
         status: 405,
-        headers: CORS_HEADERS,
+        headers: CORS,
       });
     }
 
-    const { to, subject, message } = await req.json();
+    // Verify JWT authentication — all email sending requires an authenticated user
+    const auth = await verifyAuth(req);
+    if (auth instanceof Response) return auth;
+
+    // Parse and validate request body
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+        status: 400,
+        headers: CORS,
+      });
+    }
+
+    const { to, subject, message } = body || {};
 
     if (!to || !subject || !message) {
       return new Response(
         JSON.stringify({
           error: "Missing required fields: 'to', 'subject', and 'message'",
         }),
-        { status: 400, headers: CORS_HEADERS },
+        { status: 400, headers: CORS },
       );
     }
 
@@ -63,13 +72,13 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, id: result.id }),
-      { headers: CORS_HEADERS },
+      { headers: CORS },
     );
   } catch (err) {
     console.error("send-email error:", err);
     return new Response(JSON.stringify({ error: "Failed to send email. Please try again." }), {
       status: 500,
-      headers: CORS_HEADERS,
+      headers: CORS,
     });
   }
 });

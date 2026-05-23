@@ -23,3 +23,36 @@ a {
   text-decoration: none;
   color: inherit;
 }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+[data-theme="dark"] {
+  --bg: #121212;
+  --surface: #1E1E1E;
+  --ink: #E8E2D8;
+  --inkSoft: #C4BDB0;
+  --muted: #9E9488;
+  --mutedLo: #7A7064;
+  --border: #33302C;
+  --borderHi: #4A4540;
+}
+
+[data-theme="dark"] body {
+  background: #121212;
+}

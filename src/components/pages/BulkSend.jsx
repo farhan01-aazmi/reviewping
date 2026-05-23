@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { SERVICES } from "../../data/constants";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Field from "../ui/Field";
 import Sel from "../ui/Sel";
+
+const FUNCTION_URL = "https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1";
 
 export default function BulkSend({ biz, templates, toast, onSent }) {
   const [rows, setRows] = useState([]);
@@ -14,6 +17,7 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
   const [service, setService] = useState(SERVICES[0]);
   const [method, setMethod] = useState("SMS");
   const [rowErrors, setRowErrors] = useState({});
+  const [results, setResults] = useState([]);
 
   const parseCsv = (e) => {
     const f = e.target.files[0];
@@ -81,7 +85,7 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
     return valid;
   };
 
-  const send = () => {
+  const send = async () => {
     if (!rows.length) {
       toast("Add at least one recipient", "error");
       return;
@@ -90,20 +94,87 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
       toast("Fix invalid rows before sending", "error");
       return;
     }
+
     setSending(true);
-    setTimeout(() => {
+    setResults([]);
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      toast("You must be logged in to send messages", "error");
       setSending(false);
+      return;
+    }
+
+    const token = session.access_token;
+    const sentList = [];
+    const errors = [];
+
+    for (const r of rows) {
+      try {
+        const isEmail = r.contact.includes("@");
+        const shouldSendSms = method === "SMS" || method === "Both";
+        const shouldSendEmail = method === "Email" || method === "Both";
+
+        if (shouldSendSms && !isEmail) {
+          // Send SMS
+          const bizName = biz?.business_name || biz?.biz || "our business";
+          const smsRes = await fetch(`${FUNCTION_URL}/send-sms`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ to: r.contact, message: `Hi ${r.name}, thanks for choosing ${bizName}! We'd love your feedback: [LINK]` }),
+          });
+          if (!smsRes.ok) {
+            const err = await smsRes.json();
+            throw new Error(err.error || `SMS failed (${smsRes.status})`);
+          }
+        }
+
+        if (shouldSendEmail && isEmail) {
+          // Send Email
+          const bizName = biz?.business_name || biz?.biz || "our business";
+          const emailRes = await fetch(`${FUNCTION_URL}/send-email`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              to: r.contact,
+              subject: `How was your visit to ${bizName}?`,
+              message: `Hi ${r.name},\n\nThank you for choosing ${bizName}! We'd love to hear about your experience.\n\nShare your feedback here: [LINK]\n\n— The ${bizName} Team\nSent via ReviewPing`,
+            }),
+          });
+          if (!emailRes.ok) {
+            const err = await emailRes.json();
+            throw new Error(err.error || `Email failed (${emailRes.status})`);
+          }
+        }
+
+        sentList.push({ name: r.name, contact: r.contact, service, channel: method, sentAt: Date.now() });
+        onSent(sentList[sentList.length - 1]);
+      } catch (err) {
+        console.error(`Bulk send error for ${r.name}:`, err);
+        errors.push({ name: r.name, contact: r.contact, error: err.message });
+      }
+    }
+
+    setResults(sentList);
+    setSending(false);
+
+    if (errors.length > 0) {
+      toast(`${sentList.length} sent, ${errors.length} failed. Check console for details.`, "error");
+    } else {
+      toast(`${sentList.length} requests sent successfully!`);
+    }
+
+    if (sentList.length > 0) {
       setDone2(true);
-      rows.forEach((r) =>
-        onSent({
-          name: r.name,
-          service,
-          channel: method,
-          sentAt: Date.now(),
-        })
-      );
-      toast(`${rows.length} requests sent!`);
-    }, 2000);
+    }
   };
 
   const handleRowKeyDown = (e, i) => {
@@ -117,7 +188,7 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
 
   if (done2)
     return (
-      <div style={{ textAlign: "center", padding: "52px 0" }}>
+      <div style={{ textAlign: "center", padding: "36px 0" }}>
         <div
           style={{
             width: 64,
@@ -129,7 +200,7 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
             alignItems: "center",
             justifyContent: "center",
             fontSize: 26,
-            margin: "0 auto 20px",
+            margin: "0 auto 16px",
           }}
         >
           ✓
@@ -139,7 +210,7 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
             fontFamily: "'Instrument Serif',serif",
             fontSize: 26,
             fontWeight: 400,
-            margin: "0 0 8px",
+            margin: "0 0 4px",
           }}
         >
           Bulk send complete!
@@ -147,18 +218,37 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
         <p
           style={{
             color: G.muted,
-            marginBottom: 24,
+            marginBottom: 20,
             fontSize: 14,
             lineHeight: 1.7,
           }}
         >
-          {rows.length} review requests delivered via {method}.
+          {results.length} of {rows.length} requests delivered via {method}.
         </p>
+        {results.length > 0 && (
+          <div
+            style={{
+              textAlign: "left",
+              maxHeight: 200,
+              overflowY: "auto",
+              marginBottom: 20,
+              fontSize: 12.5,
+              color: G.muted,
+            }}
+          >
+            {results.map((r, i) => (
+              <div key={i} style={{ padding: "4px 0", borderBottom: `1px solid ${G.border}` }}>
+                {r.name} → {r.contact}
+              </div>
+            ))}
+          </div>
+        )}
         <Btn
           onClick={() => {
             setDone2(false);
             setRows([]);
             setFile(null);
+            setResults([]);
           }}
         >
           Send another batch
@@ -186,13 +276,13 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
         <Sel
           label="Service provided"
           value={service}
-          onChange={setService}
+          onChange={(e) => setService(e.target.value)}
           options={SERVICES}
         />
         <Sel
           label="Send via"
           value={method}
-          onChange={setMethod}
+          onChange={(e) => setMethod(e.target.value)}
           options={["SMS", "Email", "Both"]}
         />
       </Card>
@@ -298,7 +388,8 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
                   padding: "9px 11px",
                   fontSize: 13,
                   color: sending ? G.muted : G.ink,
-                  outline: "none",
+                  outline: "2px solid transparent",
+                  outlineOffset: "2px",
                   fontFamily: "'Manrope',sans-serif",
                   opacity: sending ? 0.6 : 1,
                   cursor: sending ? "not-allowed" : "text",
@@ -330,7 +421,8 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
                   padding: "9px 11px",
                   fontSize: 13,
                   color: sending ? G.muted : G.ink,
-                  outline: "none",
+                  outline: "2px solid transparent",
+                  outlineOffset: "2px",
                   fontFamily: "'Manrope',sans-serif",
                   opacity: sending ? 0.6 : 1,
                   cursor: sending ? "not-allowed" : "text",
@@ -446,7 +538,7 @@ export default function BulkSend({ biz, templates, toast, onSent }) {
         </div>
       )}
       <Btn
-        full
+        fullWidth
         size="lg"
         onClick={send}
         loading={sending}

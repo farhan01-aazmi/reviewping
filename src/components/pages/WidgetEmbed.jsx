@@ -40,7 +40,7 @@ export default function WidgetEmbed({ biz }) {
         <Sel
           label="Widget style"
           value={style2}
-          onChange={setStyle2}
+          onChange={(e) => setStyle2(e.target.value)}
           options={[
             { value: "carousel", label: "Carousel slider" },
             { value: "grid", label: "Grid layout" },
@@ -51,7 +51,7 @@ export default function WidgetEmbed({ biz }) {
         <Sel
           label="Colour theme"
           value={theme}
-          onChange={setTheme}
+          onChange={(e) => setTheme(e.target.value)}
           options={[
             { value: "light", label: "Light" },
             { value: "dark", label: "Dark" },
@@ -61,7 +61,7 @@ export default function WidgetEmbed({ biz }) {
         <Sel
           label="Number of reviews"
           value={count}
-          onChange={setCount}
+          onChange={(e) => setCount(e.target.value)}
           options={["3", "5", "10", "All"]}
         />
       </Card>

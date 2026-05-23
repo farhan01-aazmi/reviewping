@@ -1,11 +1,5 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "authorization, content-type",
-  "Content-Type": "application/json",
-};
+import { CORS, verifyAuth } from "../_shared/auth.ts";
 
 /**
  * Stripe Checkout Session Creator
@@ -17,7 +11,7 @@ const CORS_HEADERS = {
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: CORS_HEADERS });
+    return new Response(null, { status: 204, headers: CORS });
   }
 
   try {
@@ -25,30 +19,37 @@ serve(async (req) => {
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), {
         status: 405,
-        headers: CORS_HEADERS,
+        headers: CORS,
       });
     }
 
-    // Extract user_id from the verified JWT (set by Supabase when verify_jwt = true)
-    const userId = req.headers.get("x-supabase-auth-uid");
-    if (!userId) {
-      return new Response(JSON.stringify({ error: "Authentication required" }), {
-        status: 401,
-        headers: CORS_HEADERS,
-      });
-    }
+    // Verify JWT authentication using Supabase Auth API (signature-verified)
+    const auth = await verifyAuth(req);
+    if (auth instanceof Response) return auth;
+    const userId = auth.userId;
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
       throw new Error("STRIPE_SECRET_KEY environment variable not configured");
     }
 
-    const { price_id, return_url } = await req.json();
+    // Parse and validate request body
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+        status: 400,
+        headers: CORS,
+      });
+    }
+
+    const { price_id, return_url } = body || {};
 
     if (!price_id) {
       return new Response(
         JSON.stringify({ error: "Missing required field: 'price_id'" }),
-        { status: 400, headers: CORS_HEADERS },
+        { status: 400, headers: CORS },
       );
     }
 
@@ -76,13 +77,13 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ url: session.url }), {
-      headers: CORS_HEADERS,
+      headers: CORS,
     });
   } catch (err) {
     console.error("create-checkout error:", err);
     return new Response(JSON.stringify({ error: "Failed to create checkout session. Please try again." }), {
       status: 500,
-      headers: CORS_HEADERS,
+      headers: CORS,
     });
   }
 });

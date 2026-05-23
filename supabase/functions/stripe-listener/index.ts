@@ -1,8 +1,10 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const ALLOWED_ORIGIN = Deno.env.get("CORS_ORIGIN") || "https://reviewping-seven.vercel.app";
+
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "authorization, content-type",
   "Content-Type": "application/json",
@@ -40,8 +42,8 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    if (!stripeKey || !supabaseUrl || !supabaseServiceKey) {
-      throw new Error("Missing required environment variables");
+    if (!stripeKey || !webhookSecret || !supabaseUrl || !supabaseServiceKey) {
+      throw new Error("Missing required environment variables: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY");
     }
 
     // Initialize Supabase admin client (bypasses RLS)
@@ -49,25 +51,33 @@ serve(async (req) => {
 
     // Read the raw body for signature verification
     const body = await req.text();
-    const signature = req.headers.get("stripe-signature") || "";
-
-    // Verify webhook signature if secret is configured
-    if (webhookSecret) {
-      const verified = await verifyStripeSignature(
-        body,
-        signature,
-        webhookSecret,
-        stripeKey,
-      );
-      if (!verified) {
-        return new Response(JSON.stringify({ error: "Invalid signature" }), {
-          status: 401,
-          headers: CORS_HEADERS,
-        });
-      }
+    const signature = req.headers.get("stripe-signature");
+    if (!signature) {
+      return new Response(JSON.stringify({ error: "Missing stripe-signature header" }), {
+        status: 401,
+        headers: CORS_HEADERS,
+      });
     }
 
-    const event = JSON.parse(body);
+    // Verify webhook signature — mandatory (not optional) for security
+    const verified = await verifyStripeSignature(body, signature, webhookSecret, stripeKey);
+    if (!verified) {
+      return new Response(JSON.stringify({ error: "Invalid webhook signature" }), {
+        status: 401,
+        headers: CORS_HEADERS,
+      });
+    }
+
+    // Parse event body — catch edge case of invalid JSON after signature verification
+    let event;
+    try {
+      event = JSON.parse(body);
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid webhook body" }), {
+        status: 400,
+        headers: CORS_HEADERS,
+      });
+    }
 
     switch (event.type) {
       case "checkout.session.completed": {
@@ -201,20 +211,39 @@ serve(async (req) => {
 
 /**
  * Map Stripe price IDs to plan names.
- * Update these with your actual Stripe price IDs.
+ *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  SETUP REQUIRED BEFORE PRODUCTION USE                                       ║
+ * ║  1. Go to Stripe Dashboard → Products → create 3 products:                  ║
+ * ║     - Starter ($19/mo)                                                      ║
+ * ║     - Growth ($49/mo)                                                       ║
+ * ║     - Agency ($99/mo)                                                       ║
+ * ║  2. Copy the API Price IDs (starts with "price_") into PLAN_MAP below.      ║
+ * ║  3. Deploy the function.                                                    ║
+ * ║  Until this is done, ALL subscriptions will map to "growth".                ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 function getPlanNameFromPriceId(priceId: string | undefined): string {
-  // ⚠️ IMPORTANT: Update these with your actual Stripe Price IDs before deploying.
-  // Get them from: Stripe Dashboard → Products → [Product] → API ID
+  // ── Stripe Price ID → Plan Name mapping ───────────────────────────────
+  // Paste your actual Stripe Price IDs here:
   const PLAN_MAP: Record<string, string> = {
-    // "price_starter_monthly_xxxx": "starter",
-    // "price_growth_monthly_xxxx":  "growth",
-    // "price_agency_monthly_xxxx":  "agency",
+    // "price_1ABC123starter": "starter",
+    // "price_1ABC123growth":  "growth",
+    // "price_1ABC123agency":  "agency",
   };
-  const plan = priceId && PLAN_MAP[priceId];
-  if (plan) return plan;
-  console.warn(`Unknown price ID: ${priceId}, defaulting to "growth"`);
-  return "growth";
+
+  // Allow override via environment variable (for testing):
+  // Set STRIPE_DEFAULT_PLAN to "starter", "growth", or "agency"
+  const DEFAULT_PLAN = Deno.env.get("STRIPE_DEFAULT_PLAN") || "growth";
+
+  if (priceId && PLAN_MAP[priceId]) {
+    return PLAN_MAP[priceId];
+  }
+
+  if (priceId) {
+    console.warn(`Unknown price ID: ${priceId}, defaulting to "${DEFAULT_PLAN}"`);
+  }
+  return DEFAULT_PLAN;
 }
 
 /**

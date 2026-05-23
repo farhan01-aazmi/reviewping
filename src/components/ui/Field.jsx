@@ -26,8 +26,9 @@ export default function Field({
     background: G.surface,
     border: `1.5px solid ${error ? "#DC2626" : G.border}`,
     borderRadius: 10,
-    outline: "none",
-    transition: "border-color 0.15s ease",
+    outline: "2px solid transparent",
+    outlineOffset: "2px",
+    transition: "border-color 0.15s ease, outline-color 0.15s ease",
     boxSizing: "border-box",
     resize: multiline ? "vertical" : "none",
     disabled: disabled ? 0.6 : 1,
@@ -36,12 +37,14 @@ export default function Field({
   const handleFocus = (e) => {
     if (!error) {
       e.currentTarget.style.borderColor = G.accent;
+      e.currentTarget.style.outlineColor = G.accent;
     }
   };
 
   const handleBlur = (e) => {
     if (!error) {
       e.currentTarget.style.borderColor = G.border;
+      e.currentTarget.style.outlineColor = "transparent";
     }
   };
 

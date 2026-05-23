@@ -1,5 +1,6 @@
 import { G } from "../../data/theme";
 import { Wordmark, Btn, Pill } from "../ui";
+import SEO from "../SEO";
 
 const sections = [
   {
@@ -38,13 +39,15 @@ const sections = [
 
 export default function PrivacyPolicy({ onBack }) {
   return (
-    <div
-      style={{
-        background: G.bg,
-        minHeight: "100vh",
-        fontFamily: "'Manrope',sans-serif",
-        color: G.ink,
-      }}
+    <>
+      <SEO title="Privacy Policy" description="ReviewPing Privacy Policy — how we collect, use, and protect your data. GDPR compliant." path="/privacy" />
+      <div
+        style={{
+          background: G.bg,
+          minHeight: "100vh",
+          fontFamily: "'Manrope',sans-serif",
+          color: G.ink,
+        }}
     >
       <header
         style={{
@@ -120,5 +123,6 @@ export default function PrivacyPolicy({ onBack }) {
         ))}
       </div>
     </div>
+    </>
   );
 }

@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { G } from "../../data/theme";
 import { Card, Field, Btn, Wordmark, Pill } from "../ui";
+import SEO from "../SEO";
 
 export default function FreeTool({ onSignup }) {
+  const isResponseGen = window.location.pathname === "/tools/review-response-generator";
   const [bizName, setBizName] = useState("");
   const [placeId, setPlaceId] = useState("");
   const [generated, setGenerated] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Response generator state
+  const [reviewText, setReviewText] = useState("");
+  const [responseDraft, setResponseDraft] = useState("");
 
   const link = `https://search.google.com/local/writereview?placeid=${
     placeId || "ChIJxxxxxxxxxxxxxxxxxx"
@@ -27,13 +33,19 @@ export default function FreeTool({ onSignup }) {
   };
 
   return (
-    <div
-      style={{
-        background: G.bg,
-        minHeight: "100vh",
-        fontFamily: "'Manrope',sans-serif",
-        color: G.ink,
-      }}
+    <>
+      <SEO
+        title={isResponseGen ? "Free Review Response Generator" : "Free Review Link Generator"}
+        description={isResponseGen ? "Generate AI-powered responses to your Google reviews for free." : "Generate your Google Review link for free. No sign-up required."}
+        path={isResponseGen ? "/tools/review-response-generator" : "/tools/review-link-generator"}
+      />
+      <div
+        style={{
+          background: G.bg,
+          minHeight: "100vh",
+          fontFamily: "'Manrope',sans-serif",
+          color: G.ink,
+        }}
     >
       <header
         style={{
@@ -66,7 +78,7 @@ export default function FreeTool({ onSignup }) {
               letterSpacing: "-1px",
             }}
           >
-            Google Review Link Generator
+            {isResponseGen ? "Google Review Response Generator" : "Google Review Link Generator"}
           </h1>
           <p
             style={{
@@ -77,31 +89,34 @@ export default function FreeTool({ onSignup }) {
               margin: "0 auto",
             }}
           >
-            Generate a direct link to your Google review page in seconds. Share it
-            anywhere — SMS, email, receipts, or social media.
+            {isResponseGen
+              ? "Generate thoughtful AI-powered responses to your Google reviews. Save time and impress your customers."
+              : "Generate a direct link to your Google review page in seconds. Share it anywhere — SMS, email, receipts, or social media."}
           </p>
         </div>
 
-        <Card style={{ marginBottom: 16 }}>
-          <Field
-            label="Your business name"
-            value={bizName}
-            onChange={(e) => setBizName(e.target.value)}
-            placeholder="Mike's Dental Clinic"
-          />
-          <Field
-            label="Google Place ID (optional)"
-            value={placeId}
-            onChange={(e) => setPlaceId(e.target.value)}
-            placeholder="ChIJxxxxxxxxxxxxxxxxxx"
-            hint="Find it at developers.google.com/maps/documentation/places/web-service/place-id"
-          />
-          <Btn fullWidth size="lg" onClick={generate}>
-            Generate my review link →
-          </Btn>
-        </Card>
+        {!isResponseGen && (
+          <Card style={{ marginBottom: 16 }}>
+            <Field
+              label="Your business name"
+              value={bizName}
+              onChange={(e) => setBizName(e.target.value)}
+              placeholder="Mike's Dental Clinic"
+            />
+            <Field
+              label="Google Place ID (optional)"
+              value={placeId}
+              onChange={(e) => setPlaceId(e.target.value)}
+              placeholder="ChIJxxxxxxxxxxxxxxxxxx"
+              hint="Find it at developers.google.com/maps/documentation/places/web-service/place-id"
+            />
+            <Btn fullWidth size="lg" onClick={generate}>
+              Generate my review link →
+            </Btn>
+          </Card>
+        )}
 
-        {generated && (
+        {!isResponseGen && generated && (
           <Card style={{ marginBottom: 16 }}>
             <div
               style={{
@@ -166,6 +181,91 @@ export default function FreeTool({ onSignup }) {
           </Card>
         )}
 
+        {isResponseGen && (
+          <Card style={{ marginBottom: 16 }}>
+            <Field
+              label="Customer name"
+              value={bizName}
+              onChange={(e) => setBizName(e.target.value)}
+              placeholder="e.g. Sarah Johnson"
+            />
+            <Field
+              label="Review text (paste the customer's review)"
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              placeholder="e.g. Mike did an amazing job fixing my tooth. Highly recommended!"
+              multiline
+              rows={4}
+            />
+            <Btn
+              fullWidth
+              size="lg"
+              onClick={() => {
+                if (reviewText.trim()) {
+                  setResponseDraft(
+                    `Hi ${bizName || "there"}, thank you so much for your kind words! We're thrilled to hear you had a great experience. Your feedback means the world to us, and we look forward to serving you again soon! 🙏`
+                  );
+                }
+              }}
+              disabled={!reviewText.trim()}
+            >
+              Generate response →
+            </Btn>
+          </Card>
+        )}
+
+        {isResponseGen && responseDraft && (
+          <Card style={{ marginBottom: 16 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: G.muted,
+                letterSpacing: "0.8px",
+                textTransform: "uppercase",
+                marginBottom: 10,
+              }}
+            >
+              Suggested response
+            </div>
+            <div
+              style={{
+                padding: "12px 14px",
+                background: G.bg,
+                border: `1.5px solid ${G.border}`,
+                borderRadius: 8,
+                fontSize: 13.5,
+                color: G.inkSoft,
+                lineHeight: 1.6,
+                marginBottom: 12,
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {responseDraft}
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <Btn
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  navigator.clipboard?.writeText(responseDraft);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+              >
+                {copied ? "Copied!" : "Copy to clipboard"}
+              </Btn>
+              <Btn
+                size="sm"
+                onClick={() => setResponseDraft("")}
+              >
+                Try again
+              </Btn>
+            </div>
+          </Card>
+        )}
+
+        {!isResponseGen && (
         <Card style={{ marginBottom: 16 }}>
           <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 14 }}>
             📋 How to use your review link
@@ -226,6 +326,7 @@ export default function FreeTool({ onSignup }) {
             </div>
           ))}
         </Card>
+        )}
 
         <Card
           style={{
@@ -278,16 +379,36 @@ export default function FreeTool({ onSignup }) {
       >
         <Wordmark size={13} />
         <div style={{ display: "flex", gap: 16 }}>
-          {["Privacy Policy", "Terms of Service", "Help"].map((l) => (
-            <span
-              key={l}
-              style={{ fontSize: 12, color: G.muted, cursor: "pointer" }}
-            >
-              {l}
-            </span>
-          ))}
+          <span
+            style={{ fontSize: 12, color: G.muted, cursor: "pointer" }}
+            onClick={() => window.history.pushState({}, "", "/privacy") && window.dispatchEvent(new PopStateEvent("popstate"))}
+            role="link"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && (window.history.pushState({}, "", "/privacy"), window.dispatchEvent(new PopStateEvent("popstate")))}
+          >
+            Privacy Policy
+          </span>
+          <span
+            style={{ fontSize: 12, color: G.muted, cursor: "pointer" }}
+            onClick={() => window.history.pushState({}, "", "/terms") && window.dispatchEvent(new PopStateEvent("popstate"))}
+            role="link"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && (window.history.pushState({}, "", "/terms"), window.dispatchEvent(new PopStateEvent("popstate")))}
+          >
+            Terms of Service
+          </span>
+          <span
+            style={{ fontSize: 12, color: G.muted, cursor: "pointer" }}
+            onClick={() => window.location.href = "mailto:support@reviewping.io"}
+            role="link"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && (window.location.href = "mailto:support@reviewping.io")}
+          >
+            Help
+          </span>
         </div>
       </footer>
     </div>
+    </>
   );
 }

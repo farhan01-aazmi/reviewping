@@ -49,7 +49,8 @@ export default function Sel({
           background: G.surface,
           border: `1.5px solid ${error ? "#DC2626" : G.border}`,
           borderRadius: 10,
-          outline: "none",
+          outline: "2px solid transparent",
+          outlineOffset: "2px",
           cursor: disabled ? "not-allowed" : "pointer",
           opacity: disabled ? 0.6 : 1,
           transition: "border-color 0.15s ease",
@@ -60,9 +61,11 @@ export default function Sel({
           boxSizing: "border-box",
         }}
         onFocus={(e) => {
+          e.currentTarget.style.outlineColor = G.accent;
           if (!error) e.currentTarget.style.borderColor = G.accent;
         }}
         onBlur={(e) => {
+          e.currentTarget.style.outlineColor = "transparent";
           if (!error) e.currentTarget.style.borderColor = G.border;
         }}
         {...rest}

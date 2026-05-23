@@ -2,11 +2,12 @@ import { useState } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Card, Field, Btn, LogoMark } from "../ui";
+import SEO from "../SEO";
 
-export default function Login({ onDone, onLoginComplete, onSignup, onBack, onForgot }) {
+export default function Login({ onDone, onLoginComplete, onSignup, onBack, onForgot, authError = "", onAuthErrorClear }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(authError || "");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -66,18 +67,31 @@ export default function Login({ onDone, onLoginComplete, onSignup, onBack, onFor
     setGoogleLoading(true);
     setError("");
     try {
-      const { error: oauthErr } = await supabase.auth.signInWithOAuth({
+      const redirectTo = window.location.origin;
+      console.log("Google OAuth redirectTo:", redirectTo);
+      const { data, error: oauthErr } = await supabase.auth.signInWithOAuth({
         provider: "google",
+        options: { redirectTo },
       });
       if (oauthErr) {
-        setError(oauthErr.message);
+        setError(oauthErr.message.includes("not supported") ? "Google sign-in is not configured. Please use email & password." : oauthErr.message);
         setGoogleLoading(false);
+        return;
       }
-      // Don't set loading false here — OAuth redirects away
+      // Fallback: if SDK returns URL but doesn't auto-redirect
+      if (data?.url) {
+        window.location.href = data.url;
+      }
     } catch (e) {
-      setError("Failed to start Google sign-in.");
+      setError("Failed to start Google sign-in. Check your Supabase Auth configuration.");
       setGoogleLoading(false);
     }
+  };
+
+  // Clear auth error when user interacts
+  const clearError = () => {
+    if (error) setError("");
+    if (onAuthErrorClear) onAuthErrorClear();
   };
 
   const handleKeyDown = (e) => {
@@ -85,13 +99,15 @@ export default function Login({ onDone, onLoginComplete, onSignup, onBack, onFor
   };
 
   return (
-    <div
-      style={{
-        background: G.bg,
-        minHeight: "100vh",
-        fontFamily: "'Manrope',sans-serif",
-        color: G.ink,
-        display: "flex",
+    <>
+      <SEO title="Sign in" description="Sign in to your ReviewPing account." path="/login" />
+      <div
+        style={{
+          background: G.bg,
+          minHeight: "100vh",
+          fontFamily: "'Manrope',sans-serif",
+          color: G.ink,
+          display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 24,
@@ -192,14 +208,14 @@ export default function Login({ onDone, onLoginComplete, onSignup, onBack, onFor
           <Field
             label="Email address"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); clearError(); }}
             placeholder="you@business.com"
             type="email"
           />
           <Field
             label="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); clearError(); }}
             placeholder="••••••••"
             type="password"
           />
@@ -265,5 +281,6 @@ export default function Login({ onDone, onLoginComplete, onSignup, onBack, onFor
         </p>
       </div>
     </div>
+    </>
   );
 }

@@ -108,14 +108,14 @@ export default function Team({ plan, team, setTeam, toast }) {
         <Field
           label="Email address"
           value={inviteEmail}
-          onChange={setInviteEmail}
+          onChange={(e) => setInviteEmail(e.target.value)}
           placeholder="colleague@business.com"
           type="email"
         />
         <Sel
           label="Role"
           value={inviteRole}
-          onChange={setInviteRole}
+          onChange={(e) => setInviteRole(e.target.value)}
           options={roles}
         />
         <Btn onClick={invite} disabled={plan === "starter"}>
@@ -158,7 +158,7 @@ export default function Team({ plan, team, setTeam, toast }) {
                 flexShrink: 0,
               }}
             >
-              {m.name[0].toUpperCase()}
+              {(m.name?.[0] || "?").toUpperCase()}
             </div>
             <div style={{ flex: 1 }}>
               <div

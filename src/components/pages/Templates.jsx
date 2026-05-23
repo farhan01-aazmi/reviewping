@@ -104,20 +104,20 @@ export default function Templates({ templates, setTemplates, toast }) {
           <Field
             label="Template name"
             value={eName}
-            onChange={setEName}
+            onChange={(e) => setEName(e.target.value)}
             placeholder="e.g. Dental follow-up"
             error={!eName && editing !== "new" ? "Name is required" : ""}
           />
           <Sel
             label="Best for service"
             value={eSvc}
-            onChange={setESvc}
+            onChange={(e) => setESvc(e.target.value)}
             options={["All", ...SERVICES]}
           />
           <Field
             label="Message text"
             value={eText}
-            onChange={setEText}
+            onChange={(e) => setEText(e.target.value)}
             placeholder="Hi {name}…"
             multiline
             error={!eText && editing !== "new" ? "Message text is required" : ""}
@@ -161,7 +161,7 @@ export default function Templates({ templates, setTemplates, toast }) {
             <Btn variant="secondary" onClick={() => setEditing(null)}>
               Cancel
             </Btn>
-            <Btn full onClick={save}>
+            <Btn fullWidth onClick={save}>
               Save template
             </Btn>
           </div>

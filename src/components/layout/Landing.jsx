@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
+import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Btn, Pill, Card, Stars, Wordmark } from "../ui";
+import SEO from "../SEO";
 
 export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool }) {
   const props = { onPrivacy, onTerms, onTool };
   const [tick, setTick] = useState(0);
   const [annual, setAnnual] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) window.location.href = "/dashboard";
+    });
+  }, []);
   const live = [
     "James P. left 5 stars — Austin Dental",
     "Sarah M. left 5 stars — London Salon",
@@ -19,10 +27,16 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
   }, []);
 
   return (
-    <div
-      style={{
-        background: G.bg,
-        minHeight: "100vh",
+    <>
+      <SEO
+        title="Automate Your Google Reviews"
+        description="Send AI-personalised review requests via SMS or email. No chasing. No copy-pasting. The $19/mo alternative to Podium. 2-minute setup, no contract."
+        path="/"
+      />
+      <div
+        style={{
+          background: G.bg,
+          minHeight: "100vh",
         fontFamily: "'Manrope',sans-serif",
         color: G.ink,
       }}
@@ -696,33 +710,39 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
           {
             name: "Starter",
             price: 19,
+            annualPrice: 190,
             sub: "Solo owners",
-            f: ["50 requests/month", "SMS & email", "Dashboard", "Google link"],
+            f: ["50 review requests/mo", "Email only (SMS extra)", "Dashboard & analytics", "Google review link"],
             pop: false,
+            hint: "Good for small shops testing the waters",
           },
           {
             name: "Growth",
-            price: 39,
+            price: 49,
+            annualPrice: 490,
             sub: "Most popular",
             pop: true,
             f: [
-              "Unlimited requests",
-              "AI-written messages",
-              "Priority support",
-              "Insights",
+              "Unlimited review requests",
+              "AI-personalized SMS & email",
+              "AI reply generator",
+              "Full analytics & charts",
             ],
+            hint: "Best value for growing businesses",
           },
           {
             name: "Agency",
-            price: 79,
+            price: 99,
+            annualPrice: 990,
             sub: "Multi-location",
             pop: false,
             f: [
               "Everything in Growth",
-              "5 locations",
-              "White-label",
-              "API access",
+              "Up to 5 locations",
+              "White-label & API",
+              "Team members",
             ],
+            hint: "For agencies & multi-location brands",
           },
         ].map((p) => (
           <div
@@ -819,7 +839,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
                     lineHeight: 1,
                   }}
                 >
-                  ${annual ? Math.round(p.price * 0.8) : p.price}
+                  ${annual ? Math.round(p.annualPrice / 12) : p.price}
                 </div>
                 <div style={{ fontSize: 12, color: G.muted }}>
                   / month{annual ? " · billed yearly" : ""}
@@ -832,7 +852,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
                       fontWeight: 700,
                     }}
                   >
-                    Save ${Math.round(p.price * 0.2 * 12)}/yr
+                    ${p.price * 12 - p.annualPrice}/yr savings
                   </div>
                 )}
               </div>
@@ -891,5 +911,6 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
         </p>
       </footer>
     </div>
+    </>
   );
 }
