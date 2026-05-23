@@ -8,13 +8,37 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "scrape": "node scripts/lead-scraper.mjs",
+    "scrape:dry-run": "node scripts/lead-scraper.mjs --dry-run",
+    "scrape:dentists": "node scripts/lead-scraper.mjs --category dentist --dry-run",
+    "scrape:nyc": "node scripts/lead-scraper.mjs --city \"New York\"",
+    "scrape:london": "node scripts/lead-scraper.mjs --city London --country UK",
+    "scrape:us": "node scripts/lead-scraper.mjs",
+    "scrape:uk": "node scripts/lead-scraper.mjs --country UK",
+    "functions:serve": "supabase functions serve suggest-leads --env-file .env.local",
+    "functions:deploy": "supabase functions deploy suggest-leads",
+    "sg:scrape": "node scripts/scrapegraph.mjs scrape",
+    "sg:extract": "node scripts/scrapegraph.mjs extract",
+    "sg:search": "node scripts/scrapegraph.mjs search",
+    "sg:crawl": "node scripts/scrapegraph.mjs crawl",
+    "sg:credits": "node scripts/scrapegraph.mjs credits",
+    "sg:health": "node scripts/scrapegraph.mjs health",
+    "sg:history": "node scripts/scrapegraph.mjs history",
+    "sg:help": "node scripts/scrapegraph.mjs help",
+    "sgpy:extract": "python scripts/nvidia_scrapegraph.py extract",
+    "sgpy:search": "python scripts/nvidia_scrapegraph.py search",
+    "sgpy:crawl": "python scripts/nvidia_scrapegraph.py crawl",
+    "sgpy:help": "python scripts/nvidia_scrapegraph.py --help"
   },
   "dependencies": {
+    "@sentry/react": "^10.53.1",
     "@supabase/supabase-js": "^2.105.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "recharts": "^3.8.1"
+    "react-helmet-async": "^3.0.0",
+    "recharts": "^3.8.1",
+    "sonner": "^2.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -25,7 +49,12 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
+    "scrapegraph-js": "^2.1.0",
+    "sharp": "^0.34.5",
     "vite": "^8.0.12",
     "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

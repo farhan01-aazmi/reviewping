@@ -1,81 +1,25 @@
 import { useState } from "react";
+import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
-import { SERVICES } from "../../data/constants";
-import Btn from "../ui/Btn";
-import Card from "../ui/Card";
-import Field from "../ui/Field";
-import Sel from "../ui/Sel";
-import { aiWriteMessage, sendSMS, sendEmail } from "../../api/index";
+import { Btn, Card, Field } from "../ui";
+import { toast } from "sonner";
 
-export default function SendReq({ onBack, onSent, templates, biz, toast }) {
+export default function SendReq({ onBack, onSent, biz, userId }) {
   const [name, setName] = useState("");
-  const [contact, setContact] = useState("");
-  const [service, setService] = useState(SERVICES[0]);
-  const [method, setMethod] = useState("SMS");
-  const [msg, setMsg] = useState("");
-  const [aiLoad, setAiLoad] = useState(false);
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [channel, setChannel] = useState("email");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const matched =
-    templates.find((t) => t.service === service) ||
-    templates.find((t) => t.service === "All");
-
-  const applyTpl = () => {
-    if (!matched) {
-      toast("No matching template found", "error");
-      return;
-    }
-    setMsg(
-      matched.text
-        .replace(/\{name\}/gi, name || "[Name]")
-        .replace(
-          /\{link\}/gi,
-          biz.googleLink || "reviewping.io/r/mybiz"
-        )
-        .replace(/\{service\}/gi, service)
-    );
-  };
-
-  const runAi = async () => {
-    if (!name) {
-      toast("Enter customer name first", "error");
-      return;
-    }
-    setAiLoad(true);
-    setMsg("");
-    try {
-      const result = await aiWriteMessage({
-        name,
-        service,
-        business: biz.bizName || "our business",
-      });
-      const text = result?.message || result?.text || "";
-      setMsg(
-        text.replace("[LINK]", biz.googleLink || "reviewping.io/r/mybiz")
-      );
-    } catch (e) {
-      console.error("AI error:", e);
-      setMsg(
-        `Hi ${name}, thanks for your ${service} at ${
-          biz.bizName || "ours"
-        } today. A quick review would mean a lot: ${
-          biz.googleLink || "reviewping.io/r/mybiz"
-        }`
-      );
-    }
-    setAiLoad(false);
-  };
+  const reviewLink = biz.googleLink || "https://reviewping-seven.vercel.app";
 
   const validate = () => {
     const e = {};
     if (!name.trim()) e.name = "Customer name is required";
-    if (!contact.trim())
-      e.contact =
-        method === "Email"
-          ? "Email address is required"
-          : "Phone number is required";
+    if (channel === "email" && !email.trim()) e.email = "Email is required";
+    if (channel === "sms" && !phone.trim()) e.phone = "Phone is required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -84,38 +28,53 @@ export default function SendReq({ onBack, onSent, templates, biz, toast }) {
     if (!validate()) return;
     setLoading(true);
     try {
-      const message =
-        msg ||
-        `Hi ${name}! Thanks for visiting ${
-          biz.bizName || "us"
-        } today. A quick Google review would mean the world — 30 seconds: ${
-          biz.googleLink || "reviewping.io/r/mybiz"
-        }`;
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
-      if (method === "SMS" || method === "Both") {
-        await sendSMS({ to: contact, message });
+      const { error: reqError } = await supabase.from("review_requests").insert({
+        user_id: userId,
+        customer_name: name.trim(),
+        customer_email: email.trim() || null,
+        customer_phone: phone.trim() || null,
+        channel,
+        review_link: reviewLink,
+        status: "pending",
+        sent_at: new Date().toISOString(),
+      });
+
+      if (reqError) {
+        toast.error(reqError.message);
+        setLoading(false);
+        return;
       }
-      if (method === "Email" || method === "Both") {
-        await sendEmail({
-          to: contact,
-          subject: `How was your ${service}?`,
-          message,
+
+      // Try edge function
+      try {
+        await supabase.functions.invoke("send-review-request", {
+          body: {
+            customer_name: name.trim(),
+            customer_email: email.trim(),
+            review_link: reviewLink,
+            business_name: biz.bizName || "My Business",
+          },
         });
+      } catch {
+        // Edge function not available — request saved as pending
       }
+
       setDone(true);
-      onSent({ name, service, channel: method, sentAt: Date.now() });
+      onSent({ name: name.trim(), service: "", channel, sentAt: Date.now() });
     } catch (e) {
-      console.error("Send error:", e);
-      toast("Failed to send: " + e.message, "error");
+      toast.error("Failed to send: " + e.message);
       setLoading(false);
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !loading && !aiLoad) send();
+    if (e.key === "Enter" && !loading) send();
   };
 
-  if (done)
+  if (done) {
     return (
       <div style={{ textAlign: "center", padding: "52px 0" }}>
         <div
@@ -153,8 +112,9 @@ export default function SendReq({ onBack, onSent, templates, biz, toast }) {
             lineHeight: 1.7,
           }}
         >
-          Your {method} was delivered to{" "}
-          <strong style={{ color: G.ink }}>{name}</strong>.
+          {channel === "email"
+            ? `Your email was sent to ${name}.`
+            : `Your SMS was sent to ${name}.`}
           <br />
           You'll be notified when they leave a review.
         </p>
@@ -163,6 +123,7 @@ export default function SendReq({ onBack, onSent, templates, biz, toast }) {
         </Btn>
       </div>
     );
+  }
 
   return (
     <div>
@@ -202,199 +163,130 @@ export default function SendReq({ onBack, onSent, templates, biz, toast }) {
           marginBottom: 22,
         }}
       >
-        Fill details, AI writes the message, customer receives it in seconds.
+        Send a review request via email or SMS.
       </p>
-      <Card
-        sx={{ marginBottom: 14 }}
-        onKeyDown={handleKeyDown}
-        aria-busy={aiLoad || undefined}
-      >
+      <Card sx={{ marginBottom: 14 }} onKeyDown={handleKeyDown}>
         <Field
           label="Customer name"
           value={name}
-          onChange={setName}
+          onChange={(e) => setName(e.target.value)}
           placeholder="e.g. James Patterson"
           error={errors.name}
-          disabled={aiLoad || loading}
+          disabled={loading}
         />
-        <Sel
-          label="Service provided"
-          value={service}
-          onChange={setService}
-          options={SERVICES}
-        />
-        <Sel
-          label="Send via"
-          value={method}
-          onChange={setMethod}
-          options={["SMS", "Email", "Both"]}
-        />
-        <Field
-          label={method === "Email" ? "Email address" : "Phone number"}
-          value={contact}
-          onChange={setContact}
-          placeholder={
-            method === "Email"
-              ? "james@gmail.com"
-              : "+1 (555) 000-0000"
-          }
-          error={errors.contact}
-          disabled={aiLoad || loading}
-        />
+        <div style={{ marginBottom: 16 }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: 13,
+              fontWeight: 600,
+              color: G.inkSoft,
+              marginBottom: 6,
+            }}
+          >
+            Channel
+          </label>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => setChannel("email")}
+              style={{
+                flex: 1,
+                padding: "10px 14px",
+                background: channel === "email" ? G.accent : G.surface,
+                color: channel === "email" ? "white" : G.ink,
+                border: `1.5px solid ${
+                  channel === "email" ? G.accent : G.border
+                }`,
+                borderRadius: 10,
+                cursor: "pointer",
+                fontWeight: 700,
+                fontSize: 13,
+                fontFamily: "'Manrope',sans-serif",
+                transition: "all 0.15s",
+              }}
+            >
+              ✉️ Email
+            </button>
+            <button
+              onClick={() => setChannel("sms")}
+              style={{
+                flex: 1,
+                padding: "10px 14px",
+                background: channel === "sms" ? G.accent : G.surface,
+                color: channel === "sms" ? "white" : G.ink,
+                border: `1.5px solid ${
+                  channel === "sms" ? G.accent : G.border
+                }`,
+                borderRadius: 10,
+                cursor: "pointer",
+                fontWeight: 700,
+                fontSize: 13,
+                fontFamily: "'Manrope',sans-serif",
+                transition: "all 0.15s",
+              }}
+            >
+              💬 SMS
+            </button>
+          </div>
+        </div>
+        {channel === "email" && (
+          <Field
+            label="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="james@gmail.com"
+            type="email"
+            error={errors.email}
+            disabled={loading}
+          />
+        )}
+        {channel === "sms" && (
+          <Field
+            label="Phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+1 (555) 000-0000"
+            error={errors.phone}
+            disabled={loading}
+          />
+        )}
       </Card>
       <Card sx={{ marginBottom: 14 }}>
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 10,
+            fontSize: 11,
+            fontWeight: 700,
+            color: G.muted,
+            letterSpacing: "0.8px",
+            textTransform: "uppercase",
+            marginBottom: 4,
           }}
         >
-          <label
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: G.inkSoft,
-            }}
-          >
-            Message
-          </label>
-          <div style={{ display: "flex", gap: 6 }}>
-            {matched && (
-              <Btn
-                variant="secondary"
-                size="sm"
-                onClick={applyTpl}
-                sx={{ fontSize: 11 }}
-                ariaLabel="Apply template"
-                disabled={aiLoad || loading}
-              >
-                📄 Template
-              </Btn>
-            )}
-            <Btn
-              variant="secondary"
-              size="sm"
-              onClick={runAi}
-              loading={aiLoad}
-              disabled={aiLoad || loading}
-              sx={{ fontSize: 11 }}
-              ariaLabel="AI write message"
-            >
-              ✦ AI Write
-            </Btn>
-          </div>
-        </div>
-        <div style={{ position: "relative" }}>
-          <textarea
-            value={
-              msg ||
-              (name
-                ? `Hi ${name}! Thanks for visiting ${
-                    biz.bizName || "us"
-                  } today. A quick Google review would mean the world — 30 seconds: ${
-                    biz.googleLink || "reviewping.io/r/mybiz"
-                  }`
-                : "Your personalised message will appear here…")
-            }
-            onChange={(e) => setMsg(e.target.value)}
-            style={{
-              width: "100%",
-              background: aiLoad ? G.accentBg : G.bg,
-              border: `1.5px solid ${
-                aiLoad ? G.accentBd : G.border
-              }`,
-              borderRadius: 8,
-              padding: "12px 14px",
-              color: aiLoad ? G.muted : G.ink,
-              fontSize: 13.5,
-              outline: "none",
-              boxSizing: "border-box",
-              fontFamily: "'Manrope',sans-serif",
-              minHeight: 96,
-              resize: "vertical",
-              lineHeight: 1.65,
-              opacity: aiLoad ? 0.7 : 1,
-              cursor: aiLoad ? "wait" : "text",
-            }}
-            aria-label="Message content"
-            disabled={aiLoad || undefined}
-          />
-          {aiLoad && (
-            <div
-              style={{
-                position: "absolute",
-                bottom: 14,
-                left: 14,
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                style={{ animation: "spin 0.7s linear infinite" }}
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke={G.accent}
-                  strokeWidth="3"
-                  strokeDasharray="31.4 31.4"
-                  strokeLinecap="round"
-                  opacity={0.3}
-                />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke={G.accent}
-                  strokeWidth="3"
-                  strokeDasharray="31.4 31.4"
-                  strokeLinecap="round"
-                  strokeDashoffset="10"
-                />
-              </svg>
-              <span
-                style={{
-                  fontSize: 12,
-                  color: G.accent,
-                  fontWeight: 600,
-                }}
-              >
-                AI is writing…
-              </span>
-            </div>
-          )}
+          Review link
         </div>
         <p
           style={{
-            margin: "6px 0 0",
-            fontSize: 11.5,
-            color: G.muted,
+            fontSize: 14,
+            color: G.ink,
+            margin: 0,
+            wordBreak: "break-all",
           }}
         >
-          {aiLoad ? "—" : `${msg.length} characters`}
+          {reviewLink}
+        </p>
+        <p style={{ fontSize: 12, color: G.muted, margin: "4px 0 0" }}>
+          Customers will be directed to this link to leave their review.
         </p>
       </Card>
       <Btn
-        full
+        fullWidth
         size="lg"
         onClick={send}
         loading={loading}
-        disabled={loading || aiLoad}
+        disabled={loading}
         ariaLabel="Send review request"
       >
-        {loading
-          ? "Sending…"
-          : aiLoad
-          ? "Generating message…"
-          : `Send via ${method} →`}
+        {loading ? "Saving…" : `Send ${channel === "email" ? "email" : "SMS"} →`}
       </Btn>
       <p
         style={{

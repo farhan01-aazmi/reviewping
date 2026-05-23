@@ -1,20 +1,53 @@
 import { useState } from "react";
+import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
-import { SERVICES } from "../../data/constants";
-import { Card, Field, Btn, Sel, Wordmark } from "../ui";
+import { Card, Field, Btn, Wordmark } from "../ui";
+
+const CATEGORIES = [
+  "Restaurant",
+  "Clinic/Hospital",
+  "Salon/Spa",
+  "E-commerce",
+  "Agency",
+  "Other",
+];
 
 export default function Onboarding({ user, onComplete }) {
   const [step, setStep] = useState(1);
   const [bn, setBn] = useState(user.biz || "");
-  const [bt, setBt] = useState("Dental Appointment");
-  const [gl, setGl] = useState("https://g.page/r/");
+  const [bt, setBt] = useState("");
+  const [gl, setGl] = useState("");
   const [ph, setPh] = useState(user.phone || "");
+  const [web, setWeb] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const steps = [
-    { n: 1, l: "Business setup" },
-    { n: 2, l: "Google link" },
+    { n: 1, l: "Business info" },
+    { n: 2, l: "Review link" },
     { n: 3, l: "All set" },
   ];
+
+  const handleComplete = async () => {
+    setSaving(true);
+    const uid = user?.id;
+    if (uid) {
+      await Promise.all([
+        supabase.from("business_settings").upsert({
+          user_id: uid,
+          business_name: bn,
+          business_category: bt,
+          business_phone: ph,
+          business_website: web,
+          review_link: gl,
+        }, { onConflict: "user_id" }),
+        supabase.from("profiles").update({
+          onboarding_completed: true,
+        }).eq("id", uid),
+      ]);
+    }
+    setSaving(false);
+    onComplete({ bizName: bn, bizType: bt, googleLink: gl, phone: ph });
+  };
 
   return (
     <div
@@ -27,7 +60,6 @@ export default function Onboarding({ user, onComplete }) {
         flexDirection: "column",
       }}
     >
-      {/* Top bar */}
       <div
         style={{
           padding: "16px 22px",
@@ -39,10 +71,11 @@ export default function Onboarding({ user, onComplete }) {
         }}
       >
         <Wordmark size={14} />
-        <span style={{ fontSize: 12.5, color: G.muted }}>Step {step} of 3</span>
+        <span style={{ fontSize: 12.5, color: G.muted }}>
+          Step {step} of 3
+        </span>
       </div>
 
-      {/* Progress bar */}
       <div style={{ height: 3, background: G.border }}>
         <div
           style={{
@@ -54,7 +87,6 @@ export default function Onboarding({ user, onComplete }) {
         />
       </div>
 
-      {/* Content */}
       <div
         style={{
           flex: 1,
@@ -65,8 +97,13 @@ export default function Onboarding({ user, onComplete }) {
         }}
       >
         <div style={{ width: "100%", maxWidth: 440 }}>
-          {/* Step indicators */}
-          <div style={{ display: "flex", gap: 0, marginBottom: 36 }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 0,
+              marginBottom: 36,
+            }}
+          >
             {steps.map((s, i) => (
               <div
                 key={s.n}
@@ -97,7 +134,9 @@ export default function Onboarding({ user, onComplete }) {
                     height: 26,
                     borderRadius: "50%",
                     background: step >= s.n ? G.accent : G.surface,
-                    border: `2px solid ${step >= s.n ? G.accent : G.border}`,
+                    border: `2px solid ${
+                      step >= s.n ? G.accent : G.border
+                    }`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -125,11 +164,9 @@ export default function Onboarding({ user, onComplete }) {
             ))}
           </div>
 
-          {/* Step 1: Business setup */}
+          {/* Step 1: Business info */}
           {step === 1 && (
-            <div
-              onKeyDown={(e) => e.key === "Enter" && bn && setStep(2)}
-            >
+            <div onKeyDown={(e) => e.key === "Enter" && bn && bt && setStep(2)}>
               <h2
                 style={{
                   fontFamily: "'Instrument Serif',serif",
@@ -141,40 +178,90 @@ export default function Onboarding({ user, onComplete }) {
               >
                 Set up your business
               </h2>
-              <p style={{ color: G.muted, marginBottom: 24, fontSize: 14 }}>
+              <p
+                style={{
+                  color: G.muted,
+                  marginBottom: 24,
+                  fontSize: 14,
+                }}
+              >
                 This appears in your dashboard and messages.
               </p>
-
               <Field
                 label="Business name"
                 value={bn}
                 onChange={(e) => setBn(e.target.value)}
                 placeholder="Mike's Dental Clinic"
               />
-              <Sel
-                label="Primary service"
-                value={bt}
-                onChange={(e) => setBt(e.target.value)}
-                options={SERVICES}
-              />
+              <div style={{ marginBottom: 16 }}>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: G.inkSoft,
+                    marginBottom: 6,
+                  }}
+                >
+                  Business category
+                </label>
+                <select
+                  value={bt}
+                  onChange={(e) => setBt(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    fontSize: 14,
+                    fontFamily: "Manrope, sans-serif",
+                    color: bt ? G.ink : G.muted,
+                    background: G.surface,
+                    border: `1.5px solid ${G.border}`,
+                    borderRadius: 10,
+                    outline: "2px solid transparent",
+                    cursor: "pointer",
+                    appearance: "none",
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239A9186' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 12px center",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <option value="" disabled>
+                    Select a category
+                  </option>
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <Field
-                label="Your phone (optional)"
+                label="Business phone (optional)"
                 value={ph}
                 onChange={(e) => setPh(e.target.value)}
                 placeholder="+1 (555) 000-0000"
               />
-
-              <Btn fullWidth size="lg" onClick={() => bn && setStep(2)}>
+              <Field
+                label="Website (optional)"
+                value={web}
+                onChange={(e) => setWeb(e.target.value)}
+                placeholder="https://mybusiness.com"
+              />
+              <Btn
+                fullWidth
+                size="lg"
+                onClick={() => bn && bt && setStep(2)}
+                disabled={!bn || !bt}
+              >
                 Continue →
               </Btn>
             </div>
           )}
 
-          {/* Step 2: Google link */}
+          {/* Step 2: Review link */}
           {step === 2 && (
-            <div
-              onKeyDown={(e) => e.key === "Enter" && setStep(3)}
-            >
+            <div onKeyDown={(e) => e.key === "Enter" && setStep(3)}>
               <h2
                 style={{
                   fontFamily: "'Instrument Serif',serif",
@@ -196,7 +283,6 @@ export default function Onboarding({ user, onComplete }) {
               >
                 Customers click this to leave your review.
               </p>
-
               <Field
                 label="Google review link"
                 value={gl}
@@ -204,7 +290,6 @@ export default function Onboarding({ user, onComplete }) {
                 placeholder="https://g.page/r/..."
                 hint="Google Maps → Your Business → Share → Copy review link"
               />
-
               <div
                 style={{
                   padding: "14px 16px",
@@ -228,7 +313,6 @@ export default function Onboarding({ user, onComplete }) {
                   Skip for now. Add it later from Settings.
                 </p>
               </div>
-
               <div style={{ display: "flex", gap: 8 }}>
                 <Btn variant="secondary" onClick={() => setStep(1)}>
                   ← Back
@@ -240,31 +324,41 @@ export default function Onboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 3: All set */}
+          {/* Step 3: Success */}
           {step === 3 && (
             <div>
-              <h2
-                style={{
-                  fontFamily: "'Instrument Serif',serif",
-                  fontSize: 28,
-                  fontWeight: 400,
-                  margin: "0 0 6px",
-                  letterSpacing: "-0.5px",
-                }}
-              >
-                You're all set 🎉
-              </h2>
-              <p
-                style={{
-                  color: G.muted,
-                  marginBottom: 24,
-                  fontSize: 14,
-                  lineHeight: 1.7,
-                }}
-              >
-                Here's your first review request preview.
-              </p>
-
+              <div style={{ textAlign: "center", marginBottom: 24 }}>
+                <div
+                  style={{
+                    fontSize: 64,
+                    marginBottom: 12,
+                    animation: "fs 0.6s ease",
+                  }}
+                >
+                  🎉
+                </div>
+                <h2
+                  style={{
+                    fontFamily: "'Instrument Serif',serif",
+                    fontSize: 28,
+                    fontWeight: 400,
+                    margin: "0 0 6px",
+                    letterSpacing: "-0.5px",
+                  }}
+                >
+                  You're all set!
+                </h2>
+                <p
+                  style={{
+                    color: G.muted,
+                    marginBottom: 24,
+                    fontSize: 14,
+                    lineHeight: 1.7,
+                  }}
+                >
+                  Your business profile is ready. Start collecting reviews.
+                </p>
+              </div>
               <Card
                 style={{
                   marginBottom: 20,
@@ -294,12 +388,11 @@ export default function Onboarding({ user, onComplete }) {
                     fontStyle: "italic",
                   }}
                 >
-                  "Hi [Customer Name]! Thanks for visiting {bn || "us"} today. A
-                  quick Google review would mean the world — 30 seconds:{" "}
-                  {gl || "your-link"}"
+                  "Hi [Customer Name]! Thanks for visiting {bn || "us"} today.
+                  A quick Google review would mean the world — 30 seconds:{" "}
+                  {gl || "your-link"}
                 </p>
               </Card>
-
               {[
                 { t: "AI personalises every message" },
                 { t: "Sent instantly via SMS or email" },
@@ -315,30 +408,35 @@ export default function Onboarding({ user, onComplete }) {
                   }}
                 >
                   <span
-                    style={{ color: G.success, fontWeight: 700, fontSize: 13 }}
+                    style={{
+                      color: G.success,
+                      fontWeight: 700,
+                      fontSize: 13,
+                    }}
                   >
                     ✓
                   </span>
-                  <span style={{ fontSize: 13.5, color: G.inkSoft }}>{i.t}</span>
+                  <span style={{ fontSize: 13.5, color: G.inkSoft }}>
+                    {i.t}
+                  </span>
                 </div>
               ))}
-
               <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
-                <Btn variant="secondary" onClick={() => setStep(2)}>
+                <Btn
+                  variant="secondary"
+                  onClick={() => setStep(2)}
+                  disabled={saving}
+                >
                   ← Back
                 </Btn>
                 <Btn
                   fullWidth
                   size="lg"
-                  onClick={() =>
-                    onComplete({
-                      bizName: bn,
-                      bizType: bt,
-                      googleLink: gl,
-                    })
-                  }
+                  onClick={handleComplete}
+                  loading={saving}
+                  disabled={saving}
                 >
-                  Go to dashboard →
+                  {saving ? "Saving…" : "Go to dashboard →"}
                 </Btn>
               </div>
             </div>

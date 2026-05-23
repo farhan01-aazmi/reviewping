@@ -1,27 +1,10 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
-
-// Data imports
 import { G } from "../../data/theme";
-import { NAV_ITEMS, MAIN_SCREENS, SERVICES } from "../../data/constants";
-import {
-  SEED_REVIEWS,
-  SEED_TEMPLATES,
-  SEED_TEAM,
-  SEED_CONTACTS,
-  SEED_NOTIFS,
-} from "../../data/seedData";
-
-// Config
+import { NAV_ITEMS, MAIN_SCREENS } from "../../data/constants";
 import { supabase } from "../../config/supabase";
+import { Toaster, toast } from "sonner";
+import { Wordmark, Pill } from "../ui";
 
-// Hooks
-import { useSupabaseArray } from "../../hooks/useSupabaseArray";
-import { useToast } from "../../hooks/useToast";
-
-// UI
-import { ToastContainer, Wordmark, Pill, Btn, Card } from "../ui";
-
-// Pages — lazily loaded for code splitting
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const SendReq = lazy(() => import("../pages/SendReq"));
 const ReviewsPage = lazy(() => import("../pages/ReviewsPage"));
@@ -52,107 +35,56 @@ export default function AppShell({ user: initUser, onLogout }) {
   const [prevScreen, setPrevScreen] = useState(null);
   const userId = initUser?.id;
 
-  // Data state synced with Supabase
-  const [reviews, setReviews] = useSupabaseArray("reviews", userId, SEED_REVIEWS);
-  const [templates, setTemplates] = useSupabaseArray(
-    "templates",
-    userId,
-    SEED_TEMPLATES
-  );
-  const [team, setTeam] = useSupabaseArray("team_members", userId, SEED_TEAM);
-  const [contacts, setContacts] = useSupabaseArray("contacts", userId, SEED_CONTACTS);
-  const [notifs, setNotifs] = useSupabaseArray(
-    "notifications",
-    userId,
-    SEED_NOTIFS
-  );
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("gbp") === "connected") {
+      toast("Google Business Profile connected!");
+      window.history.replaceState({}, "", "/dashboard");
+    } else if (params.get("gbp") === "error") {
+      const msg = params.get("msg");
+      toast(msg === "expired" ? "Connection expired. Try again." : "Failed to connect GBP", "error");
+      window.history.replaceState({}, "", "/dashboard");
+    }
+  }, []);
 
-  // Local state for plan, biz, user
+  const [reviews, setReviews] = useState([]);
+  const [templates, setTemplates] = useState([]);
+  const [team, setTeam] = useState([]);
+  const [notifs, setNotifs] = useState([]);
+
   const [plan, setPlan] = useState("growth");
   const [biz, setBiz] = useState({
     bizName: initUser?.biz || "My Business",
-    bizType: "Dental Appointment",
+    bizType: "",
     googleLink: "",
   });
   const [user, setUser] = useState(initUser);
 
-  // Toast system
-  const { toasts, toast } = useToast();
-
-  // Load business settings & plan from Supabase
   useEffect(() => {
     if (!userId) return;
-    supabase
-      .from("business_settings")
-      .select("*")
-      .eq("user_id", userId)
-      .single()
-      .then(({ data }) => {
-        if (data)
-          setBiz({
-            bizName: data.business_name,
-            bizType: data.biz_type,
-            googleLink: data.google_link,
-          });
-      });
-    supabase
-      .from("profiles")
-      .select("plan")
-      .eq("id", userId)
-      .single()
-      .then(({ data }) => {
-        if (data?.plan) setPlan(data.plan);
-      });
+    supabase.from("business_settings").select("*").eq("user_id", userId).single().then(({ data }) => {
+      if (data) setBiz({ bizName: data.business_name || "", bizType: data.business_category || "", googleLink: data.review_link || "" });
+    });
+    supabase.from("profiles").select("plan").eq("id", userId).single().then(({ data }) => {
+      if (data?.plan) setPlan(data.plan);
+    });
   }, [userId]);
 
-  // Sync biz changes to Supabase
-  const setBizAndSync = useCallback(
-    (updater) => {
-      setBiz((prev) => {
-        const next = typeof updater === "function" ? updater(prev) : updater;
-        if (userId)
-          supabase.from("business_settings").upsert({
-            user_id: userId,
-            business_name: next.bizName,
-            biz_type: next.bizType,
-            google_link: next.googleLink,
-            updated_at: new Date().toISOString(),
-          });
-        return next;
-      });
-    },
-    [userId]
-  );
+  const setBizAndSync = useCallback((updater) => {
+    setBiz((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      if (userId) supabase.from("business_settings").upsert({ user_id: userId, business_name: next.bizName, business_category: next.bizType, review_link: next.googleLink, updated_at: new Date().toISOString() });
+      return next;
+    });
+  }, [userId]);
 
-  // Sync plan changes to Supabase — ONLY called after Stripe webhook confirms payment
-  const setPlanAndSync = useCallback(
-    (updater) => {
-      setPlan((prev) => {
-        const next = typeof updater === "function" ? updater(prev) : updater;
-        // Plan changes now go through Stripe Checkout — the webhook listener
-        // updates the DB server-side. This function only updates local state
-        // for UI responsiveness after the webhook fires.
-        return next;
-      });
-    },
-    [userId]
-  );
+  const setPlanAndSync = useCallback((updater) => {
+    setPlan((prev) => typeof updater === "function" ? updater(prev) : updater);
+  }, [userId]);
 
-  // Sync user profile changes to Supabase
-  const setUserAndSync = useCallback(
-    (updater) => {
-      setUser((prev) => {
-        const next = typeof updater === "function" ? updater(prev) : updater;
-        if (userId)
-          supabase
-            .from("profiles")
-            .update({ name: next.name, email: next.email })
-            .eq("id", userId);
-        return next;
-      });
-    },
-    [userId]
-  );
+  const setUserAndSync = useCallback((updater) => {
+    setUser((prev) => typeof updater === "function" ? updater(prev) : updater);
+  }, [userId]);
 
   // Navigation helpers
   const navigate = useCallback(
@@ -169,36 +101,12 @@ export default function AppShell({ user: initUser, onLogout }) {
   };
 
   // Handle a sent review request
-  const handleSent = ({ name, service, channel, sentAt }) => {
-    const newReview = {
-      id: Date.now(),
-      name,
-      service,
-      rating: null,
-      text: null,
-      sentAt: sentAt || Date.now(),
-      status: "pending",
-      channel,
-      reply: null,
-    };
-    setReviews((p) => [newReview, ...p]);
-    setNotifs((p) => [
-      {
-        id: Date.now(),
-        type: "pending",
-        title: "Request sent",
-        body: `${name} received your review request via ${channel}.`,
-        time: Date.now(),
-        read: false,
-        icon: "📤",
-      },
-      ...p,
-    ]);
-    toast(`Request sent to ${name}`);
+  const handleSent = ({ name, channel }) => {
+    toast.success(`Request sent to ${name}`);
     setTimeout(() => setScreen("dashboard"), 60);
   };
 
-  const unread = notifs.filter((n) => !n.read).length;
+  const unread = (notifs || []).filter((n) => !n.read).length;
   const isSecondary = !MAIN_SCREENS.includes(screen);
 
   // Bottom navigation items with inline SVGs
@@ -251,10 +159,10 @@ export default function AppShell({ user: initUser, onLogout }) {
         flexDirection: "column",
       }}
     >
-      <ToastContainer toasts={toasts} />
+      <Toaster richColors position="top-center" />
 
       {/* TOPBAR */}
-      <div
+      <header
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -289,6 +197,7 @@ export default function AppShell({ user: initUser, onLogout }) {
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button
             onClick={() => navigate("notifications")}
+            aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ""}`}
             style={{
               background: "none",
               border: "none",
@@ -346,10 +255,10 @@ export default function AppShell({ user: initUser, onLogout }) {
             variant={plan === "growth" ? "success" : "info"}
           />
         </div>
-      </div>
+      </header>
 
       {/* CONTENT AREA */}
-      <div
+      <main
         style={{
           flex: 1,
           overflowY: "auto",
@@ -376,7 +285,7 @@ export default function AppShell({ user: initUser, onLogout }) {
         >
           {screen === "dashboard" && (
             <Dashboard
-              reviews={reviews}
+              userId={userId}
               biz={biz}
               onSend={() => navigate("send")}
               onNav={navigate}
@@ -386,46 +295,26 @@ export default function AppShell({ user: initUser, onLogout }) {
             <SendReq
               onBack={goBack}
               onSent={handleSent}
-              templates={templates}
               biz={biz}
-              toast={toast}
+              userId={userId}
             />
           )}
           {screen === "reviews" && (
             <ReviewsPage
-              reviews={reviews}
-              setReviews={setReviews}
+              userId={userId}
               onSend={() => navigate("send")}
-              toast={toast}
             />
           )}
-          {screen === "analytics" && <Analytics reviews={reviews} />}
-          {screen === "templates" && (
-            <Templates
-              templates={templates}
-              setTemplates={setTemplates}
-              toast={toast}
-            />
-          )}
-          {screen === "automations" && <Automations toast={toast} />}
-          {screen === "contacts" && (
-            <Contacts
-              contacts={contacts}
-              setContacts={setContacts}
-              onSend={(c) => {
-                navigate("send");
-              }}
-              toast={toast}
-            />
-          )}
-          {screen === "qrcode" && <QRCode biz={biz} toast={toast} />}
+          {screen === "analytics" && <Analytics userId={userId} />}
+          {screen === "templates" && <Templates userId={userId} />}
+          {screen === "automations" && <Automations />}
+          {screen === "contacts" && <Contacts userId={userId} />}
+          {screen === "qrcode" && <QRCode biz={biz} />}
           {screen === "widget" && <WidgetEmbed biz={biz} />}
-          {screen === "integrations" && <Integrations plan={plan} toast={toast} />}
-          {screen === "notifications" && (
-            <Notifications notifs={notifs} setNotifs={setNotifs} onBack={goBack} />
-          )}
+          {screen === "integrations" && <Integrations plan={plan} />}
+          {screen === "notifications" && <Notifications userId={userId} />}
           {screen === "billing" && (
-            <Billing plan={plan} setPlan={setPlanAndSync} toast={toast} />
+            <Billing plan={plan} setPlan={setPlanAndSync} />
           )}
           {screen === "settings" && (
             <Settings
@@ -433,43 +322,26 @@ export default function AppShell({ user: initUser, onLogout }) {
               setBiz={setBizAndSync}
               user={user}
               setUser={setUserAndSync}
-              toast={toast}
             />
           )}
-          {screen === "team" && (
-            <Team
-              plan={plan}
-              team={team}
-              setTeam={setTeam}
-              toast={toast}
-            />
-          )}
+          {screen === "team" && <Team plan={plan} userId={userId} />}
           {screen === "help" && <Help />}
-          {screen === "privacy" && (
-            <AppPrivacyPolicy onBack={goBack} />
-          )}
-          {screen === "terms" && (
-            <AppTerms onBack={goBack} />
-          )}
+          {screen === "privacy" && <AppPrivacyPolicy onBack={goBack} />}
+          {screen === "terms" && <AppTerms onBack={goBack} />}
           {screen === "more" && (
             <More onNav={navigate} onLogout={onLogout} unreadCount={unread} />
           )}
-          {screen === "sentlog" && <SentLog reviews={reviews} />}
-          {screen === "referral" && <Referral user={user} toast={toast} />}
+          {screen === "sentlog" && <SentLog userId={userId} />}
+          {screen === "referral" && <Referral user={user} />}
           {screen === "changelog" && <Changelog />}
           {screen === "bulk" && (
-            <BulkSend
-              biz={biz}
-              templates={templates}
-              toast={toast}
-              onSent={handleSent}
-            />
+            <BulkSend biz={biz} onSent={handleSent} />
           )}
         </Suspense>
-      </div>
+      </main>
 
       {/* BOTTOM NAV */}
-      <div
+      <nav
         style={{
           position: "fixed",
           bottom: 0,
@@ -530,7 +402,7 @@ export default function AppShell({ user: initUser, onLogout }) {
             </span>
           </button>
         ))}
-      </div>
+      </nav>
     </div>
   );
 }

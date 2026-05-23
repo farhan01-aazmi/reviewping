@@ -12,13 +12,12 @@ export default defineConfig({
       output: {
         codeSplitting: true,
         manualChunks(id) {
-          // ⚡ Core vendor: React runtime — loaded on every page
           if (id.includes('node_modules/react')) return 'vendor-react';
-          // ⚡ Heavy charting: recharts — only loaded when user visits Analytics
-          if (id.includes('node_modules/recharts')) return 'vendor-recharts';
-          // ⚡ Database client: supabase — needed for auth on most pages
+          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3')) return 'vendor-recharts';
           if (id.includes('node_modules/@supabase')) return 'vendor-supabase';
-          // 📦 Everything else (lucide, d3, etc.)
+          if (id.includes('node_modules/@sentry')) return 'vendor-sentry';
+          if (id.includes('node_modules/react-helmet-async')) return 'vendor-react';
+          if (id.includes('node_modules/sonner')) return 'vendor-ui';
           if (id.includes('node_modules/')) return 'vendor-other';
         },
       },
