@@ -38,7 +38,7 @@ export default function Contacts({ userId }) {
       .from("contacts")
       .select("*")
       .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+      .order("id", { ascending: false });
     if (error) {
       setFetchError(error.message);
       toast.error("Failed to load contacts");
@@ -575,17 +575,6 @@ export default function Contacts({ userId }) {
               <div style={{ fontSize: 12, color: G.muted }}>
                 {[c.phone, c.email].filter(Boolean).join(" · ") || "No contact info"}
               </div>
-              {c.created_at && (
-                <div
-                  style={{
-                    fontSize: 11.5,
-                    color: G.mutedLo,
-                    marginTop: 2,
-                  }}
-                >
-                  Added {fmtDate(new Date(c.created_at).getTime())}
-                </div>
-              )}
             </div>
             <div
               style={{

@@ -84,41 +84,41 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
             .from("reviews")
             .select("rating")
             .eq("user_id", userId)
-            .neq("rating", null),
+            .not("rating", "is", null),
           supabase
             .from("reviews")
             .select("id", { count: "exact", head: true })
             .eq("user_id", userId)
-            .gte("created_at", sMonth),
+            .gte("sentAt", sMonth),
           supabase
             .from("reviews")
             .select("id", { count: "exact", head: true })
             .eq("user_id", userId)
-            .gte("created_at", sLastMonth)
-            .lt("created_at", sMonth),
+            .gte("sentAt", sLastMonth)
+            .lt("sentAt", sMonth),
           supabase
             .from("reviews")
-            .select("id, replied")
+            .select("id, reply")
             .eq("user_id", userId),
           supabase
             .from("reviews")
             .select("*")
             .eq("user_id", userId)
             .eq("status", "reviewed")
-            .order("created_at", { ascending: false })
+            .order("sentAt", { ascending: false })
             .limit(5),
           supabase
             .from("reviews")
             .select("*")
             .eq("user_id", userId)
             .eq("status", "pending")
-            .order("created_at", { ascending: false })
+            .order("sentAt", { ascending: false })
             .limit(10),
           supabase
             .from("reviews")
-            .select("created_at")
+            .select("sentAt")
             .eq("user_id", userId)
-            .gte("created_at", thirtyDaysAgo),
+            .gte("sentAt", thirtyDaysAgo),
         ]);
 
         if (cancelled) return;
@@ -146,7 +146,7 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
         const thisMonth = thisMonthRes.count ?? 0;
         const lastMonth = lastMonthRes.count ?? 0;
         const replyData = replyRes.data || [];
-        const repliedCount = replyData.filter((r) => r.replied === true).length;
+        const repliedCount = replyData.filter((r) => !!r.reply).length;
         const responseRate =
           replyData.length > 0
             ? Math.round((repliedCount / replyData.length) * 100)
@@ -173,7 +173,7 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
         // Reviews per day for last 30 days
         const dayCounts = {};
         (dailyRes.data || []).forEach((r) => {
-          const day = new Date(r.created_at).toISOString().slice(0, 10);
+          const day = new Date(r.sentAt).toISOString().slice(0, 10);
           dayCounts[day] = (dayCounts[day] || 0) + 1;
         });
 
@@ -614,7 +614,7 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
                     {r.name}
                   </div>
                   <div style={{ fontSize: 12, color: G.muted }}>
-                    {r.service} · {fmtDate(r.sentAt || r.created_at)} ·{" "}
+                    {r.service} · {fmtDate(r.sentAt)} ·{" "}
                     {r.channel}
                   </div>
                 </div>
@@ -722,7 +722,7 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
                   "{r.text}"
                 </div>
                 <div style={{ fontSize: 11, color: G.mutedLo, marginTop: 4 }}>
-                  {r.service} · {fmtDate(r.sentAt || r.created_at)}
+                  {r.service} · {fmtDate(r.sentAt)}
                 </div>
               </div>
             </div>

@@ -37,7 +37,6 @@ export default function SendReq({ onBack, onSent, biz, userId }) {
         customer_email: email.trim() || null,
         customer_phone: phone.trim() || null,
         channel,
-        review_link: reviewLink,
         status: "pending",
         sent_at: new Date().toISOString(),
       });
@@ -50,16 +49,45 @@ export default function SendReq({ onBack, onSent, biz, userId }) {
 
       // Try edge function
       try {
-        await supabase.functions.invoke("send-review-request", {
-          body: {
-            customer_name: name.trim(),
-            customer_email: email.trim(),
-            review_link: reviewLink,
-            business_name: biz.bizName || "My Business",
-          },
-        });
-      } catch {
-        // Edge function not available — request saved as pending
+        const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? '';
+        if (channel === "email") {
+          const res = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              to: email.trim(),
+              subject: `How was your experience at ${biz.bizName || "My Business"}?`,
+              message: `Hi ${name.trim()}! Thank you for choosing ${biz.bizName || "My Business"}. We'd love to hear about your experience.\n\nLeave a review here: ${reviewLink}\n\nTakes less than 60 seconds.`,
+            }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: res.statusText }));
+            throw new Error(err.error || 'Failed to send email');
+          }
+        } else if (channel === "sms") {
+          const res = await fetch(`${SUPABASE_URL}/functions/v1/send-sms`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              to: phone.trim(),
+              message: `Hi ${name.trim()}! Thanks for visiting ${biz.bizName || "us"} today. A quick review would mean the world: ${reviewLink}`,
+            }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({ error: res.statusText }));
+            throw new Error(err.error || 'Failed to send SMS');
+          }
+        }
+      } catch (e) {
+        toast.error("Failed to send: " + (e.message || "Service unavailable"));
+        setLoading(false);
+        return;
       }
 
       setDone(true);

@@ -35,10 +35,10 @@ export default function Onboarding({ user, onComplete }) {
         supabase.from("business_settings").upsert({
           user_id: uid,
           business_name: bn,
-          business_category: bt,
+          biz_type: bt,
           business_phone: ph,
           business_website: web,
-          review_link: gl,
+          google_link: gl,
         }, { onConflict: "user_id" }),
         supabase.from("profiles").update({
           onboarding_completed: true,

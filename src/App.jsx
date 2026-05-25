@@ -158,15 +158,15 @@ export default function App() {
     setUser((u) => {
       const updated = { ...u, ...bizData, onboarding_completed: true };
       if (u?.id) {
-        supabase
-          .from("business_settings")
-          .upsert({
-            user_id: u.id,
-            business_name: bizData.bizName,
-            business_category: bizData.bizType,
-            review_link: bizData.googleLink,
-          })
-          .catch(console.error);
+          supabase
+            .from("business_settings")
+            .upsert({
+              user_id: u.id,
+              business_name: bizData.bizName,
+              biz_type: bizData.bizType,
+              google_link: bizData.googleLink,
+            })
+            .then(() => {}).catch(console.error);
       }
       return updated;
     });

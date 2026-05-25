@@ -176,9 +176,9 @@ export default function Analytics({ userId }) {
       const [reviewsResult, requestsResult] = await Promise.all([
         supabase
           .from("reviews")
-          .select("created_at, rating, sentiment")
+          .select("sentAt, rating")
           .eq("user_id", userId)
-          .gte("created_at", thirtyDaysAgo),
+          .gte("sentAt", thirtyDaysAgo),
         supabase
           .from("review_requests")
           .select("sent_at")
@@ -223,7 +223,7 @@ export default function Analytics({ userId }) {
   const reviewsPerDay = useMemo(() => {
     const map = {};
     reviews.forEach((r) => {
-      const day = r.created_at?.slice(0, 10);
+      const day = r.sentAt?.slice(0, 10);
       if (day) map[day] = (map[day] || 0) + 1;
     });
     return Object.entries(map)

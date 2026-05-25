@@ -63,7 +63,7 @@ export default function AppShell({ user: initUser, onLogout }) {
   useEffect(() => {
     if (!userId) return;
     supabase.from("business_settings").select("*").eq("user_id", userId).single().then(({ data }) => {
-      if (data) setBiz({ bizName: data.business_name || "", bizType: data.business_category || "", googleLink: data.review_link || "" });
+      if (data) setBiz({ bizName: data.business_name || "", bizType: data.biz_type || data.business_category || "", googleLink: data.google_link || data.review_link || "" });
     });
     supabase.from("profiles").select("plan").eq("id", userId).single().then(({ data }) => {
       if (data?.plan) setPlan(data.plan);
@@ -73,7 +73,7 @@ export default function AppShell({ user: initUser, onLogout }) {
   const setBizAndSync = useCallback((updater) => {
     setBiz((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
-      if (userId) supabase.from("business_settings").upsert({ user_id: userId, business_name: next.bizName, business_category: next.bizType, review_link: next.googleLink, updated_at: new Date().toISOString() });
+      if (userId) supabase.from("business_settings").upsert({ user_id: userId, business_name: next.bizName, biz_type: next.bizType, google_link: next.googleLink, updated_at: new Date().toISOString() });
       return next;
     });
   }, [userId]);
