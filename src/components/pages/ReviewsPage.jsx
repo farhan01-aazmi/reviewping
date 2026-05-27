@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import Btn from "../ui/Btn";
@@ -9,13 +10,20 @@ import EmptyState from "../ui/EmptyState";
 import Spinner from "../ui/Spinner";
 import { exportCSV, fmtDate, getRating } from "../../utils/formatters";
 
-const AI_FN_URL = `${import.meta.env.VITE_API_URL || "https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1"}/ai-reply-generator`;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
+const BASE_FN = SUPABASE_URL
+  ? `${SUPABASE_URL}/functions/v1`
+  : "https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1";
+const AI_FN_URL = `${BASE_FN}/ai-reply-generator`;
 
 function Skeleton({ h = 14, w = "100%" }) {
   return <div style={{ height: h, background: G.border, borderRadius: 6, width: w, animation: "pulse 1.5s ease-in-out infinite", marginBottom: 8 }} />;
 }
 
-export default function ReviewsPage({ reviews, setReviews, onSend, toast, loading, error }) {
+export default function ReviewsPage({ onSend }) {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("Newest");
@@ -23,6 +31,20 @@ export default function ReviewsPage({ reviews, setReviews, onSend, toast, loadin
   const [replyText, setReplyText] = useState("");
   const [aiLoading, setAiLoading] = useState(null);
   const [aiTone, setAiTone] = useState("Professional");
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase.from("reviews").select("*").order("sentAt", { ascending: false }).then(({ data, error: err }) => {
+      if (!cancelled) {
+        if (err) { setError(err.message); setLoading(false); return; }
+        setReviews(data || []);
+        setLoading(false);
+      }
+    }).catch((e) => {
+      if (!cancelled) { setError(e.message); setLoading(false); }
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   let list =
     filter === "All"
@@ -45,13 +67,13 @@ export default function ReviewsPage({ reviews, setReviews, onSend, toast, loadin
   else if (sort === "Rating ↓")
     list = [...list].sort((a, b) => getRating(b) - getRating(a));
 
-  const saveReply = (id) => {
-    setReviews((p) =>
-      p.map((r) => (r.id === id ? { ...r, reply: replyText } : r))
-    );
+  const saveReply = async (id) => {
+    const { error } = await supabase.from("reviews").update({ reply: replyText }).eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    setReviews((p) => p.map((r) => (r.id === id ? { ...r, reply: replyText } : r)));
     setReplyId(null);
     setReplyText("");
-    toast("Reply saved successfully");
+    toast.success("Reply saved");
   };
 
   const generateAiReply = async (r) => {

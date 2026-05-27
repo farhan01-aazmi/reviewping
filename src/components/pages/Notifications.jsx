@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
@@ -5,7 +7,8 @@ import Pill from "../ui/Pill";
 import EmptyState from "../ui/EmptyState";
 import { fmtDate } from "../../utils/formatters";
 
-export default function Notifications({ notifs, setNotifs, onBack }) {
+export default function Notifications() {
+  const [notifs, setNotifs] = useState([]);
   const markAll = () => {
     setNotifs((p) => p.map((n) => ({ ...n, read: true })));
   };

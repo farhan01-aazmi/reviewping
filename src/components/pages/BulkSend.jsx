@@ -6,10 +6,14 @@ import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Field from "../ui/Field";
 import Sel from "../ui/Sel";
+import { toast } from "sonner";
 
-const FUNCTION_URL = "https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
+const FUNCTION_URL = SUPABASE_URL
+  ? `${SUPABASE_URL}/functions/v1`
+  : "https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1";
 
-export default function BulkSend({ biz, templates, toast, onSent }) {
+export default function BulkSend({ biz, templates, onSent }) {
   const [rows, setRows] = useState([]);
   const [file, setFile] = useState(null);
   const [sending, setSending] = useState(false);

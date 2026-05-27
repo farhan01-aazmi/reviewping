@@ -4,19 +4,16 @@ import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Pill from "../ui/Pill";
 import { fmtDate } from "../../utils/formatters";
+import { toast } from "sonner";
 
-export default function Referral({ user, toast }) {
+export default function Referral({ user }) {
   const code = `RP-${(user?.name || "USER")
     .toUpperCase()
     .replace(/\s/g, "")
     .slice(0, 6)}`;
   const link = `https://reviewping.io/?ref=${code}`;
   const [copied, setCopied] = useState(false);
-  const [refs] = useState([
-    { name: "David Chen", status: "active", earned: "$39", joined: Date.now() - 10 * 86400000 },
-    { name: "Priya Sharma", status: "trial", earned: "Pending", joined: Date.now() - 3 * 86400000 },
-    { name: "Sam Wilson", status: "active", earned: "$39", joined: Date.now() - 20 * 86400000 },
-  ]);
+  const [refs] = useState([]);
 
   const total = refs.filter((r) => r.status === "active").length * 39;
 

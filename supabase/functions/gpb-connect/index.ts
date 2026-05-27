@@ -66,10 +66,14 @@ serve(async (req) => {
   // --- DISCONNECT ---
   if (action === "disconnect") {
     const token = req.headers.get("Authorization")?.replace("Bearer ", "") || ""
-    const { data: { user } } = await supabase.auth.getUser(token)
-    if (user) {
-      await supabase.from("gbp_connections").delete().eq("user_id", user.id)
+    if (!token) {
+      return json({ error: "Authentication required" }, 401)
     }
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
+    if (authErr || !user) {
+      return json({ error: "Unauthorized" }, 401)
+    }
+    await supabase.from("gbp_connections").delete().eq("user_id", user.id)
     return json({ success: true })
   }
 

@@ -5,48 +5,10 @@ import Card from "../ui/Card";
 import Field from "../ui/Field";
 import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
+import { toast } from "sonner";
 
-const AUTO_DEFAULTS = [
-  {
-    id: 1,
-    name: "Send after appointment",
-    trigger: "After service ends",
-    delay: "1 hour",
-    channel: "SMS",
-    active: true,
-    sent: 142,
-  },
-  {
-    id: 2,
-    name: "Follow-up if no response",
-    trigger: "No response in 48h",
-    delay: "48 hours",
-    channel: "SMS",
-    active: true,
-    sent: 38,
-  },
-  {
-    id: 3,
-    name: "Email follow-up",
-    trigger: "After service ends",
-    delay: "2 hours",
-    channel: "Email",
-    active: false,
-    sent: 0,
-  },
-  {
-    id: 4,
-    name: "Gym monthly check-in",
-    trigger: "Monthly repeat customers",
-    delay: "30 days",
-    channel: "SMS",
-    active: false,
-    sent: 0,
-  },
-];
-
-export default function Automations({ toast }) {
-  const [rules, setRules] = useState(AUTO_DEFAULTS);
+export default function Automations() {
+  const [rules, setRules] = useState([]);
   const [showNew, setShowNew] = useState(false);
   const [nName, setNName] = useState("");
   const [nDelay, setNDelay] = useState("1 hour");

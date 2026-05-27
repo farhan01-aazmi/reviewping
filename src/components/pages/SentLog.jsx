@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
@@ -6,11 +7,30 @@ import Pill from "../ui/Pill";
 import Stars from "../ui/Stars";
 import { fmtDate } from "../../utils/formatters";
 
-export default function SentLog({ reviews }) {
+export default function SentLog({ userId }) {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
 
-  let list = [...reviews].sort((a, b) => b.sentAt - a.sentAt);
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    supabase
+      .from("reviews")
+      .select("*")
+      .eq("user_id", userId)
+      .order("sentAt", { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) console.error(error);
+        setReviews(data || []);
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [userId]);
+
+  let list = loading ? [] : [...reviews].sort((a, b) => b.sentAt - a.sentAt);
   if (filter === "Reviewed")
     list = list.filter((r) => r.status === "reviewed");
   if (filter === "Pending")
@@ -91,9 +111,13 @@ export default function SentLog({ reviews }) {
           marginBottom: 10,
         }}
       >
-        {list.length} messages
+        {loading ? "Loading..." : `${list.length} messages`}
       </div>
-      {list.length === 0 ? (
+      {loading ? (
+        <div style={{ textAlign: "center", padding: 40, color: G.muted }}>
+          Loading messages…
+        </div>
+      ) : list.length === 0 ? (
         <div style={{ textAlign: "center", padding: 40, color: G.muted }}>
           No messages found.
         </div>

@@ -6,8 +6,18 @@ import Card from "../ui/Card";
 import Field from "../ui/Field";
 import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
+import { toast } from "sonner";
 
-export default function Templates({ templates, setTemplates, toast }) {
+const DEFAULT_TEMPLATES = [
+  { id: 1, name: "Dental check-up follow-up", text: "Hi {name}! Thanks for visiting us today. We'd love your feedback: {link}", service: "Dental Appointment" },
+  { id: 2, name: "Restaurant review request", text: "Thanks for dining with us, {name}! Your review helps others discover great food: {link}", service: "Restaurant Dining" },
+  { id: 3, name: "Auto service follow-up", text: "Hi {name}, your {service} is complete. Mind leaving a quick review? {link}", service: "Car Service" },
+  { id: 4, name: "Salon visit thank-you", text: "Thanks {name} for stopping by today! A quick review helps us a ton: {link}", service: "Hair & Beauty" },
+  { id: 5, name: "General follow-up", text: "Hi {name}! Thanks for your {service} today. A quick review would mean a lot: {link}", service: "All" },
+];
+
+export default function Templates() {
+  const [templates, setTemplates] = useState(DEFAULT_TEMPLATES);
   const [editing, setEditing] = useState(null);
   const [eName, setEName] = useState("");
   const [eText, setEText] = useState(

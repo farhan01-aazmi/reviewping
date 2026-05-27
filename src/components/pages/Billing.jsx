@@ -6,8 +6,9 @@ import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Pill from "../ui/Pill";
 import ConfirmModal from "../ui/ConfirmModal";
+import { toast } from "sonner";
 
-export default function Billing({ plan, setPlan, toast }) {
+export default function Billing({ plan, setPlan }) {
   const cur = PLANS.find((p) => p.id === plan) || PLANS[1];
   const [annual, setAnnual] = useState(false);
   const [confirm, setConfirm] = useState(null);
@@ -20,7 +21,9 @@ export default function Billing({ plan, setPlan, toast }) {
       const result = await createSubscription({ price_id, return_url: window.location.href });
       if (result?.url) {
         window.location.href = result.url;
+        return; // page will navigate away
       }
+      toast("Checkout URL not returned", "error");
     } catch (err) {
       toast(err.message || "Failed to start checkout", "error");
     }
@@ -103,9 +106,9 @@ export default function Billing({ plan, setPlan, toast }) {
           This month's usage
         </div>
         {[
-          { l: "Review requests", v: 23, max: plan === "starter" ? 50 : null },
-          { l: "SMS messages", v: 18, max: null },
-          { l: "Email messages", v: 5, max: null },
+          { l: "Review requests", v: 0, max: plan === "starter" ? 50 : null },
+          { l: "SMS messages", v: 0, max: null },
+          { l: "Email messages", v: 0, max: null },
         ].map((u) => (
           <div key={u.l} style={{ marginBottom: 14 }}>
             <div
@@ -221,23 +224,22 @@ export default function Billing({ plan, setPlan, toast }) {
         <div
           style={{
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            gap: 12,
-            padding: "12px 14px",
+            gap: 10,
+            padding: "20px 14px",
             background: G.bg,
-            border: `1.5px solid ${G.border}`,
+            border: `1.5px dashed ${G.border}`,
             borderRadius: 8,
+            textAlign: "center",
           }}
         >
-          <span style={{ fontSize: 22 }}>💳</span>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 600, fontSize: 14 }}>
-              Visa ending 4242
-            </div>
-            <div style={{ fontSize: 12, color: G.muted }}>Expires 12/27</div>
+          <span style={{ fontSize: 28, opacity: 0.4 }}>💳</span>
+          <div style={{ fontSize: 13, color: G.muted }}>
+            No payment method saved yet.
           </div>
           <Btn variant="secondary" size="sm">
-            Update
+            Add payment method
           </Btn>
         </div>
       </Card>
@@ -245,40 +247,16 @@ export default function Billing({ plan, setPlan, toast }) {
         <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
           Billing history
         </div>
-        {[
-          { d: "1 May 2026", a: `$${cur.price}.00` },
-          { d: "1 Apr 2026", a: `$${cur.price}.00` },
-          { d: "1 Mar 2026", a: `$${cur.price}.00` },
-        ].map((inv, i) => (
-          <div
-            key={i}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "10px 0",
-              borderBottom: i < 2 ? `1px solid ${G.border}` : "none",
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 13.5, fontWeight: 500 }}>{inv.d}</div>
-              <div style={{ fontSize: 11.5, color: G.muted }}>
-                {cur.name} Plan
-              </div>
-            </div>
-            <div
-              style={{
-                textAlign: "right",
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <span style={{ fontSize: 13.5, fontWeight: 600 }}>{inv.a}</span>
-              <Pill color={G.success}>Paid</Pill>
-            </div>
-          </div>
-        ))}
+        <div
+          style={{
+            padding: "20px 14px",
+            textAlign: "center",
+            fontSize: 13,
+            color: G.muted,
+          }}
+        >
+          No billing history yet.
+        </div>
       </Card>
     </div>
   );

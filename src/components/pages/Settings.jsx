@@ -7,8 +7,9 @@ import Field from "../ui/Field";
 import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
 import EditProfileModal from "../ui/EditProfileModal";
+import { toast } from "sonner";
 
-export default function Settings({ biz, setBiz, user, setUser, toast }) {
+export default function Settings({ biz, setBiz, user, setUser }) {
   const [bn, setBn] = useState(biz.bizName || "");
   const [gl, setGl] = useState(biz.googleLink || "");
   const [bt, setBt] = useState(biz.bizType || SERVICES[0]);

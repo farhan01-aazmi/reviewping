@@ -1,24 +1,39 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
-
-const cors = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { CORS, verifyAuth } from "../_shared/auth.ts"
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: CORS });
+  }
+
+  // Only allow POST
+  if (req.method !== "POST") {
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: CORS,
+    });
+  }
+
+  // Verify JWT authentication
+  const auth = await verifyAuth(req);
+  if (auth instanceof Response) return auth;
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
-  const token = req.headers.get('Authorization')?.replace('Bearer ', '')
-  const { data: { user } } = await supabase.auth.getUser(token ?? '')
-  if (!user) return new Response('Unauthorized', { status: 401 })
-
   const { customer_name, customer_email, review_link, business_name } = await req.json()
+  const from = Deno.env.get("FROM_EMAIL") || "ReviewPing <reviews@reviewping.io>"
+  const resendKey = Deno.env.get("RESEND_API_KEY")
+
+  if (!resendKey) {
+    return new Response(JSON.stringify({ error: "Resend API key not configured" }), {
+      status: 500, headers: CORS,
+    })
+  }
 
   const html = `
     <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;">
@@ -36,11 +51,11 @@ serve(async (req) => {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+      Authorization: `Bearer ${resendKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: `${business_name} <reviews@yourdomain.com>`,
+      from: `${business_name || "ReviewPing"} <${from.replace(/.*<(.*)>/, "$1") || "reviews@reviewping.io"}>`,
       to: customer_email,
       subject: `How was your experience at ${business_name}?`,
       html,
@@ -50,7 +65,7 @@ serve(async (req) => {
   const status = res.ok ? 'sent' : 'failed'
 
   await supabase.from('review_requests').insert({
-    user_id: user.id,
+    user_id: auth.userId,
     customer_name,
     customer_email,
     channel: 'email',
@@ -61,6 +76,6 @@ serve(async (req) => {
 
   return new Response(
     JSON.stringify({ success: res.ok }),
-    { headers: { ...cors, 'Content-Type': 'application/json' } }
+    { headers: CORS }
   )
 })

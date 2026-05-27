@@ -6,8 +6,9 @@ import Field from "../ui/Field";
 import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
 import { fmtDate } from "../../utils/formatters";
+import { toast } from "sonner";
 
-export default function Team({ plan, team, setTeam, toast }) {
+export default function Team({ plan, team, setTeam }) {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("Staff");
   const [inviting, setInviting] = useState(false);

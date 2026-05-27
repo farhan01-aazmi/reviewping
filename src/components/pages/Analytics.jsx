@@ -235,10 +235,10 @@ export default function Analytics({ userId }) {
   const sentimentData = useMemo(() => {
     const counts = { positive: 0, neutral: 0, negative: 0 };
     reviews.forEach((r) => {
-      const s = r.sentiment;
-      if (s && Object.prototype.hasOwnProperty.call(counts, s)) {
-        counts[s]++;
-      }
+      const rating = Number(r.rating);
+      if (rating >= 4) counts.positive++;
+      else if (rating === 3) counts.neutral++;
+      else if (rating >= 1) counts.negative++;
     });
     return Object.entries(counts).map(([name, value]) => ({
       name: name.charAt(0).toUpperCase() + name.slice(1),

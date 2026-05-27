@@ -4,8 +4,9 @@ import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Field from "../ui/Field";
 import Sel from "../ui/Sel";
+import { toast } from "sonner";
 
-export default function QRCode({ biz, toast }) {
+export default function QRCode({ biz }) {
   const [url, setUrl] = useState(
     biz.googleLink || "https://g.page/r/mybiz"
   );

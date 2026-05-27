@@ -5,8 +5,9 @@ import { G } from "../../data/theme";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Pill from "../ui/Pill";
+import { toast } from "sonner";
 
-export default function Integrations({ plan, toast }) {
+export default function Integrations({ plan }) {
   const [gbp, setGbp] = useState(null);
   const [gbpLoading, setGbpLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -23,9 +24,10 @@ export default function Integrations({ plan, toast }) {
   }, []);
 
   useEffect(() => {
-    supabase.from("gbp_connections").select("*").single().then(({ data }) => {
+    supabase.from("gbp_connections").select("*").single().then(({ data, error }) => {
+      if (error) { console.error("Failed to load GBP connection:", error); return; }
       if (data?.is_connected) setGbp(data);
-    });
+    }).catch(console.error);
   }, []);
 
   const doGbpConnect = async () => {
