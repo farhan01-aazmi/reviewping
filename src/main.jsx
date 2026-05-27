@@ -7,20 +7,18 @@ import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { ThemeProvider } from './data/ThemeProvider'
 
-const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
-if (sentryDsn) {
-  Sentry.init({
-    dsn: sentryDsn,
-    integrations: [
-      Sentry.browserTracingIntegration(),
-      Sentry.replayIntegration(),
-    ],
-    tracesSampleRate: 1.0,
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
-    environment: import.meta.env.MODE || 'production',
-  });
-}
+Sentry.init({
+  dsn: "https://d6d14d34380ba55eeb322339d776fe66@o4511460334829568.ingest.us.sentry.io/4511460362092544",
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+  tracesSampleRate: 1.0,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+  environment: import.meta.env.MODE || 'production',
+  sendDefaultPii: true,
+});
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
