@@ -75,16 +75,20 @@ export default function AppShell({ user: initUser, onLogout }) {
   const setBizAndSync = useCallback((updater) => {
     setBiz((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
+      if (userId && next) {
+        supabase.from("business_settings").upsert({
+          user_id: userId,
+          business_name: next.bizName,
+          biz_type: next.bizType,
+          google_link: next.googleLink,
+          updated_at: new Date().toISOString()
+        }).then(({ error }) => {
+          if (error) console.error("Failed to sync business settings:", error);
+        }).catch(console.error);
+      }
       return next;
     });
-    // Sync to DB outside of setState
-    const next = typeof updater === "function" ? updater(biz) : updater;
-    if (userId && next) {
-      supabase.from("business_settings").upsert({ user_id: userId, business_name: next.bizName, biz_type: next.bizType, google_link: next.googleLink, updated_at: new Date().toISOString() }).then(({ error }) => {
-        if (error) console.error("Failed to sync business settings:", error);
-      }).catch(console.error);
-    }
-  }, [userId, biz]);
+  }, [userId]);
 
   const setPlanAndSync = useCallback((updater) => {
     setPlan((prev) => typeof updater === "function" ? updater(prev) : updater);

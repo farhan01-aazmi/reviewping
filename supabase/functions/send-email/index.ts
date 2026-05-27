@@ -76,7 +76,8 @@ serve(async (req) => {
     );
   } catch (err) {
     console.error("send-email error:", err);
-    return new Response(JSON.stringify({ error: "Failed to send email. Please try again." }), {
+    const msg = err instanceof Error ? err.message : "Failed to send email";
+    return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: CORS,
     });

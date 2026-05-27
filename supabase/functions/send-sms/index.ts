@@ -73,7 +73,8 @@ serve(async (req) => {
     );
   } catch (err) {
     console.error("send-sms error:", err);
-    return new Response(JSON.stringify({ error: "Failed to send SMS. Please try again." }), {
+    const msg = err instanceof Error ? err.message : "Failed to send SMS";
+    return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: CORS,
     });
