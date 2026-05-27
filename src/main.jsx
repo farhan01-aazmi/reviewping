@@ -7,17 +7,20 @@ import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { ThemeProvider } from './data/ThemeProvider'
 
-Sentry.init({
-  dsn: import.meta.env.VITE_SENTRY_DSN,
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration(),
-  ],
-  tracesSampleRate: 1.0,
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
-  environment: import.meta.env.MODE || 'production',
-})
+const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration(),
+    ],
+    tracesSampleRate: 1.0,
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+    environment: import.meta.env.MODE || 'production',
+  });
+}
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -9,6 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "smoke": "node tests/smoke.mjs",
+    "smoke:prod": "node tests/smoke.mjs https://reviewping-seven.vercel.app",
+    "auth-test": "node scripts/test-auth.mjs",
     "scrape": "node scripts/lead-scraper.mjs",
     "scrape:dry-run": "node scripts/lead-scraper.mjs --dry-run",
     "scrape:dentists": "node scripts/lead-scraper.mjs --category dentist --dry-run",
@@ -42,6 +45,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.60.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",

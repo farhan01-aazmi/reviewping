@@ -1,0 +1,58 @@
+name: ReviewPing Tests
+
+on:
+  push:
+    branches: [master, staging]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  smoke-test:
+    name: Smoketest Public Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run smoketest
+        run: node tests/smoke.mjs "https://reviewping-seven.vercel.app"
+        timeout-minutes: 3
+
+  auth-test:
+    name: Test Dashboard Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/staging'
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run authenticated test
+        env:
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+        run: node scripts/test-auth.mjs
+        timeout-minutes: 3
