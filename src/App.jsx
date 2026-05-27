@@ -13,6 +13,14 @@ import Terms from "./components/layout/Terms";
 import FreeTool from "./components/layout/FreeTool";
 import NotFound from "./components/layout/NotFound";
 import AuthCallback from "./components/layout/AuthCallback";
+import FeaturesPage from "./components/layout/FeaturesPage";
+import FAQPage from "./components/layout/FAQPage";
+import BlogPage from "./components/layout/BlogPage";
+import BlogArticle from "./components/layout/BlogArticle";
+import AboutPage from "./components/layout/AboutPage";
+import ContactPage from "./components/layout/ContactPage";
+import IndustryPage from "./components/layout/IndustryPage";
+import VSPodiumPage from "./components/layout/VSPodiumPage";
 
 function pathToView(pathname) {
   if (
@@ -35,11 +43,20 @@ function pathToView(pathname) {
     "/pricing": "landing",
     "/dashboard": "app",
     "/onboarding": "onboarding",
+    "/features": "features",
+    "/faq": "faq",
+    "/blog": "blog",
+    "/about": "about",
+    "/contact": "contact",
+    "/vs/podium": "vspodium",
   };
-  return knownPaths[path] || "notfound";
+  if (knownPaths[path]) return knownPaths[path];
+  if (/^\/blog\//.test(path)) return "blogarticle";
+  if (/^\/industry\//.test(path)) return "industry";
+  return "notfound";
 }
 
-function navigate(view) {
+function navigate(view, param) {
   const viewToPath = {
     landing: "/",
     login: "/login",
@@ -50,11 +67,18 @@ function navigate(view) {
     freetool: "/tools/review-link-generator",
     app: "/dashboard",
     onboarding: "/onboarding",
+    features: "/features",
+    faq: "/faq",
+    blog: "/blog",
+    about: "/about",
+    contact: "/contact",
+    vspodium: "/vs/podium",
     notfound: window.location.pathname,
   };
-  const url = viewToPath[view] || "/";
+  const path = view === "blogarticle" ? `/blog/${param}` : view === "industry" ? `/industry/${param}` : viewToPath[view];
+  const url = path || "/";
   if (window.location.pathname !== url) {
-    window.history.pushState({ view }, "", url);
+    window.history.pushState({ view, param }, "", url);
   }
 }
 
@@ -153,6 +177,11 @@ export default function App() {
       changeView("onboarding");
     }
   };
+
+  function getSlug() {
+    const parts = window.location.pathname.replace(/\/+$/, "").split("/");
+    return parts[parts.length - 1];
+  }
 
   const handleOnboard = (bizData) => {
     setUser((u) => {
@@ -261,6 +290,30 @@ export default function App() {
         <PrivacyPolicy onBack={() => changeView("landing")} />
       )}
       {view === "terms" && <Terms onBack={() => changeView("landing")} />}
+      {view === "features" && (
+        <FeaturesPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+      )}
+      {view === "faq" && (
+        <FAQPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+      )}
+      {view === "blog" && (
+        <BlogPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+      )}
+      {view === "blogarticle" && (
+        <BlogArticle slug={getSlug()} onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("blog")} />
+      )}
+      {view === "about" && (
+        <AboutPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+      )}
+      {view === "contact" && (
+        <ContactPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+      )}
+      {view === "industry" && (
+        <IndustryPage type={getSlug()} onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+      )}
+      {view === "vspodium" && (
+        <VSPodiumPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+      )}
       {view === "freetool" && <FreeTool onSignup={() => changeView("signup")} />}
       {view === "notfound" && <NotFound onBack={() => changeView("landing")} />}
     </>

@@ -33,6 +33,46 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
         description="Send AI-personalised review requests via SMS or email. No chasing. No copy-pasting. The $19/mo alternative to Podium. 2-minute setup, no contract."
         path="/"
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": "https://reviewping-seven.vercel.app/#organization",
+              "name": "ReviewPing",
+              "url": "https://reviewping-seven.vercel.app",
+              "description": "AI-powered review request automation for small businesses. The $19/mo alternative to Podium.",
+              "foundingDate": "2025",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "email": "hello@reviewping.io",
+                "contactType": "customer support"
+              }
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://reviewping-seven.vercel.app/#software",
+              "name": "ReviewPing",
+              "applicationCategory": "BusinessApplication",
+              "operatingSystem": "Web",
+              "description": "Automated review request platform for Google Reviews. Send AI-personalised SMS and email review requests.",
+              "offers": [
+                { "@type": "Offer", "name": "Starter", "price": "19", "priceCurrency": "USD" },
+                { "@type": "Offer", "name": "Growth", "price": "49", "priceCurrency": "USD" },
+                { "@type": "Offer", "name": "Agency", "price": "99", "priceCurrency": "USD" }
+              ]
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://reviewping-seven.vercel.app/#website",
+              "url": "https://reviewping-seven.vercel.app",
+              "name": "ReviewPing",
+              "publisher": { "@id": "https://reviewping-seven.vercel.app/#organization" }
+            }
+          ]
+        })
+      }} />
       <div
         style={{
           background: G.bg,
@@ -66,7 +106,37 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
         }}
       >
         <Wordmark size={15} />
-        <div style={{ display: "flex", gap: 6 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="hide-xs" style={{ display: "flex", gap: 14, marginRight: 14 }}>
+            {[
+              ["Features", "/features"],
+              ["Pricing", "#pricing"],
+              ["Blog", "/blog"],
+              ["FAQ", "/faq"],
+            ].map(([label, href]) => (
+              <span
+                key={label}
+                onClick={() => {
+                  if (href.startsWith("#")) {
+                    document.getElementById(href.slice(1))?.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                    window.location.href = href;
+                  }
+                }}
+                style={{
+                  fontSize: 12.5,
+                  color: G.inkSoft,
+                  cursor: "pointer",
+                  fontWeight: 500,
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={(e) => (e.target.style.color = G.accent)}
+                onMouseLeave={(e) => (e.target.style.color = G.inkSoft)}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
           <Btn variant="ghost" size="sm" onClick={onLogin}>
             Sign in
           </Btn>
@@ -612,7 +682,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
       </section>
 
       {/* Pricing */}
-      <section style={{ maxWidth: 660, margin: "0 auto 64px", padding: "0 22px" }}>
+      <section id="pricing" style={{ maxWidth: 660, margin: "0 auto 64px", padding: "0 22px" }}>
         <p
           style={{
             fontSize: 11,
@@ -888,18 +958,23 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
           }}
         >
           {[
+            ["Features", () => window.location.href="/features"],
+            ["Pricing", () => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })],
+            ["FAQ", () => window.location.href="/faq"],
+            ["Blog", () => window.location.href="/blog"],
+            ["About", () => window.location.href="/about"],
+            ["Contact", () => window.location.href="/contact"],
             ["Privacy Policy", "onPrivacy"],
             ["Terms of Service", "onTerms"],
             ["Free Review Link Tool", "onTool"],
-            ["Help", ""],
           ].map(([l, fn]) => (
             <span
               key={l}
-              onClick={fn ? props[fn] : undefined}
+              onClick={typeof fn === "function" ? fn : props[fn] ? props[fn] : undefined}
               style={{
                 fontSize: 12.5,
                 color: G.muted,
-                cursor: fn ? "pointer" : "default",
+                cursor: typeof fn === "function" || props[fn] ? "pointer" : "default",
               }}
             >
               {l}
