@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Not Found — ReviewPing</title>
+  <meta name="description" content="The page you are looking for does not exist. ReviewPing helps small businesses automate Google review requests." />
+  <meta property="og:title" content="Page Not Found — ReviewPing" />
+  <meta property="og:description" content="The page you are looking for does not exist. ReviewPing helps small businesses automate Google review requests." />
+  <meta property="og:url" content="https://reviewping-seven.vercel.app/features" />
+  <meta name="robots" content="noindex" />
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;background:#faf9f6;color:#1a1a2e;text-align:center}
+    .c{max-width:420px}
+    h1{font-size:64px;margin:0 0 8px;font-weight:200;color:#c73b3b;line-height:1}
+    .sep{width:40px;height:3px;background:#c73b3b;margin:0 auto 20px;border-radius:2px;opacity:.3}
+    p{font-size:15px;line-height:1.6;color:#666;margin:0 0 24px}
+    a{color:#c73b3b;text-decoration:none;font-weight:600}
+    a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="c">
+    <h1>404</h1>
+    <div class="sep"></div>
+    <p>The page you are looking for does not exist or has been moved.</p>
+    <p><a href="https://reviewping-seven.vercel.app">← Back to ReviewPing</a></p>
+  </div>
+</body>
+</html>
