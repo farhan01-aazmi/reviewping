@@ -13,7 +13,7 @@ export default function SendReq({ onBack, onSent, biz, userId }) {
   const [done, setDone] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const reviewLink = biz.googleLink || "https://reviewping-eight.vercel.app";
+  const reviewLink = biz.googleLink || "https://reviewping-seven.vercel.app";
 
   const validate = () => {
     const e = {};
