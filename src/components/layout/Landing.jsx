@@ -39,9 +39,9 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
           "@graph": [
             {
               "@type": "Organization",
-              "@id": "https://reviewping-seven.vercel.app/#organization",
+              "@id": "https://reviewping-eight.vercel.app/#organization",
               "name": "ReviewPing",
-              "url": "https://reviewping-seven.vercel.app",
+              "url": "https://reviewping-eight.vercel.app",
               "description": "AI-powered review request automation for small businesses. The $19/mo alternative to Podium.",
               "foundingDate": "2025",
               "contactPoint": {
@@ -52,7 +52,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
             },
             {
               "@type": "SoftwareApplication",
-              "@id": "https://reviewping-seven.vercel.app/#software",
+              "@id": "https://reviewping-eight.vercel.app/#software",
               "name": "ReviewPing",
               "applicationCategory": "BusinessApplication",
               "operatingSystem": "Web",
@@ -65,10 +65,10 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
             },
             {
               "@type": "WebSite",
-              "@id": "https://reviewping-seven.vercel.app/#website",
-              "url": "https://reviewping-seven.vercel.app",
+              "@id": "https://reviewping-eight.vercel.app/#website",
+              "url": "https://reviewping-eight.vercel.app",
               "name": "ReviewPing",
-              "publisher": { "@id": "https://reviewping-seven.vercel.app/#organization" }
+              "publisher": { "@id": "https://reviewping-eight.vercel.app/#organization" }
             }
           ]
         })

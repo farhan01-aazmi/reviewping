@@ -36,9 +36,12 @@ try { statSync(DIST) } catch {
 mkdirSync(STATIC, { recursive: true })
 
 // 3. Write config.json with SPA rewrites
+//    The "filesystem" handle tells Vercel to check for static files first,
+//    then the catch-all routes everything else to index.html for the SPA.
 const config = {
   version: 3,
   routes: [
+    { handle: 'filesystem' },
     { src: '/(.*)', dest: '/index.html' },
   ],
 }

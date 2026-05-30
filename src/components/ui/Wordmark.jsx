@@ -1,7 +1,5 @@
-import { G } from "../../data/theme";
-import LogoMark from "./LogoMark";
-
 export default function Wordmark({ size = 28, showTagline = false, style, ...rest }) {
+  const aspectRatio = 300 / 77; // natural w/h of logo.png
   return (
     <div
       style={{
@@ -12,34 +10,29 @@ export default function Wordmark({ size = 28, showTagline = false, style, ...res
       }}
       {...rest}
     >
-      <LogoMark size={size} />
-      <div>
+      <img
+        src="/logo.png"
+        alt="ReviewPing"
+        style={{
+          height: size,
+          width: "auto",
+          objectFit: "contain",
+          display: "block",
+        }}
+      />
+      {showTagline && (
         <span
           style={{
-            fontFamily: "Instrument Serif, serif",
-            fontSize: size * 0.85,
-            fontWeight: 600,
-            color: G.ink,
-            lineHeight: 1.1,
+            fontFamily: "Manrope, sans-serif",
+            fontSize: size * 0.32,
+            color: "var(--muted, #666)",
+            fontWeight: 500,
+            letterSpacing: "0.02em",
           }}
         >
-          ReviewPing
+          Review requests, simplified.
         </span>
-        {showTagline && (
-          <span
-            style={{
-              display: "block",
-              fontFamily: "Manrope, sans-serif",
-              fontSize: size * 0.32,
-              color: G.muted,
-              fontWeight: 500,
-              letterSpacing: "0.02em",
-            }}
-          >
-            Review requests, simplified.
-          </span>
-        )}
-      </div>
+      )}
     </div>
   );
 }
