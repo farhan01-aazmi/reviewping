@@ -6,3 +6,5 @@ Disallow: /billing
 Disallow: /api
 
 Sitemap: https://reviewping-seven.vercel.app/sitemap.xml
+
+# SPA redirect fix deploy - 2026-05-30 12:30
