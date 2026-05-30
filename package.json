@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "vercel:build": "node scripts/prepare-vercel-output.mjs",
     "test": "vitest run",
     "smoke": "node tests/smoke.mjs",
     "smoke:prod": "node tests/smoke.mjs https://reviewping-seven.vercel.app",
