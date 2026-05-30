@@ -8,9 +8,8 @@ export default defineConfig({
     reportCompressedSize: true,
     chunkSizeWarningLimit: 250,
     sourcemap: false,
-    rolldownOptions: {
+    rollupOptions: {
       output: {
-        codeSplitting: true,
         manualChunks(id) {
           if (id.includes('node_modules/react')) return 'vendor-react';
           if (id.includes('node_modules/recharts') || id.includes('node_modules/d3')) return 'vendor-recharts';
