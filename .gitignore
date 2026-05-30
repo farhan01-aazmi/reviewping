@@ -20,3 +20,5 @@ Thumbs.db
 
 # ── Supabase local ─────────────────────────────────────────────────────────────
 supabase/.temp
+
+.vercel
