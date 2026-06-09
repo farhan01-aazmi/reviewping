@@ -1,10 +1,14 @@
 /**
  * Vercel Edge Middleware
  *
- * Returns proper 404 HTTP status for unknown SPA routes.
- * Known routes pass through to the SPA catch-all rewrite.
- * This ensures crawlers get correct status codes.
+ * 1. Proxies /api/edge/* requests to Supabase Edge Functions (bypasses ad blockers)
+ * 2. Returns proper 404 HTTP status for unknown SPA routes.
+ *    Known routes pass through to the SPA catch-all rewrite.
+ *    This ensures crawlers get correct status codes.
  */
+
+const SUPABASE_FN_URL = 'https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1';
+
 const KNOWN_ROUTES = new Set([
   "/",
   "/auth/callback",
@@ -36,11 +40,53 @@ const STATIC_EXTENSIONS = [
   ".css", ".js", ".json", ".xml", ".txt", ".woff2", ".woff", ".eot", ".ttf", ".otf",
 ];
 
-export default function middleware(request) {
+export default async function middleware(request) {
   const url = new URL(request.url);
   let pathname = url.pathname;
   const hasTrailingSlash = pathname.length > 1 && pathname.endsWith("/");
   const normalized = hasTrailingSlash ? pathname.slice(0, -1) : pathname;
+
+  // ═══════════════════════════════════════════════════════════
+  // EDGE PROXY: /api/edge/* → Supabase Edge Functions
+  // ═══════════════════════════════════════════════════════════
+  if (normalized.startsWith('/api/edge/')) {
+    const functionPath = normalized.replace(/^\/api\/edge\//, '');
+    const targetUrl = `${SUPABASE_FN_URL}/${functionPath}`;
+
+    try {
+      // Forward headers (auth, content-type, etc.)
+      const headers = new Headers(request.headers);
+      headers.delete('host');
+
+      // Forward the request
+      const upstream = await fetch(targetUrl, {
+        method: request.method,
+        headers,
+        body: request.body,
+      });
+
+      // Build response with CORS headers
+      const respHeaders = new Headers(upstream.headers);
+      respHeaders.set('Access-Control-Allow-Origin', '*');
+      respHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      respHeaders.set('Access-Control-Allow-Headers', 'authorization, content-type, x-client-info, apikey');
+
+      return new Response(upstream.body, {
+        status: upstream.status,
+        statusText: upstream.statusText,
+        headers: respHeaders,
+      });
+    } catch (err) {
+      console.error('Edge proxy error:', err.message);
+      return new Response(JSON.stringify({ error: 'Edge proxy failed', detail: err.message }), {
+        status: 502,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
+    }
+  }
 
   // Redirect trailing-slash URLs to non-trailing-slash (301 permanent)
   // Prevents duplicate content / SEO dilution
@@ -62,9 +108,8 @@ export default function middleware(request) {
   // Pass through known SPA routes
   if (KNOWN_ROUTES.has(normalized)) return;
 
-  // Unknown route — return proper 404 status
-  const title = "Page Not Found — ReviewPing";
-  const description = "The page you are looking for does not exist. ReviewPing helps small businesses automate Google review requests.";
+  // Unknown route - return proper 404 status
+  const title = "Page Not Found - ReviewPing";
   const homeUrl = "https://reviewping.pro";
 
   return new Response(
@@ -74,10 +119,6 @@ export default function middleware(request) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title}</title>
-  <meta name="description" content="${description}" />
-  <meta property="og:title" content="${title}" />
-  <meta property="og:description" content="${description}" />
-  <meta property="og:url" content="${url.origin}${pathname}" />
   <meta name="robots" content="noindex" />
   <style>
     body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;background:#faf9f6;color:#1a1a2e;text-align:center}
