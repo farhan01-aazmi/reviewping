@@ -51,7 +51,9 @@ export default async function middleware(request) {
   // ═══════════════════════════════════════════════════════════
   if (normalized.startsWith('/api/edge/')) {
     const functionPath = normalized.replace(/^\/api\/edge\//, '');
-    const targetUrl = `${SUPABASE_FN_URL}/${functionPath}`;
+    // Include query string in the forwarded URL
+    const queryString = url.search;
+    const targetUrl = `${SUPABASE_FN_URL}/${functionPath}${queryString}`;
 
     try {
       // Handle OPTIONS (no body)
