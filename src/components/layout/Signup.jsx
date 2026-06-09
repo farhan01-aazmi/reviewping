@@ -4,6 +4,7 @@ import { G } from "../../data/theme";
 import { validateEmail, validatePassword } from "../../utils/validators";
 import { Card, Field, Btn, LogoMark } from "../ui";
 import SEO from "../SEO";
+import { toast } from "sonner";
 
 export default function Signup({ onDone, onLogin }) {
   const [name, setName] = useState("");
@@ -13,6 +14,8 @@ export default function Signup({ onDone, onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [checkEmail, setCheckEmail] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   const go = async () => {
     if (!name || !email || !password || !biz) {
@@ -45,7 +48,7 @@ export default function Signup({ onDone, onLogin }) {
     }
 
     if (!data?.session) {
-      setError("Account created! Please check your email for a confirmation link before signing in.");
+      setCheckEmail(true);
       setLoading(false);
       return;
     }
@@ -64,6 +67,25 @@ export default function Signup({ onDone, onLogin }) {
 
     setLoading(false);
     onDone({ name, email, biz, id: data.user.id });
+  };
+
+  const handleResend = async () => {
+    setResendLoading(true);
+    try {
+      const { error: err } = await supabase.auth.resend({
+        type: "signup",
+        email,
+      });
+      if (err) {
+        toast.error(err.message);
+        setResendLoading(false);
+        return;
+      }
+      toast.success("Verification email resent!");
+    } catch (e) {
+      toast.error(e.message || "Failed to resend");
+    }
+    setResendLoading(false);
   };
 
   const doGoogle = async () => {
@@ -170,79 +192,121 @@ export default function Signup({ onDone, onLogin }) {
             <div style={{ flex: 1, height: 1, background: G.border }} />
           </div>
 
-          <Field
-            label="Full name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Mike Reynolds"
-          />
-          <Field
-            label="Business name"
-            value={biz}
-            onChange={(e) => setBiz(e.target.value)}
-            placeholder="Mike's Dental Clinic"
-          />
-          <Field
-            label="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="mike@mydental.com"
-            type="email"
-          />
-          <Field
-            label="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Min. 8 characters"
-            type="password"
-          />
+          {checkEmail ? (
+            <div style={{ textAlign: "center", padding: "8px 0" }}>
+              <div style={{ fontSize: 48, marginBottom: 12 }}>✉️</div>
+              <h3
+                style={{
+                  fontFamily: "'Instrument Serif',serif",
+                  fontSize: 20,
+                  fontWeight: 400,
+                  margin: "0 0 6px",
+                  color: G.ink,
+                }}
+              >
+                Check your email
+              </h3>
+              <p
+                style={{
+                  fontSize: 13.5,
+                  color: G.muted,
+                  margin: "0 0 20px",
+                  lineHeight: 1.6,
+                }}
+              >
+                We sent a confirmation link to <strong>{email}</strong>. Click the link to activate your account.
+              </p>
+              <Btn
+                onClick={handleResend}
+                fullWidth
+                loading={resendLoading}
+                variant="secondary"
+                size="sm"
+                style={{ marginBottom: 12 }}
+              >
+                Resend verification email
+              </Btn>
+              <p style={{ fontSize: 12, color: G.muted, margin: 0 }}>
+                Didn't get it? Check your spam folder.
+              </p>
+            </div>
+          ) : (
+            <>
+              <Field
+                label="Full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Mike Reynolds"
+              />
+              <Field
+                label="Business name"
+                value={biz}
+                onChange={(e) => setBiz(e.target.value)}
+                placeholder="Mike's Dental Clinic"
+              />
+              <Field
+                label="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="mike@mydental.com"
+                type="email"
+              />
+              <Field
+                label="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Min. 8 characters"
+                type="password"
+              />
 
-          {error && (
-            <p
-              role="alert"
-              style={{
-                color: G.accent,
-                fontSize: 12.5,
-                marginBottom: 12,
-                marginTop: -8,
-              }}
-            >
-              {error}
-            </p>
+              {error && (
+                <p
+                  role="alert"
+                  style={{
+                    color: G.accent,
+                    fontSize: 12.5,
+                    marginBottom: 12,
+                    marginTop: -8,
+                  }}
+                >
+                  {error}
+                </p>
+              )}
+
+              <Btn onClick={go} fullWidth size="lg" loading={loading} disabled={loading}>
+                Create account →
+              </Btn>
+
+              <div
+                style={{
+                  textAlign: "center",
+                  marginTop: 14,
+                  fontSize: 12,
+                  color: G.muted,
+                }}
+              >
+                By signing up you agree to our{" "}
+                <span
+                  style={{ color: G.accent, cursor: "pointer" }}
+                  onClick={() => window.history.pushState({}, "", "/terms") && window.dispatchEvent(new PopStateEvent("popstate"))}
+                  role="link"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && (window.history.pushState({}, "", "/terms"), window.dispatchEvent(new PopStateEvent("popstate")))}
+                >
+                  Terms
+                </span> &{" "}
+                <span
+                  style={{ color: G.accent, cursor: "pointer" }}
+                  onClick={() => window.history.pushState({}, "", "/privacy") && window.dispatchEvent(new PopStateEvent("popstate"))}
+                  role="link"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && (window.history.pushState({}, "", "/privacy"), window.dispatchEvent(new PopStateEvent("popstate")))}
+                >
+                  Privacy Policy
+                </span>
+              </div>
+            </>
           )}
-
-          <Btn onClick={go} fullWidth size="lg" loading={loading} disabled={loading}>
-            Create account →
-          </Btn>
-
-          <div
-            style={{
-              textAlign: "center",
-              marginTop: 14,
-              fontSize: 12,
-              color: G.muted,
-            }}
-          >
-            By signing up you agree to our{" "}
-            <span
-              style={{ color: G.accent, cursor: "pointer" }}
-              onClick={() => window.history.pushState({}, "", "/terms") && window.dispatchEvent(new PopStateEvent("popstate"))}
-              role="link"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && (window.history.pushState({}, "", "/terms"), window.dispatchEvent(new PopStateEvent("popstate")))}
-            >
-              Terms
-            </span> &{" "}
-            <span
-              style={{ color: G.accent, cursor: "pointer" }}
-              onClick={() => window.history.pushState({}, "", "/privacy") && window.dispatchEvent(new PopStateEvent("popstate"))}
-              role="link"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && (window.history.pushState({}, "", "/privacy"), window.dispatchEvent(new PopStateEvent("popstate")))}
-            >
-              Privacy Policy
-            </span>
-          </div>
         </Card>
 
         <p

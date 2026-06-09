@@ -1,84 +1,38 @@
 import { Component } from "react";
-import * as Sentry from "@sentry/react";
 import { G } from "../data/theme";
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { error: null };
+    this.state = { hasError: false, error: null };
   }
-
   static getDerivedStateFromError(error) {
-    return { error };
+    return { hasError: true, error };
   }
-
-  componentDidCatch(error, info) {
-    console.error("ErrorBoundary caught:", error, info);
-    try {
-      if (typeof Sentry?.captureException === 'function') {
-        Sentry.captureException(error, { extra: { componentStack: info?.componentStack } });
-      }
-    } catch {}
-  }
-
   render() {
-    if (this.state.error) {
+    if (this.state.hasError) {
       return (
-        <div
-          style={{
-            background: G.bg,
-            minHeight: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "'Manrope',sans-serif",
-            color: G.ink,
-            padding: 24,
-          }}
-        >
-          <div style={{ textAlign: "center", maxWidth: 420 }}>
-            <div
-              style={{
-                fontSize: 40,
-                marginBottom: 12,
-                fontFamily: "'Instrument Serif',serif",
-              }}
-            >
-              Something went wrong
-            </div>
-            <p style={{ fontSize: 12.5, color: G.muted, lineHeight: 1.6, marginBottom: 8 }}>
-              {this.state.error.message}
-            </p>
-            <p style={{ color: G.muted, fontSize: 14, marginBottom: 24, lineHeight: 1.7 }}>
-              An unexpected error occurred. Please try refreshing, or go back to the homepage.
-            </p>
-            <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-              <button
-                onClick={() => { this.setState({ error: null }); window.location.href = "/"; }}
-                style={{
-                  background: G.accent, color: "white", border: "none", borderRadius: 8,
-                  padding: "12px 24px", fontSize: 14, fontWeight: 700, cursor: "pointer",
-                  fontFamily: "'Manrope',sans-serif",
-                }}
-              >
-                Reload app
-              </button>
-              <button
-                onClick={() => { this.setState({ error: null }); window.location.reload(); }}
-                style={{
-                  background: G.surface, color: G.ink, border: `1.5px solid ${G.border}`,
-                  borderRadius: 8, padding: "12px 24px", fontSize: 14, fontWeight: 700,
-                  cursor: "pointer", fontFamily: "'Manrope',sans-serif",
-                }}
-              >
-                Retry
-              </button>
-            </div>
-          </div>
+        <div style={{
+          minHeight: "100vh", display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", padding: "2rem",
+          textAlign: "center", background: G.bg, color: G.ink,
+          fontFamily: "'Manrope',sans-serif",
+        }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>⚠️</div>
+          <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 24, fontWeight: 400, margin: "0 0 8px" }}>
+            Something went wrong
+          </h2>
+          <p style={{ color: G.muted, fontSize: 14, marginBottom: 24 }}>{this.state.error?.message}</p>
+          <button onClick={() => window.location.href = "/"} style={{
+            background: G.accent, color: "white", border: "none",
+            padding: "12px 24px", borderRadius: 10, fontSize: 14,
+            fontWeight: 700, cursor: "pointer", fontFamily: "'Manrope',sans-serif",
+          }}>
+            Go to Home
+          </button>
         </div>
       );
     }
-
     return this.props.children;
   }
 }

@@ -22,7 +22,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey)
     const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString()
 
-    // Get all users who have reviews from the past week
+    // Get all users
     const { data: users } = await supabase.from("profiles").select("id, email, name, business_name")
 
     if (!users || users.length === 0) {
@@ -47,11 +47,20 @@ serve(async (req) => {
 
       const total = weekReviews.length
       const reviewed = weekReviews.filter((r) => r.status === "reviewed")
+      const replied = weekReviews.filter((r) => !!r.reply)
+      const needsReply = reviewed.filter((r) => !r.reply)
       const positive = reviewed.filter((r) => (r.rating || 0) >= 4)
       const negative = reviewed.filter((r) => (r.rating || 0) <= 2)
+      const responseRate = reviewed.length > 0
+        ? Math.round((replied.length / reviewed.length) * 100)
+        : 0
       const avgRating = reviewed.length
         ? (reviewed.reduce((s, r) => s + (r.rating || 0), 0) / reviewed.length).toFixed(1)
         : "N/A"
+
+      // Best review of the week (highest rated, with text preferred)
+      const sortedByRating = [...reviewed].sort((a, b) => (b.rating || 0) - (a.rating || 0) || ((b.text?.length || 0) - (a.text?.length || 0)))
+      const bestReview = sortedByRating[0] || null
 
       const topics: string[] = []
       reviewed.forEach((r) => {
@@ -74,12 +83,14 @@ serve(async (req) => {
     .container { max-width: 560px; margin: 0 auto; padding: 24px; }
     h1 { font-size: 24px; margin-bottom: 4px; }
     .subtitle { color: #666; font-size: 14px; }
-    .stat { display: inline-block; margin: 16px 8px; text-align: center; }
+    .stat { display: inline-block; margin: 16px 10px; text-align: center; }
     .stat-value { font-size: 28px; font-weight: 700; color: #c93d10; }
-    .stat-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
     .section { margin: 24px 0; }
     .section-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
     .topic-tag { display: inline-block; padding: 4px 10px; background: #fdf0eb; border-radius: 12px; font-size: 12px; color: #c93d10; margin: 2px; }
+    .cta { display: block; background: #c93d10; color: white !important; text-align: center; padding: 14px 24px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px; margin: 24px 0; }
+    .review-card { padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
     .footer { font-size: 12px; color: #999; margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee; }
   </style>
 </head>
@@ -91,17 +102,29 @@ serve(async (req) => {
     <div style="text-align:center;margin:20px 0;">
       <div class="stat">
         <div class="stat-value">${total}</div>
-        <div class="stat-label">Reviews</div>
+        <div class="stat-label">New Reviews</div>
       </div>
       <div class="stat">
         <div class="stat-value">${avgRating}★</div>
         <div class="stat-label">Avg Rating</div>
       </div>
       <div class="stat">
-        <div class="stat-value">${positive.length}</div>
-        <div class="stat-label">Positive</div>
+        <div class="stat-value">${responseRate}%</div>
+        <div class="stat-label">Response Rate</div>
       </div>
     </div>
+
+    ${bestReview ? `
+    <div class="section">
+      <div class="section-title">⭐ Best Review of the Week</div>
+      <div class="review-card">
+        <div style="display:flex;justify-content:space-between;font-size:13px;">
+          <strong>${bestReview.name}</strong>
+          <span style="color:#1a7a4a;">${"★".repeat(bestReview.rating || 0)}${"☆".repeat(5 - (bestReview.rating || 0))}</span>
+        </div>
+        ${bestReview.text ? `<p style="font-size:13px;color:#666;margin:4px 0;">"${bestReview.text}"</p>` : ""}
+      </div>
+    </div>` : ""}
 
     <div class="section">
       <div class="section-title">Top Praised Aspects</div>
@@ -114,11 +137,24 @@ serve(async (req) => {
       <p style="font-size:13px;color:#666;">${negative.length} review(s) mentioned areas needing attention. Consider following up with these customers.</p>
     </div>` : ""}
 
+    ${needsReply.length > 0 ? `
+    <div class="section">
+      <div class="section-title">💬 Reviews That Need a Reply</div>
+      <p style="font-size:13px;color:#666;">${needsReply.length} review(s) from this week are still waiting for your response.</p>
+      ${needsReply.slice(0, 5).map((r) => `
+        <div style="padding:6px 0;font-size:13px;border-bottom:1px solid #f0f0f0;">
+          <strong>${r.name}</strong>
+          <span style="color:${(r.rating || 0) <= 2 ? "#c93d10" : "#666"};"> ${"★".repeat(r.rating || 0)}${"☆".repeat(5 - (r.rating || 0))}</span>
+          ${r.text ? `<span style="color:#666;"> — "${r.text.slice(0, 80)}${r.text.length > 80 ? '…' : ''}"</span>` : ""}
+        </div>
+      `).join("")}
+    </div>` : ""}
+
     ${reviewed.length > 0 ? `
     <div class="section">
       <div class="section-title">Recent Reviews</div>
       ${reviewed.slice(0, 5).map((r) => `
-        <div style="padding:10px 0;border-bottom:1px solid #f0f0f0;">
+        <div class="review-card">
           <div style="display:flex;justify-content:space-between;font-size:13px;">
             <strong>${r.name}</strong>
             <span style="color:${(r.rating || 0) >= 4 ? "#1a7a4a" : (r.rating || 0) <= 2 ? "#c93d10" : "#b87a10"};">${"★".repeat(r.rating || 0)}${"☆".repeat(5 - (r.rating || 0))}</span>
@@ -132,14 +168,17 @@ serve(async (req) => {
       <div class="section-title">💡 Suggested Actions</div>
       <ul style="font-size:13px;color:#666;padding-left:20px;">
         ${negative.length > 0 ? "<li>Respond to negative reviews within 24 hours</li>" : ""}
+        ${needsReply.length > 0 ? "<li>Reply to unreviewed responses to boost engagement</li>" : ""}
         ${positive.length > 0 ? "<li>Thank your top promoters — they're your best marketers</li>" : ""}
         <li>Send review requests within 1 hour of service completion</li>
         <li>Aim for 3+ new reviews this coming week</li>
       </ul>
     </div>
 
+    <a href="https://reviewping-eight.vercel.app/dashboard" class="cta">View Dashboard →</a>
+
     <div class="footer">
-      <p>Sent by ReviewPing · <a href="https://reviewping-seven.vercel.app/dashboard">View full dashboard</a></p>
+      <p>Sent by ReviewPing · <a href="https://reviewping-eight.vercel.app/dashboard">View full dashboard</a></p>
     </div>
   </div>
 </body>
@@ -163,6 +202,7 @@ serve(async (req) => {
       if (res.ok) {
         results.push({ email: user.email, status: "sent" })
       } else {
+        console.error(`Failed to send digest to ${user.email}:`, await res.text())
         results.push({ email: user.email, status: "failed" })
       }
     }
@@ -171,6 +211,7 @@ serve(async (req) => {
       headers: CORS,
     })
   } catch (err) {
+    console.error("weekly-digest error:", err)
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: CORS,

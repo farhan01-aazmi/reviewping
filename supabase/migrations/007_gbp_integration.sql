@@ -26,18 +26,23 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_gbp_connections_user ON gbp_connections(us
 
 ALTER TABLE gbp_connections ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own GBP connection" ON gbp_connections;
 CREATE POLICY "Users can view their own GBP connection"
   ON gbp_connections FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own GBP connection" ON gbp_connections;
 CREATE POLICY "Users can insert their own GBP connection"
   ON gbp_connections FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own GBP connection" ON gbp_connections;
 CREATE POLICY "Users can update their own GBP connection"
   ON gbp_connections FOR UPDATE
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own GBP connection" ON gbp_connections;
 CREATE POLICY "Users can delete their own GBP connection"
   ON gbp_connections FOR DELETE
   USING (auth.uid() = user_id);
@@ -65,14 +70,17 @@ CREATE INDEX IF NOT EXISTS idx_gbp_reviews_time ON gbp_reviews(create_time DESC)
 
 ALTER TABLE gbp_reviews ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own GBP reviews" ON gbp_reviews;
 CREATE POLICY "Users can view their own GBP reviews"
   ON gbp_reviews FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Service role can insert GBP reviews" ON gbp_reviews;
 CREATE POLICY "Service role can insert GBP reviews"
   ON gbp_reviews FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Service role can update GBP reviews" ON gbp_reviews;
 CREATE POLICY "Service role can update GBP reviews"
   ON gbp_reviews FOR UPDATE
   USING (true);

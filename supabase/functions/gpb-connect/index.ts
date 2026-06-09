@@ -5,7 +5,7 @@ const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_OAUTH_CLIENT_ID") || ""
 const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_OAUTH_CLIENT_SECRET") || ""
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || ""
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
-const SITE_URL = Deno.env.get("SITE_URL") || "https://reviewping-seven.vercel.app"
+const SITE_URL = Deno.env.get("SITE_URL") || "https://reviewping-eight.vercel.app"
 
 const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/gpb-connect`
 
@@ -162,7 +162,39 @@ serve(async (req) => {
       last_sync_at: new Date().toISOString(),
     }, { onConflict: "user_id" })
 
-    return Response.redirect(`${SITE_URL}/dashboard?gbp=connected`, 302)
+    // ── Auto-save Google review link after successful GBP connect ──
+    try {
+      if (locationId) {
+        const locMetaRes = await fetch(
+          `https://mybusinessbusinessinformation.googleapis.com/v1/${locationId}?readMask=metadata`,
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        )
+        const locMeta = await locMetaRes.json()
+        const placeId = locMeta?.metadata?.placeId || ""
+        if (placeId) {
+          const reviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`
+          await supabase.from("business_settings").upsert({
+            user_id: userId,
+            google_link: reviewUrl,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: "user_id" })
+        }
+      }
+    } catch (_e) {
+      // Silently fail — user can set link manually in Settings
+    }
+
+    // Return HTML that sends postMessage to the popup opener and closes
+    return html(
+      `<html><body><script>
+        if (window.opener) {
+          window.opener.postMessage({ type: "gbp_success" }, "${SITE_URL}");
+          window.close();
+        } else {
+          document.body.innerHTML = '<p style="font-family:sans-serif;padding:2rem;text-align:center;color:#333"><strong>Connected to Google Business Profile!</strong><br><br>You can close this tab and return to ReviewPing.</p>';
+        }
+      </script><noscript><p>GBP connected! Close this tab.</p></noscript></body></html>`
+    )
   }
 
   // --- INIT: Generate OAuth URL ---

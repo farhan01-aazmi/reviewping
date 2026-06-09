@@ -65,7 +65,7 @@ export default function middleware(request) {
   // Unknown route — return proper 404 status
   const title = "Page Not Found — ReviewPing";
   const description = "The page you are looking for does not exist. ReviewPing helps small businesses automate Google review requests.";
-  const homeUrl = "https://reviewping-seven.vercel.app";
+  const homeUrl = "https://reviewping.pro";
 
   return new Response(
     `<!DOCTYPE html>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
@@ -8,45 +9,85 @@ import Pill from "../ui/Pill";
 import { fmtDate } from "../../utils/formatters";
 import { toast } from "sonner";
 
-export default function Team({ plan, team, setTeam }) {
+export default function Team({ plan, userId }) {
+  const [team, setTeam] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("Staff");
   const [inviting, setInviting] = useState(false);
 
-  const invite = () => {
+  useEffect(() => {
+    if (!userId) return;
+    setLoading(true);
+    supabase
+      .from("team_members")
+      .select("*")
+      .eq("user_id", userId)
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Failed to fetch team members:", error);
+          return;
+        }
+        setTeam(data || []);
+      })
+      .catch((err) => console.error("Failed to fetch team members:", err))
+      .finally(() => setLoading(false));
+  }, [userId]);
+
+  const invite = async () => {
     if (!inviteEmail) {
-      toast("Enter an email address", "error");
+      toast.error("Enter an email address");
       return;
     }
     if (plan === "starter") {
-      toast(
-        "Upgrade to Growth or Agency to invite team members",
-        "error"
-      );
+      toast.error("Upgrade to Growth or Agency to invite team members");
       return;
     }
     setInviting(true);
-    setTimeout(() => {
-      setTeam((p) => [
-        ...p,
-        {
-          id: Date.now(),
+    try {
+      const { data, error } = await supabase
+        .from("team_members")
+        .insert({
+          user_id: userId,
           name: inviteEmail.split("@")[0],
           email: inviteEmail,
           role: inviteRole,
           status: "invited",
-          joinedAt: Date.now(),
-        },
-      ]);
+        })
+        .select();
+      if (error) {
+        console.error("Failed to invite team member:", error);
+        toast.error("Failed to send invitation");
+        return;
+      }
+      if (data) setTeam((p) => [...p, data[0]]);
       setInviteEmail("");
+      toast.success(`Invitation sent to ${inviteEmail}`);
+    } catch (err) {
+      console.error("Failed to invite team member:", err);
+      toast.error("Failed to send invitation");
+    } finally {
       setInviting(false);
-      toast(`Invitation sent to ${inviteEmail}`);
-    }, 1200);
+    }
   };
 
-  const remove = (id) => {
-    setTeam((p) => p.filter((m) => m.id !== id));
-    toast("Team member removed", "info");
+  const remove = async (id) => {
+    try {
+      const { error } = await supabase
+        .from("team_members")
+        .delete()
+        .eq("id", id);
+      if (error) {
+        console.error("Failed to remove team member:", error);
+        toast.error("Failed to remove team member");
+        return;
+      }
+      setTeam((p) => p.filter((m) => m.id !== id));
+      toast.success("Team member removed");
+    } catch (err) {
+      console.error("Failed to remove team member:", err);
+      toast.error("Failed to remove team member");
+    }
   };
 
   const roles = ["Owner", "Manager", "Staff"];
@@ -119,95 +160,101 @@ export default function Team({ plan, team, setTeam }) {
           onChange={(e) => setInviteRole(e.target.value)}
           options={roles}
         />
-        <Btn onClick={invite} disabled={plan === "starter"}>
+        <Btn onClick={invite} disabled={plan === "starter" || inviting}>
           {inviting ? "Sending…" : "Send invitation →"}
         </Btn>
       </Card>
-      <div
-        style={{
-          fontSize: 10.5,
-          fontWeight: 700,
-          color: G.muted,
-          letterSpacing: "1px",
-          textTransform: "uppercase",
-          marginBottom: 12,
-        }}
-      >
-        Current team
-      </div>
-      {team.map((m) => (
-        <Card
-          key={m.id}
-          sx={{ marginBottom: 10, padding: "14px 16px" }}
-        >
+      {loading ? (
+        <p style={{ color: G.muted, fontSize: 13.5 }}>Loading team...</p>
+      ) : (
+        <>
           <div
-            style={{ display: "flex", gap: 12, alignItems: "center" }}
+            style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: G.muted,
+              letterSpacing: "1px",
+              textTransform: "uppercase",
+              marginBottom: 12,
+            }}
           >
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: "50%",
-                background: G.accentBg,
-                border: `1.5px solid ${G.accentBd}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 800,
-                fontSize: 14,
-                color: G.accent,
-                flexShrink: 0,
-              }}
+            Current team
+          </div>
+          {team.map((m) => (
+            <Card
+              key={m.id}
+              sx={{ marginBottom: 10, padding: "14px 16px" }}
             >
-              {(m.name?.[0] || "?").toUpperCase()}
-            </div>
-            <div style={{ flex: 1 }}>
               <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
+                style={{ display: "flex", gap: 12, alignItems: "center" }}
               >
-                <span style={{ fontWeight: 700, fontSize: 14 }}>
-                  {m.name}
-                </span>
-                <Pill
-                  color={
-                    m.role === "Owner"
-                      ? G.accent
-                      : m.role === "Manager"
-                      ? G.purple
-                      : G.muted
-                  }
+                <div
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: "50%",
+                    background: G.accentBg,
+                    border: `1.5px solid ${G.accentBd}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 800,
+                    fontSize: 14,
+                    color: G.accent,
+                    flexShrink: 0,
+                  }}
                 >
-                  {m.role}
-                </Pill>
-                {m.status === "invited" && (
-                  <Pill color={G.gold}>Invited</Pill>
+                  {(m.name?.[0] || "?").toUpperCase()}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <span style={{ fontWeight: 700, fontSize: 14 }}>
+                      {m.name}
+                    </span>
+                    <Pill
+                      color={
+                        m.role === "Owner"
+                          ? G.accent
+                          : m.role === "Manager"
+                          ? G.purple
+                          : G.muted
+                      }
+                    >
+                      {m.role}
+                    </Pill>
+                    {m.status === "invited" && (
+                      <Pill color={G.gold}>Invited</Pill>
+                    )}
+                  </div>
+                  <div
+                    style={{ fontSize: 12, color: G.muted, marginTop: 2 }}
+                  >
+                    {m.email} ·{" "}
+                    {m.status === "active"
+                      ? `Joined ${fmtDate(m.joinedAt)}`
+                      : "Invite pending"}
+                  </div>
+                </div>
+                {m.role !== "Owner" && (
+                  <Btn
+                    variant="danger"
+                    size="sm"
+                    onClick={() => remove(m.id)}
+                  >
+                    Remove
+                  </Btn>
                 )}
               </div>
-              <div
-                style={{ fontSize: 12, color: G.muted, marginTop: 2 }}
-              >
-                {m.email} ·{" "}
-                {m.status === "active"
-                  ? `Joined ${fmtDate(m.joinedAt)}`
-                  : "Invite pending"}
-              </div>
-            </div>
-            {m.role !== "Owner" && (
-              <Btn
-                variant="danger"
-                size="sm"
-                onClick={() => remove(m.id)}
-              >
-                Remove
-              </Btn>
-            )}
-          </div>
-        </Card>
-      ))}
+            </Card>
+          ))}
+        </>
+      )}
     </div>
   );
 }

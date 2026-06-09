@@ -15,7 +15,7 @@
  * route rules directly into the Build Output API v3 config.
  */
 
-import { mkdirSync, copyFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { mkdirSync, copyFileSync, readdirSync, statSync, writeFileSync, rmSync } from 'node:fs'
 import { join, dirname, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -35,18 +35,33 @@ try { statSync(DIST) } catch {
 // 2. Create output directories
 mkdirSync(STATIC, { recursive: true })
 
-// 3. Write config.json with SPA rewrites
+// 3. Write config.json with SPA rewrites + API proxy
 //    The "filesystem" handle tells Vercel to check for static files first,
-//    then the catch-all routes everything else to index.html for the SPA.
+//    then proxy API/edge requests to Supabase, then catch-all to index.html.
+const SUPABASE_REF = 'fvugrcqjrtwabaobuigb'
 const config = {
   version: 3,
   routes: [
     { handle: 'filesystem' },
+    {
+      src: '/api/edge/(.*)',
+      dest: `https://${SUPABASE_REF}.supabase.co/functions/v1/$1`,
+    },
     { src: '/(.*)', dest: '/index.html' },
   ],
 }
 writeFileSync(CONFIG, JSON.stringify(config, null, 2))
 console.log('✅ .vercel/output/config.json written')
+
+// 3b. Clean static directory to prevent stale files
+if (statSync(STATIC, { throwIfNoEntry: false })) {
+  const oldFiles = readdirSync(STATIC, { recursive: true });
+  if (oldFiles.length > 0) {
+    rmSync(STATIC, { recursive: true });
+    mkdirSync(STATIC, { recursive: true });
+    console.log(`🧹 Cleaned ${oldFiles.length} stale files from static/`);
+  }
+}
 
 // 4. Copy dist/ → .vercel/output/static/
 function copyRecursive(src, dest) {

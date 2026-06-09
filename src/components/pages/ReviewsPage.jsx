@@ -20,7 +20,7 @@ function Skeleton({ h = 14, w = "100%" }) {
   return <div style={{ height: h, background: G.border, borderRadius: 6, width: w, animation: "pulse 1.5s ease-in-out infinite", marginBottom: 8 }} />;
 }
 
-export default function ReviewsPage({ onSend }) {
+export default function ReviewsPage({ userId, onSend }) {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,6 +32,12 @@ export default function ReviewsPage({ onSend }) {
   const [aiLoading, setAiLoading] = useState(null);
   const [aiTone, setAiTone] = useState("Professional");
 
+  // Negative reviews state
+  const [negativeReviews, setNegativeReviews] = useState([]);
+  const [negLoading, setNegLoading] = useState(true);
+  const [resolvingId, setResolvingId] = useState(null);
+
+  // Fetch main reviews
   useEffect(() => {
     let cancelled = false;
     supabase.from("reviews").select("*").order("sentAt", { ascending: false }).then(({ data, error: err }) => {
@@ -46,6 +52,28 @@ export default function ReviewsPage({ onSend }) {
     return () => { cancelled = true; };
   }, []);
 
+  // Fetch negative reviews (1-2 star, approved = unresolved)
+  useEffect(() => {
+    if (!userId) return;
+    setNegLoading(true);
+    supabase
+      .from("review_submissions")
+      .select("*")
+      .eq("user_id", userId)
+      .lte("rating", 2)
+      .eq("moderation_status", "approved")
+      .order("submitted_at", { ascending: false })
+      .then(({ data, error: err }) => {
+        if (err) {
+          console.error("Failed to fetch negative reviews:", err.message);
+          return;
+        }
+        setNegativeReviews(data || []);
+      })
+      .finally(() => setNegLoading(false));
+  }, [userId]);
+
+  // Filter/sort main list
   let list =
     filter === "All"
       ? reviews
@@ -106,6 +134,54 @@ export default function ReviewsPage({ onSend }) {
     setAiLoading(null);
   };
 
+  // Generate AI reply for a negative review (from review_submissions)
+  const generateAiReplyForNeg = async (r) => {
+    setAiLoading(r.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(AI_FN_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          review_text: r.review_text || "",
+          rating: r.rating || 1,
+          author_name: r.author_name,
+          tone: "Apologetic",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "AI generation failed");
+      const reply = data.reply || data.message || "Thank you for your feedback!";
+      // Copy reply to clipboard since review_submissions has no reply field
+      await navigator.clipboard.writeText(reply);
+      toast.success("AI reply copied to clipboard!");
+    } catch (e) {
+      console.error("AI reply error:", e);
+      toast.error("Failed to generate AI reply");
+    }
+    setAiLoading(null);
+  };
+
+  // Mark negative review as resolved
+  const markResolved = async (id) => {
+    setResolvingId(id);
+    try {
+      const { error } = await supabase
+        .from("review_submissions")
+        .update({ moderation_status: "rejected" })
+        .eq("id", id);
+      if (error) { throw error; }
+      setNegativeReviews((p) => p.filter((r) => r.id !== id));
+      toast.success("Marked as resolved");
+    } catch (e) {
+      toast.error(e.message || "Failed to resolve");
+    }
+    setResolvingId(null);
+  };
+
   if (error) {
     return (
       <Card sx={{ padding: "24px", textAlign: "center" }}>
@@ -118,6 +194,79 @@ export default function ReviewsPage({ onSend }) {
 
   return (
     <div>
+      {/* ── Needs Attention Section ── */}
+      {!negLoading && negativeReviews.length > 0 && (
+        <div style={{ marginBottom: 22 }}>
+          <div style={{
+            fontSize: 10.5, fontWeight: 700, color: G.muted,
+            letterSpacing: "1px", textTransform: "uppercase", marginBottom: 10,
+          }}>
+            ⚠️ Needs Your Attention
+          </div>
+          {negativeReviews.map((r) => (
+            <Card key={r.id} sx={{ marginBottom: 10, padding: "13px 15px", borderLeft: "4px solid #ef4444" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 8 }}>
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <div style={{
+                    width: 34, height: 34, borderRadius: "50%",
+                    background: "#fef2f2", border: "1.5px solid #fca5a5",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontWeight: 800, fontSize: 13, color: "#dc2626", flexShrink: 0,
+                  }}>
+                    {r.author_name?.[0] || "?"}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 14 }}>{r.author_name}</div>
+                    <div style={{ fontSize: 12, color: G.muted }}>
+                      {r.source === "gbp_sync" ? "Google" : "ReviewPing"} · {fmtDate(r.submitted_at)}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ color: "#dc2626", fontWeight: 700, fontSize: 14, display: "flex", alignItems: "center", gap: 3 }}>
+                  {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
+                </div>
+              </div>
+              {r.review_text && (
+                <div style={{
+                  padding: "9px 12px", background: "#fef2f2", borderRadius: 8,
+                  fontSize: 13, color: "#991b1b", fontStyle: "italic",
+                  fontFamily: "'Instrument Serif',serif", lineHeight: 1.6, marginBottom: 10,
+                }}>
+                  "{r.review_text}"
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 6 }}>
+                <button
+                  onClick={() => generateAiReplyForNeg(r)}
+                  disabled={aiLoading === r.id}
+                  style={{
+                    background: "#f3e8ff", border: "1.5px solid #d8b4fe", borderRadius: 8,
+                    padding: "7px 14px", fontSize: 12, cursor: aiLoading === r.id ? "wait" : "pointer",
+                    color: "#9333ea", fontFamily: "'Manrope',sans-serif", fontWeight: 700,
+                    display: "flex", alignItems: "center", gap: 5, opacity: aiLoading === r.id ? 0.6 : 1,
+                  }}
+                >
+                  {aiLoading === r.id ? <><Spinner size={12} /> Generating…</> : "✨ Generate AI Reply"}
+                </button>
+                <button
+                  onClick={() => markResolved(r.id)}
+                  disabled={resolvingId === r.id}
+                  style={{
+                    background: "#f0fdf4", border: "1.5px solid #bbf7d0", borderRadius: 8,
+                    padding: "7px 14px", fontSize: 12, cursor: resolvingId === r.id ? "wait" : "pointer",
+                    color: "#16a34a", fontFamily: "'Manrope',sans-serif", fontWeight: 700,
+                    display: "flex", alignItems: "center", gap: 5, opacity: resolvingId === r.id ? 0.6 : 1,
+                  }}
+                >
+                  {resolvingId === r.id ? "Resolving…" : "✓ Mark as Resolved"}
+                </button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* ── Header ── */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
         <div>
           <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 26, fontWeight: 400, margin: "0 0 4px", letterSpacing: "-0.5px" }}>
@@ -161,8 +310,10 @@ export default function ReviewsPage({ onSend }) {
             </div>
           </Card>
         ))
+      ) : reviews.length === 0 ? (
+        <EmptyState icon="📬" title="No reviews yet" description="Send your first review request to start collecting feedback." action={<Btn size="sm" onClick={onSend}>+ Send Review Request</Btn>} />
       ) : list.length === 0 ? (
-        <EmptyState icon="🔍" title="No results found" subtitle="Try adjusting your filters or search terms." />
+        <EmptyState icon="🔍" title="No results found" description="Try adjusting your filters or search terms." />
       ) : (
         list.map((r) => (
           <Card key={r.id} sx={{ marginBottom: 10, padding: "13px 15px" }}>

@@ -2,88 +2,137 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { CORS, verifyAuth } from "../_shared/auth.ts";
 
 /**
- * Stripe Checkout Session Creator
+ * Dodo Payments Checkout Session Creator
  *
- * Creates a Stripe Checkout Session for subscription payments.
- * Called from the frontend when a user clicks "Subscribe".
- * Requires JWT authentication — the user_id is extracted from the verified token.
+ * Creates a hosted checkout session for subscription payments.
+ * Accepts `plan` (starter/growth/agency) and `billing` (monthly/annual).
+ * Resolves Dodo Payments product IDs from environment variables.
+ *
+ * Products must be created in Dodo Payments dashboard first.
+ *
+ * Required env vars:
+ *   DODO_PAYMENTS_API_KEY
+ *   DODO_PRODUCT_STARTER_MONTHLY
+ *   DODO_PRODUCT_STARTER_ANNUAL
+ *   DODO_PRODUCT_GROWTH_MONTHLY
+ *   DODO_PRODUCT_GROWTH_ANNUAL
+ *   DODO_PRODUCT_AGENCY_MONTHLY
+ *   DODO_PRODUCT_AGENCY_ANNUAL
+ *   DODO_MODE (optional: "test" or "live", defaults to "test")
  */
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS });
   }
 
   try {
-    // Only allow POST
     if (req.method !== "POST") {
       return new Response(JSON.stringify({ error: "Method not allowed" }), {
-        status: 405,
-        headers: CORS,
+        status: 405, headers: CORS,
       });
     }
 
-    // Verify JWT authentication using Supabase Auth API (signature-verified)
     const auth = await verifyAuth(req);
     if (auth instanceof Response) return auth;
     const userId = auth.userId;
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) {
-      throw new Error("STRIPE_SECRET_KEY environment variable not configured");
+    const apiKey = Deno.env.get("DODO_PAYMENTS_API_KEY");
+    if (!apiKey) {
+      throw new Error("DODO_PAYMENTS_API_KEY not configured");
     }
 
-    // Parse and validate request body
     let body;
     try {
       body = await req.json();
     } catch {
       return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
-        status: 400,
-        headers: CORS,
+        status: 400, headers: CORS,
       });
     }
 
-    const { price_id, return_url } = body || {};
+    const { plan, billing, return_url } = body || {};
 
-    if (!price_id) {
-      return new Response(
-        JSON.stringify({ error: "Missing required field: 'price_id'" }),
-        { status: 400, headers: CORS },
+    if (!plan || !["starter", "growth", "agency"].includes(plan)) {
+      return new Response(JSON.stringify({ error: "Invalid plan. Must be starter, growth, or agency" }), {
+        status: 400, headers: CORS,
+      });
+    }
+
+    if (!billing || !["monthly", "annual"].includes(billing)) {
+      return new Response(JSON.stringify({ error: "Invalid billing. Must be monthly or annual" }), {
+        status: 400, headers: CORS,
+      });
+    }
+
+    // Resolve product ID from env vars
+    const envKey = `DODO_PRODUCT_${plan.toUpperCase()}_${billing.toUpperCase()}`;
+    const productId = Deno.env.get(envKey);
+
+    if (!productId) {
+      throw new Error(
+        `Missing product ID: set ${envKey} in Supabase Edge Function environment variables.`
       );
     }
 
-    const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+    // Determine Dodo API endpoint (test vs live)
+    const mode = Deno.env.get("DODO_MODE") || "test";
+    const baseUrl = mode === "live"
+      ? "https://live.dodopayments.com"
+      : "https://test.dodopayments.com";
+
+    // Call Dodo Payments API to create checkout session
+    const dodoRes = await fetch(`${baseUrl}/checkouts`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Bearer ${stripeKey}`,
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
       },
-      body: new URLSearchParams({
-        mode: "subscription",
-        "line_items[0][price]": price_id,
-        "line_items[0][quantity]": "1",
-        success_url:
-          `${return_url || "https://reviewping.io/dashboard"}?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${return_url || "https://reviewping.io/billing"}`,
-        "metadata[user_id]": userId,
+      body: JSON.stringify({
+        product_cart: [{ product_id: productId, quantity: 1 }],
+        return_url: return_url || "https://reviewping-eight.vercel.app/dashboard",
+        metadata: {
+          user_id: userId,
+          plan: plan,
+          billing: billing,
+        },
       }),
     });
 
-    const session = await stripeRes.json();
+    const session = await dodoRes.json();
 
-    if (!stripeRes.ok) {
-      throw new Error(session.error?.message || "Stripe API error");
+    if (!dodoRes.ok) {
+      throw new Error(session.error?.message || session.message || "Dodo Payments API error");
     }
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    // Store the session info in database for webhook verification
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    if (supabaseUrl && supabaseKey) {
+      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      const { error: dbError } = await supabase.from("dodo_sessions").upsert({
+        user_id: userId,
+        session_id: session.session_id,
+        plan: plan,
+        billing: billing,
+        status: "pending",
+        created_at: new Date().toISOString(),
+      }, { onConflict: "session_id" });
+
+      if (dbError) {
+        console.error("Failed to store session metadata:", dbError);
+        return new Response(JSON.stringify({ error: "Failed to initialize checkout session" }), { status: 500, headers: { "Content-Type": "application/json" } });
+      }
+    }
+
+    return new Response(JSON.stringify({ url: session.checkout_url }), {
       headers: CORS,
     });
   } catch (err) {
     console.error("create-checkout error:", err);
-    return new Response(JSON.stringify({ error: "Failed to create checkout session. Please try again." }), {
-      status: 500,
-      headers: CORS,
+    return new Response(JSON.stringify({ error: err.message || "Failed to create checkout session" }), {
+      status: 500, headers: CORS,
     });
   }
 });

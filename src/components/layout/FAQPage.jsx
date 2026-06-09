@@ -235,9 +235,8 @@ export default function FAQPage({ onSignup, onLogin, onBack }) {
                 fontSize: 14.5,
                 color: G.muted,
                 lineHeight: 1.7,
-                margin: "0 0 24px",
-                maxWidth: 400,
                 margin: "0 auto 24px",
+                  maxWidth: 400,
               }}
             >
               We're here to help. Reach out to our team and we'll get back to you
@@ -321,3 +320,4 @@ export default function FAQPage({ onSignup, onLogin, onBack }) {
     </>
   );
 }
+

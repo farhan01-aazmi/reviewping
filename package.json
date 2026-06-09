@@ -11,7 +11,7 @@
     "vercel:build": "node scripts/prepare-vercel-output.mjs",
     "test": "vitest run",
     "smoke": "node tests/smoke.mjs",
-    "smoke:prod": "node tests/smoke.mjs https://reviewping-seven.vercel.app",
+    "smoke:prod": "node tests/smoke.mjs https://reviewping.pro",
     "auth-test": "node scripts/test-auth.mjs",
     "scrape": "node scripts/lead-scraper.mjs",
     "scrape:dry-run": "node scripts/lead-scraper.mjs --dry-run",

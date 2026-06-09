@@ -4,8 +4,8 @@ import { G } from "../../data/theme";
 import { Btn, Pill, Card, Stars, Wordmark } from "../ui";
 import SEO from "../SEO";
 
-export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool }) {
-  const props = { onPrivacy, onTerms, onTool };
+export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefund, onTool }) {
+  const props = { onPrivacy, onTerms, onRefund, onTool };
   const [tick, setTick] = useState(0);
   const [annual, setAnnual] = useState(false);
 
@@ -39,9 +39,9 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
           "@graph": [
             {
               "@type": "Organization",
-              "@id": "https://reviewping-seven.vercel.app/#organization",
+              "@id": "https://reviewping.pro/#organization",
               "name": "ReviewPing",
-              "url": "https://reviewping-seven.vercel.app",
+              "url": "https://reviewping.pro",
               "description": "AI-powered review request automation for small businesses. The $19/mo alternative to Podium.",
               "foundingDate": "2025",
               "contactPoint": {
@@ -52,7 +52,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
             },
             {
               "@type": "SoftwareApplication",
-              "@id": "https://reviewping-seven.vercel.app/#software",
+              "@id": "https://reviewping.pro/#software",
               "name": "ReviewPing",
               "applicationCategory": "BusinessApplication",
               "operatingSystem": "Web",
@@ -65,10 +65,10 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
             },
             {
               "@type": "WebSite",
-              "@id": "https://reviewping-seven.vercel.app/#website",
-              "url": "https://reviewping-seven.vercel.app",
+              "@id": "https://reviewping.pro/#website",
+              "url": "https://reviewping.pro",
               "name": "ReviewPing",
-              "publisher": { "@id": "https://reviewping-seven.vercel.app/#organization" }
+              "publisher": { "@id": "https://reviewping.pro/#organization" }
             }
           ]
         })
@@ -966,6 +966,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onTool 
             ["Contact", () => window.location.href="/contact"],
             ["Privacy Policy", "onPrivacy"],
             ["Terms of Service", "onTerms"],
+            ["Refund Policy", "onRefund"],
             ["Free Review Link Tool", "onTool"],
           ].map(([l, fn]) => (
             <span

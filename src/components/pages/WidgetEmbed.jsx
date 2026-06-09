@@ -10,9 +10,8 @@ export default function WidgetEmbed({ biz }) {
   const [count, setCount] = useState("5");
   const [copied, setCopied] = useState(false);
 
-  const code = `<!-- ReviewPing Widget -->\n<script src="https://cdn.reviewping.io/widget.js"\n  data-business="${
-    biz.googleLink || "your-link"
-  }"\n  data-style="${style2}"\n  data-theme="${theme}"\n  data-count="${count}"\n  async>\n</script>`;
+  const slug = biz?.slug || "your-business";
+  const code = `<!-- ReviewPing Widget -->\n<script src="https://reviewping.pro/widget.js"\n  data-business="${slug}"\n  data-style="${style2}"\n  data-theme="${theme}"\n  data-count="${count}"\n  async>\n</script>`;
 
   const copy = () => {
     navigator.clipboard?.writeText(code);

@@ -3,6 +3,7 @@ import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Card, Field, Btn, LogoMark } from "../ui";
 import SEO from "../SEO";
+import { toast } from "sonner";
 
 export default function Login({ onDone, onLoginComplete, onSignup, onBack, onForgot, authError = "", onAuthErrorClear }) {
   const [email, setEmail] = useState("");
@@ -10,6 +11,10 @@ export default function Login({ onDone, onLoginComplete, onSignup, onBack, onFor
   const [error, setError] = useState(authError || "");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   const doLogin = async () => {
     if (!email || !password) {
@@ -63,12 +68,35 @@ export default function Login({ onDone, onLoginComplete, onSignup, onBack, onFor
     });
   };
 
+  const handleForgot = async () => {
+    if (!forgotEmail || !/@/.test(forgotEmail)) {
+      toast.error("Enter a valid email address");
+      return;
+    }
+    setForgotLoading(true);
+    try {
+      const { error: err } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: "https://reviewping-eight.vercel.app/update-password",
+      });
+      if (err) {
+        toast.error(err.message);
+        setForgotLoading(false);
+        return;
+      }
+      setForgotSent(true);
+      setForgotLoading(false);
+      toast.success("Check your email for reset link");
+    } catch (e) {
+      toast.error(e.message || "Failed to send reset email");
+      setForgotLoading(false);
+    }
+  };
+
   const doGoogle = async () => {
     setGoogleLoading(true);
     setError("");
     try {
       const redirectTo = window.location.origin;
-      console.log("Google OAuth redirectTo:", redirectTo);
       const { data, error: oauthErr } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo },
@@ -234,24 +262,61 @@ export default function Login({ onDone, onLoginComplete, onSignup, onBack, onFor
             </p>
           )}
 
-          <div
-            style={{
-              textAlign: "right",
-              marginTop: -10,
-              marginBottom: 16,
-            }}
-          >
-            <span
-              onClick={onForgot}
-              style={{ fontSize: 12.5, color: G.accent, cursor: "pointer" }}
-            >
-              Forgot password?
-            </span>
-          </div>
+          {showForgot ? (
+            <div style={{ marginBottom: 16 }}>
+              <Field
+                label="Email address"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                placeholder="you@business.com"
+                type="email"
+              />
+              {forgotSent ? (
+                <p style={{ fontSize: 12.5, color: G.success, margin: "0 0 12px" }}>
+                  ✓ Reset link sent! Check your email.
+                </p>
+              ) : (
+                <Btn
+                  onClick={handleForgot}
+                  fullWidth
+                  loading={forgotLoading}
+                  size="sm"
+                  style={{ marginBottom: 8 }}
+                >
+                  Send reset link →
+                </Btn>
+              )}
+              <div style={{ textAlign: "center" }}>
+                <span
+                  onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(""); }}
+                  style={{ fontSize: 12.5, color: G.muted, cursor: "pointer" }}
+                >
+                  ← Back to sign in
+                </span>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div
+                style={{
+                  textAlign: "right",
+                  marginTop: -10,
+                  marginBottom: 16,
+                }}
+              >
+                <span
+                  onClick={() => setShowForgot(true)}
+                  style={{ fontSize: 12.5, color: G.accent, cursor: "pointer" }}
+                >
+                  Forgot password?
+                </span>
+              </div>
 
-          <Btn onClick={doLogin} fullWidth loading={loading} disabled={loading}>
-            Sign in →
-          </Btn>
+              <Btn onClick={doLogin} fullWidth loading={loading} disabled={loading}>
+                Sign in →
+              </Btn>
+            </>
+          )}
         </Card>
 
         <p

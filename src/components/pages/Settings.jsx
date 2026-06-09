@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { G } from "../../data/theme";
+import { useTheme } from "../../data/ThemeProvider";
 import { SERVICES } from "../../data/constants";
+import { supabase } from "../../config/supabase";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Field from "../ui/Field";
@@ -10,9 +12,11 @@ import EditProfileModal from "../ui/EditProfileModal";
 import { toast } from "sonner";
 
 export default function Settings({ biz, setBiz, user, setUser }) {
+  const { isDark, toggleDark } = useTheme();
   const [bn, setBn] = useState(biz.bizName || "");
   const [gl, setGl] = useState(biz.googleLink || "");
   const [bt, setBt] = useState(biz.bizType || SERVICES[0]);
+  const [avgVal, setAvgVal] = useState(biz.avg_order_value ?? 500);
   const [notifs, setNotifs] = useState({
     newReview: true,
     daily: true,
@@ -21,21 +25,78 @@ export default function Settings({ biz, setBiz, user, setUser }) {
   });
   const [showEdit, setShowEdit] = useState(false);
 
+
+  // Load notification preferences from DB
+  useEffect(() => {
+    if (!user?.id) return;
+    supabase
+      .from("profiles")
+      .select("notif_prefs")
+      .eq("id", user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (error) return;
+        if (data?.notif_prefs) {
+          setNotifs((prev) => ({ ...prev, ...data.notif_prefs }));
+        }
+      })
+      .catch(() => {});
+  }, [user?.id]);
+
   const save = () => {
-    setBiz((b) => ({ ...b, bizName: bn, googleLink: gl, bizType: bt }));
-    toast("Settings saved successfully");
+    setBiz((b) => ({ ...b, bizName: bn, googleLink: gl, bizType: bt, avg_order_value: Number(avgVal) || 500 }));
+
+    // Persist notification preferences
+    if (user?.id) {
+      supabase
+        .from("profiles")
+        .update({ notif_prefs: notifs })
+        .eq("id", user.id)
+        .then(({ error }) => {
+          if (error) console.error("Failed to save notif prefs:", error);
+        })
+        .catch(console.error);
+    }
+
+    toast.success("Settings saved successfully");
+  };
+
+  const handleEditProfileSave = (updatedUser) => {
+    // Update local state
+    setUser((prev) => ({ ...prev, ...updatedUser }));
+
+    // Persist to Supabase profiles table
+    if (user?.id) {
+      supabase
+        .from("profiles")
+        .update({
+          full_name: updatedUser.name,
+          email: updatedUser.email,
+          phone: updatedUser.phone,
+        })
+        .eq("id", user.id)
+        .then(({ error }) => {
+          if (error) {
+            toast.error("Failed to save profile");
+            return;
+          }
+          setShowEdit(false);
+          toast.success("Profile updated");
+        })
+        .catch(() => toast.error("Failed to save profile"));
+    } else {
+      setShowEdit(false);
+      toast.success("Profile updated");
+    }
   };
 
   return (
     <div>
       {showEdit && (
         <EditProfileModal
-          user={user}
-          onSave={(u) => {
-            setUser((prev) => ({ ...prev, ...u }));
-            setShowEdit(false);
-            toast("Profile updated");
-          }}
+          open={showEdit}
+          profile={user}
+          onSave={handleEditProfileSave}
           onClose={() => setShowEdit(false)}
         />
       )}
@@ -134,6 +195,15 @@ export default function Settings({ biz, setBiz, user, setUser }) {
           placeholder="https://g.page/r/..."
           note="Google Maps → Your Business → Share → Copy review link"
         />
+        <Field
+          label="Average order / service value ($)"
+          value={avgVal}
+          onChange={(e) => setAvgVal(e.target.value)}
+          placeholder="500"
+          note="Used to estimate your ROI from new reviews"
+          type="number"
+          min="1"
+        />
       </Card>
       <Card sx={{ marginBottom: 12 }}>
         <div
@@ -195,44 +265,56 @@ export default function Settings({ biz, setBiz, user, setUser }) {
           </div>
         ))}
       </Card>
-      <Card sx={{ marginBottom: 20 }}>
+      <Card sx={{ marginBottom: 12 }}>
         <div
           style={{
             fontWeight: 700,
             fontSize: 14,
-            marginBottom: 12,
+            marginBottom: 14,
             color: G.inkSoft,
           }}
         >
-          API access
+          Appearance
         </div>
         <div
           style={{
-            padding: "10px 14px",
-            background: G.bg,
-            border: `1.5px solid ${G.border}`,
-            borderRadius: 8,
-            fontFamily: "monospace",
-            fontSize: 12,
-            color: G.inkSoft,
-            marginBottom: 12,
-            wordBreak: "break-all",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
-          sk_live_rp_••••••••••••••••••••••
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Btn variant="secondary" size="sm">
-            Reveal key
-          </Btn>
-          <Btn variant="secondary" size="sm">
-            Regenerate
-          </Btn>
-          <Btn variant="secondary" size="sm">
-            View docs →
-          </Btn>
+          <span style={{ fontSize: 14, color: G.inkSoft }}>Dark Mode</span>
+          <div
+            onClick={toggleDark}
+            style={{
+              width: 44,
+              height: 24,
+              borderRadius: 12,
+              background: isDark ? G.accent : G.border,
+              position: "relative",
+              cursor: "pointer",
+              flexShrink: 0,
+              transition: "background 0.2s",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: 3,
+                left: isDark ? "unset" : "3px",
+                right: isDark ? "3px" : "unset",
+                width: 18,
+                height: 18,
+                borderRadius: "50%",
+                background: "white",
+                transition: "all 0.2s",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
+              }}
+            />
+          </div>
         </div>
       </Card>
+
       <Btn onClick={save} fullWidth size="lg">
         Save changes
       </Btn>

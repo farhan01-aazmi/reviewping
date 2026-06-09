@@ -3,6 +3,103 @@ import { Btn, Wordmark, Card } from "../ui";
 import SEO from "../SEO";
 import { BLOG_POSTS } from "../../data/seoPages";
 
+/* ─── Rich content renderer ─── */
+function renderSection(section, i) {
+  switch (section.type) {
+    case "h2":
+      return (
+        <h2 key={i} style={{ fontFamily: "'Instrument Serif',serif", fontSize: 26, fontWeight: 400, margin: "36px 0 14px", letterSpacing: "-0.5px", lineHeight: 1.25 }}>
+          {section.text}
+        </h2>
+      );
+    case "h3":
+      return (
+        <h3 key={i} style={{ fontFamily: "'Instrument Serif',serif", fontSize: 20, fontWeight: 400, margin: "28px 0 10px", letterSpacing: "-0.3px", lineHeight: 1.3 }}>
+          {section.text}
+        </h3>
+      );
+    case "p":
+      return <p key={i} style={{ margin: "0 0 18px", fontSize: 16, lineHeight: 1.85, color: G.inkSoft }}>{section.text}</p>;
+    case "bold":
+      return <p key={i} style={{ margin: "0 0 18px", fontSize: 16, fontWeight: 700, lineHeight: 1.85, color: G.ink }}>{section.text}</p>;
+    case "ul":
+      return (
+        <ul key={i} style={{ margin: "0 0 18px", paddingLeft: 22, fontSize: 16, lineHeight: 1.85, color: G.inkSoft }}>
+          {section.items.map((item, j) => <li key={j} style={{ marginBottom: 6 }}>{item}</li>)}
+        </ul>
+      );
+    case "ol":
+      return (
+        <ol key={i} style={{ margin: "0 0 18px", paddingLeft: 22, fontSize: 16, lineHeight: 1.85, color: G.inkSoft }}>
+          {section.items.map((item, j) => <li key={j} style={{ marginBottom: 6 }}>{item}</li>)}
+        </ol>
+      );
+    case "blockquote":
+      return (
+        <blockquote key={i} style={{ margin: "0 0 24px", padding: "16px 22px", borderLeft: `4px solid ${G.accent}`, background: G.accentBg, borderRadius: "0 10px 10px 0", fontFamily: "'Instrument Serif',serif", fontSize: 17, lineHeight: 1.7, color: G.inkSoft, fontStyle: "italic" }}>
+          {section.text}
+        </blockquote>
+      );
+    case "tip":
+      return (
+        <div key={i} style={{ margin: "0 0 20px", padding: "16px 20px", background: G.infoBg, border: `1.5px solid ${G.infoBd}`, borderRadius: 10, fontSize: 14, lineHeight: 1.7, color: G.inkSoft }}>
+          <strong style={{ color: G.info }}>💡 Pro tip:</strong> {section.text}
+        </div>
+      );
+    case "table":
+      return (
+        <div key={i} style={{ overflowX: "auto", margin: "0 0 24px", borderRadius: 10, border: `1.5px solid ${G.border}` }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+            {section.headers && (
+              <thead>
+                <tr style={{ background: G.surface }}>
+                  {section.headers.map((h, j) => (
+                    <th key={j} style={{ padding: "10px 14px", textAlign: "left", fontWeight: 700, fontSize: 12.5, color: G.muted, borderBottom: `1.5px solid ${G.border}` }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+            )}
+            <tbody>
+              {section.rows.map((row, j) => (
+                <tr key={j} style={{ background: j % 2 === 0 ? G.bg : G.surface }}>
+                  {row.map((cell, k) => (
+                    <td key={k} style={{ padding: "10px 14px", borderBottom: `1px solid ${G.border}`, color: G.inkSoft }}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    case "cta":
+      return (
+        <div key={i} style={{ margin: "32px 0", padding: "28px 24px", background: G.accentBg, border: `1.5px solid ${G.accentBd}`, borderRadius: 12, textAlign: "center" }}>
+          <div style={{ fontFamily: "'Instrument Serif',serif", fontSize: 22, marginBottom: 8, color: G.ink }}>{section.heading || "Start getting more reviews today"}</div>
+          <p style={{ color: G.muted, fontSize: 14, lineHeight: 1.7, margin: "0 0 18px", maxWidth: 400, marginLeft: "auto", marginRight: "auto" }}>
+            {section.text}
+          </p>
+          <Btn size="lg" onClick={() => window.location.href = "/signup"}>
+            {section.btn || "Start free — no card needed →"}
+          </Btn>
+        </div>
+      );
+    case "faq":
+      return (
+        <div key={i} style={{ margin: "32px 0" }}>
+          <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 26, fontWeight: 400, margin: "0 0 18px" }}>Frequently Asked Questions</h2>
+          {section.items.map((item, j) => (
+            <div key={j} style={{ marginBottom: 10, padding: "16px 20px", background: G.surface, border: `1.5px solid ${G.border}`, borderRadius: 10 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 8, color: G.ink }}>{item.q}</div>
+              <div style={{ fontSize: 14, lineHeight: 1.7, color: G.inkSoft }}>{item.a}</div>
+            </div>
+          ))}
+        </div>
+      );
+    default:
+      return <p key={i} style={{ margin: "0 0 18px", fontSize: 16, lineHeight: 1.85, color: G.inkSoft }}>{section.text || ""}</p>;
+  }
+}
+
 export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
   const post = BLOG_POSTS.find((p) => p.slug === slug);
 
@@ -284,8 +381,25 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               alignItems: "center",
               gap: 10,
               marginBottom: 14,
+              flexWrap: "wrap",
             }}
           >
+            {post.category && (
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: G.accent,
+                  background: G.accentBg,
+                  padding: "3px 10px",
+                  borderRadius: 20,
+                  letterSpacing: "0.3px",
+                  textTransform: "uppercase",
+                }}
+              >
+                {post.category}
+              </span>
+            )}
             <span style={{ fontSize: 12.5, color: G.muted, fontWeight: 500 }}>
               {post.date}
             </span>
@@ -349,13 +463,54 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
                 key={i}
                 className="ft"
                 style={{
-                  margin: i === post.content.length - 1 ? "0 0 40px" : "0 0 20px",
+                  margin: i === post.content.length - 1 ? "0 0 32px" : "0 0 20px",
                 }}
               >
                 {paragraph}
               </p>
             ))}
           </div>
+
+          {/* Keywords */}
+          {post.keywords && post.keywords.length > 0 && (
+            <div
+              style={{
+                padding: "20px 0 0",
+                borderTop: `1px solid ${G.border}`,
+                marginBottom: 32,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: G.muted,
+                  marginBottom: 10,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                Topics
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {post.keywords.map((kw, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      fontSize: 12,
+                      color: G.muted,
+                      background: G.surface,
+                      padding: "4px 12px",
+                      borderRadius: 16,
+                      border: `1px solid ${G.border}`,
+                    }}
+                  >
+                    {kw}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </article>
 
         {/* CTA */}

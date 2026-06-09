@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { G } from "../../data/theme";
 import { SERVICES } from "../../data/constants";
 import Btn from "../ui/Btn";
@@ -7,23 +7,70 @@ import Field from "../ui/Field";
 import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
 import { toast } from "sonner";
+import { supabase } from "../../config/supabase";
 
 const DEFAULT_TEMPLATES = [
-  { id: 1, name: "Dental check-up follow-up", text: "Hi {name}! Thanks for visiting us today. We'd love your feedback: {link}", service: "Dental Appointment" },
-  { id: 2, name: "Restaurant review request", text: "Thanks for dining with us, {name}! Your review helps others discover great food: {link}", service: "Restaurant Dining" },
-  { id: 3, name: "Auto service follow-up", text: "Hi {name}, your {service} is complete. Mind leaving a quick review? {link}", service: "Car Service" },
-  { id: 4, name: "Salon visit thank-you", text: "Thanks {name} for stopping by today! A quick review helps us a ton: {link}", service: "Hair & Beauty" },
-  { id: 5, name: "General follow-up", text: "Hi {name}! Thanks for your {service} today. A quick review would mean a lot: {link}", service: "All" },
+  {
+    id: 1,
+    name: "Dental check-up follow-up",
+    text: "Hi {name}! Thanks for visiting us today. We'd love your feedback: {link}",
+    service: "Dental Appointment",
+  },
+  {
+    id: 2,
+    name: "Restaurant review request",
+    text: "Thanks for dining with us, {name}! Your review helps others discover great food: {link}",
+    service: "Restaurant Dining",
+  },
+  {
+    id: 3,
+    name: "Auto service follow-up",
+    text: "Hi {name}, your {service} is complete. Mind leaving a quick review? {link}",
+    service: "Car Service",
+  },
+  {
+    id: 4,
+    name: "Salon visit thank-you",
+    text: "Thanks {name} for stopping by today! A quick review helps us a ton: {link}",
+    service: "Hair & Beauty",
+  },
+  {
+    id: 5,
+    name: "General follow-up",
+    text: "Hi {name}! Thanks for your {service} today. A quick review would mean a lot: {link}",
+    service: "All",
+  },
 ];
 
-export default function Templates() {
-  const [templates, setTemplates] = useState(DEFAULT_TEMPLATES);
+export default function Templates({ userId }) {
+  const [templates, setTemplates] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [eName, setEName] = useState("");
   const [eText, setEText] = useState(
     "Hi {name}! Thanks for your {service} today. A quick review would mean a lot: {link}"
   );
   const [eSvc, setESvc] = useState("All");
+
+  useEffect(() => {
+    if (!userId) return;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("templates")
+          .select("*")
+          .eq("user_id", userId);
+        if (error) throw error;
+        setTemplates([...DEFAULT_TEMPLATES, ...(data || [])]);
+      } catch (err) {
+        toast.error(err.message || "Failed to load templates");
+        setTemplates(DEFAULT_TEMPLATES);
+      }
+      setLoading(false);
+    };
+    load();
+  }, [userId]);
 
   const openNew = () => {
     setEName("");
@@ -41,32 +88,57 @@ export default function Templates() {
     setEditing(t.id);
   };
 
-  const save = () => {
+  const save = async () => {
     if (!eName || !eText) {
-      toast("Fill in all fields", "error");
+      toast.error("Fill in all fields");
       return;
     }
-    if (editing === "new") {
-      setTemplates((p) => [
-        ...p,
-        { id: Date.now(), name: eName, text: eText, service: eSvc },
-      ]);
-    } else {
-      setTemplates((p) =>
-        p.map((t) =>
-          t.id === editing
-            ? { ...t, name: eName, text: eText, service: eSvc }
-            : t
-        )
-      );
+    try {
+      if (editing === "new") {
+        const { data, error } = await supabase
+          .from("templates")
+          .insert({ user_id: userId, name: eName, text: eText, service: eSvc })
+          .select();
+        if (error) throw error;
+        setTemplates((p) => [...p, data[0]]);
+        toast.success("Template saved");
+      } else if (editing <= 5) {
+        // Editing a default template — create a custom copy
+        const { data, error } = await supabase
+          .from("templates")
+          .insert({ user_id: userId, name: eName, text: eText, service: eSvc })
+          .select();
+        if (error) throw error;
+        setTemplates((p) => [...p, data[0]]);
+        toast.success("Template saved as custom");
+      } else {
+        // Editing a custom template — update in DB
+        const { data, error } = await supabase
+          .from("templates")
+          .update({ name: eName, text: eText, service: eSvc })
+          .eq("id", editing)
+          .select();
+        if (error) throw error;
+        setTemplates((p) =>
+          p.map((t) => (t.id === editing ? data[0] : t))
+        );
+        toast.success("Template updated");
+      }
+      setEditing(null);
+    } catch (err) {
+      toast.error(err.message || "Failed to save template");
     }
-    toast("Template saved");
-    setEditing(null);
   };
 
-  const del = (id) => {
-    setTemplates((p) => p.filter((t) => t.id !== id));
-    toast("Template deleted", "info");
+  const del = async (id) => {
+    try {
+      const { error } = await supabase.from("templates").delete().eq("id", id);
+      if (error) throw error;
+      setTemplates((p) => p.filter((t) => t.id !== id));
+      toast.success("Template deleted");
+    } catch (err) {
+      toast.error(err.message || "Failed to delete template");
+    }
   };
 
   const handleTplKeyDown = (e) => {
@@ -130,7 +202,9 @@ export default function Templates() {
             onChange={(e) => setEText(e.target.value)}
             placeholder="Hi {name}…"
             multiline
-            error={!eText && editing !== "new" ? "Message text is required" : ""}
+            error={
+              !eText && editing !== "new" ? "Message text is required" : ""
+            }
           />
           <div
             style={{
@@ -176,6 +250,47 @@ export default function Templates() {
             </Btn>
           </div>
         </Card>
+      </div>
+    );
+
+  if (loading)
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: 20,
+          }}
+        >
+          <div>
+            <h2
+              style={{
+                fontFamily: "'Instrument Serif',serif",
+                fontSize: 26,
+                fontWeight: 400,
+                margin: "0 0 4px",
+                letterSpacing: "-0.5px",
+              }}
+            >
+              Templates
+            </h2>
+            <p style={{ margin: 0, color: G.muted, fontSize: 13.5 }}>
+              Reusable message templates
+            </p>
+          </div>
+        </div>
+        <div
+          style={{
+            padding: 40,
+            textAlign: "center",
+            color: G.muted,
+            fontSize: 13.5,
+          }}
+        >
+          Loading…
+        </div>
       </div>
     );
 
@@ -228,7 +343,7 @@ export default function Templates() {
           use AI to write a fresh message instead.
         </p>
       </Card>
-      {templates.map((t) => (
+      {templates && templates.length > 0 ? templates.map((t) => (
         <Card key={t.id} sx={{ marginBottom: 10 }}>
           <div
             style={{
@@ -268,7 +383,11 @@ export default function Templates() {
             "{t.text}"
           </p>
         </Card>
-      ))}
+        )) : (
+        <div style={{ padding: 40, textAlign: "center", color: G.muted, fontSize: 13.5 }}>
+          No templates yet. Click <strong>+ New</strong> to create one.
+        </div>
+      )}
     </div>
   );
 }

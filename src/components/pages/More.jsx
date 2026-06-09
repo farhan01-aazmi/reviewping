@@ -6,16 +6,20 @@ import Card from "../ui/Card";
 export default function More({ onNav, onLogout, unreadCount }) {
   const { isDark, toggleDark } = useTheme();
   const items = [
-    { e: "🔔", l: "Notifications", s: "notifications", badge: unreadCount > 0 ? unreadCount : null },
-    { e: "🤖", l: "Automations", s: "automations" },
-    { e: "📒", l: "Contact Book", s: "contacts" },
-    { e: "📱", l: "QR Code Generator", s: "qrcode" },
-    { e: "🖼️", l: "Review Widget", s: "widget" },
+    { e: "📋", l: "Sent Log", s: "sentlog" },
+    { e: "📤", l: "Bulk Send", s: "bulksend" },
+    { e: "📒", l: "Contacts", s: "contacts" },
+    { e: "📱", l: "QR Code", s: "qrcode" },
+    { e: "🖼️", l: "Widget", s: "widget" },
     { e: "🔌", l: "Integrations", s: "integrations" },
-    { e: "👥", l: "Team Members", s: "team" },
-    { e: "💳", l: "Billing & Plan", s: "billing" },
+    { e: "🤖", l: "Automations", s: "automations" },
+    { e: "👥", l: "Team", s: "team" },
+    { e: "🔗", l: "Referral", s: "referral" },
+    { e: "📝", l: "Changelog", s: "changelog" },
+    { e: "🔔", l: "Notifications", s: "notifications", badge: unreadCount > 0 ? unreadCount : null },
+    { e: "💳", l: "Billing", s: "billing" },
     { e: "⚙️", l: "Settings", s: "settings" },
-    { e: "❓", l: "Help & Support", s: "help" },
+    { e: "❓", l: "Help", s: "help" },
     { e: isDark ? "☀️" : "🌙", l: isDark ? "Light Mode" : "Dark Mode", s: "_dark", toggle: toggleDark },
   ];
 

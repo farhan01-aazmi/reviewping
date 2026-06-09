@@ -47,16 +47,13 @@ export default function AppShell({ user: initUser, onLogout }) {
     }
   }, []);
 
-  const [reviews, setReviews] = useState([]);
-  const [templates, setTemplates] = useState([]);
-  const [team, setTeam] = useState([]);
-  const [notifs, setNotifs] = useState([]);
-
   const [plan, setPlan] = useState("growth");
   const [biz, setBiz] = useState({
     bizName: initUser?.biz || "My Business",
     bizType: "",
     googleLink: "",
+    slug: "",
+    avg_order_value: 500,
   });
   const [user, setUser] = useState(initUser);
 
@@ -64,12 +61,23 @@ export default function AppShell({ user: initUser, onLogout }) {
     if (!userId) return;
     supabase.from("business_settings").select("*").eq("user_id", userId).single().then(({ data, error }) => {
       if (error) { console.error("Failed to load business settings:", error); return; }
-      if (data) setBiz({ bizName: data.business_name || "", bizType: data.biz_type || data.business_category || "", googleLink: data.google_link || data.review_link || "" });
+      if (data) setBiz({ bizName: data.business_name || "", bizType: data.biz_type || data.business_category || "", googleLink: data.google_link || data.review_link || "", slug: data.slug || "", avg_order_value: data.avg_order_value ?? 500 });
     }).catch(console.error);
     supabase.from("profiles").select("plan").eq("id", userId).single().then(({ data, error }) => {
       if (error) { console.error("Failed to load plan:", error); return; }
       if (data?.plan) setPlan(data.plan);
     }).catch(console.error);
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    const loadUnread = async () => {
+      const { count } = await supabase.from("notifications").select("*", { count: "exact", head: true }).eq("user_id", userId).eq("read", false);
+      if (typeof count === "number") setUnread(count);
+    };
+    loadUnread();
+    const sub = supabase.channel("notif-changes").on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` }, () => loadUnread()).subscribe();
+    return () => sub.unsubscribe();
   }, [userId]);
 
   const setBizAndSync = useCallback((updater) => {
@@ -81,6 +89,7 @@ export default function AppShell({ user: initUser, onLogout }) {
           business_name: next.bizName,
           biz_type: next.bizType,
           google_link: next.googleLink,
+          avg_order_value: next.avg_order_value ?? 500,
           updated_at: new Date().toISOString()
         }).then(({ error }) => {
           if (error) console.error("Failed to sync business settings:", error);
@@ -118,7 +127,7 @@ export default function AppShell({ user: initUser, onLogout }) {
     setTimeout(() => setScreen("dashboard"), 60);
   };
 
-  const unread = (notifs || []).filter((n) => !n.read).length;
+  const [unread, setUnread] = useState(0);
   const isSecondary = !MAIN_SCREENS.includes(screen);
 
   // Bottom navigation items with inline SVGs
@@ -319,14 +328,14 @@ export default function AppShell({ user: initUser, onLogout }) {
           )}
           {screen === "analytics" && <Analytics userId={userId} />}
           {screen === "templates" && <Templates userId={userId} />}
-          {screen === "automations" && <Automations />}
+          {screen === "automations" && <Automations userId={userId} />}
           {screen === "contacts" && <Contacts userId={userId} />}
           {screen === "qrcode" && <QRCode biz={biz} />}
           {screen === "widget" && <WidgetEmbed biz={biz} />}
           {screen === "integrations" && <Integrations plan={plan} />}
           {screen === "notifications" && <Notifications userId={userId} />}
           {screen === "billing" && (
-            <Billing plan={plan} setPlan={setPlanAndSync} />
+            <Billing userId={userId} plan={plan} setPlan={setPlanAndSync} />
           )}
           {screen === "settings" && (
             <Settings
@@ -344,7 +353,7 @@ export default function AppShell({ user: initUser, onLogout }) {
             <More onNav={navigate} onLogout={onLogout} unreadCount={unread} />
           )}
           {screen === "sentlog" && <SentLog userId={userId} />}
-          {screen === "referral" && <Referral user={user} />}
+          {screen === "referral" && <Referral userId={userId} user={user} />}
           {screen === "changelog" && <Changelog />}
           {screen === "bulk" && (
             <BulkSend biz={biz} onSent={handleSent} />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { G } from "../../data/theme";
 import { PLANS } from "../../data/constants";
 import { createSubscription } from "../../api";
@@ -7,29 +7,96 @@ import Card from "../ui/Card";
 import Pill from "../ui/Pill";
 import ConfirmModal from "../ui/ConfirmModal";
 import { toast } from "sonner";
+import { supabase } from "../../config/supabase";
 
-export default function Billing({ plan, setPlan }) {
+export default function Billing({ userId, plan, setPlan }) {
   const cur = PLANS.find((p) => p.id === plan) || PLANS[1];
   const [annual, setAnnual] = useState(false);
   const [confirm, setConfirm] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [usage, setUsage] = useState({ requests: 0, sms: 0, email: 0 });
+  const [usageLoading, setUsageLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) return;
+    const fetchUsage = async () => {
+      setUsageLoading(true);
+      try {
+        const startOfMonth = new Date(
+          new Date().getFullYear(),
+          new Date().getMonth(),
+          1
+        ).toISOString();
+
+        const { count: totalRequests, error: err1 } = await supabase
+          .from("review_requests")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .gte("sent_at", startOfMonth);
+
+        if (err1) throw err1;
+
+        const { count: smsCount, error: err2 } = await supabase
+          .from("review_requests")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .eq("channel", "sms")
+          .gte("sent_at", startOfMonth);
+
+        if (err2) throw err2;
+
+        const { count: emailCount, error: err3 } = await supabase
+          .from("review_requests")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .eq("channel", "email")
+          .gte("sent_at", startOfMonth);
+
+        if (err3) throw err3;
+
+        setUsage({
+          requests: totalRequests ?? 0,
+          sms: smsCount ?? 0,
+          email: emailCount ?? 0,
+        });
+      } catch (err) {
+        toast.error(err.message || "Failed to load usage");
+      }
+      setUsageLoading(false);
+    };
+    fetchUsage();
+  }, [userId]);
 
   const doSwitch = async (p) => {
     setLoading(true);
     try {
-      const price_id = annual ? p.annual_price_id : p.price_id;
-      const result = await createSubscription({ price_id, return_url: window.location.href });
+      const billing = annual ? "annual" : "monthly";
+      const result = await createSubscription({
+        plan: p.id,
+        billing,
+        return_url: window.location.href,
+      });
       if (result?.url) {
         window.location.href = result.url;
         return; // page will navigate away
       }
-      toast("Checkout URL not returned", "error");
+      toast.error("Checkout URL not returned");
     } catch (err) {
-      toast(err.message || "Failed to start checkout", "error");
+      toast.error(err.message || "Failed to start checkout");
     }
     setLoading(false);
     setConfirm(null);
   };
+
+  const usageItems = [
+    {
+      l: "Review requests",
+      v: usage.requests,
+      max: plan === "starter" ? 50 : null,
+    },
+    { l: "SMS messages", v: usage.sms, max: null },
+    { l: "Email messages", v: usage.email, max: null },
+  ];
 
   return (
     <div>
@@ -105,59 +172,125 @@ export default function Billing({ plan, setPlan }) {
         <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 14 }}>
           This month's usage
         </div>
-        {[
-          { l: "Review requests", v: 0, max: plan === "starter" ? 50 : null },
-          { l: "SMS messages", v: 0, max: null },
-          { l: "Email messages", v: 0, max: null },
-        ].map((u) => (
-          <div key={u.l} style={{ marginBottom: 14 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 5,
-              }}
-            >
-              <span style={{ fontSize: 13.5, color: G.inkSoft }}>
-                {u.l}
-              </span>
-              <span style={{ fontSize: 13, color: G.muted, fontWeight: 600 }}>
-                {u.v}
-                {u.max ? ` / ${u.max}` : " sent"}
-              </span>
-            </div>
-            <div
-              style={{
-                height: 6,
-                background: G.border,
-                borderRadius: 3,
-                overflow: "hidden",
-              }}
-            >
+        {usageLoading ? (
+          <div
+            style={{
+              padding: "12px 0",
+              textAlign: "center",
+              color: G.muted,
+              fontSize: 13,
+            }}
+          >
+            Loading usage…
+          </div>
+        ) : (
+          usageItems.map((u) => (
+            <div key={u.l} style={{ marginBottom: 14 }}>
               <div
                 style={{
-                  height: "100%",
-                  background:
-                    u.max && u.v / u.max > 0.8 ? G.gold : G.accent,
-                  borderRadius: 3,
-                  width: `${
-                    u.max ? Math.min((u.v / u.max) * 100, 100) : 30
-                  }%`,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: 5,
                 }}
-              />
+              >
+                <span style={{ fontSize: 13.5, color: G.inkSoft }}>
+                  {u.l}
+                </span>
+                <span
+                  style={{ fontSize: 13, color: G.muted, fontWeight: 600 }}
+                >
+                  {u.v}
+                  {u.max ? ` / ${u.max}` : " sent"}
+                </span>
+              </div>
+              <div
+                style={{
+                  height: 6,
+                  background: G.border,
+                  borderRadius: 3,
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    background:
+                      u.max && u.v / u.max > 0.8 ? G.gold : G.accent,
+                    borderRadius: 3,
+                    width: `${
+                      u.max ? Math.min((u.v / u.max) * 100, 100) : 30
+                    }%`,
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </Card>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-        <span style={{ fontSize: 13.5, color: annual ? G.muted : G.ink, fontWeight: annual ? 400 : 700, cursor: "pointer" }} onClick={() => setAnnual(false)}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 14,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 13.5,
+            color: annual ? G.muted : G.ink,
+            fontWeight: annual ? 400 : 700,
+            cursor: "pointer",
+          }}
+          onClick={() => setAnnual(false)}
+        >
           Monthly
         </span>
-        <div onClick={() => setAnnual((a) => !a)} style={{ width: 44, height: 24, borderRadius: 12, background: annual ? G.accent : G.border, position: "relative", cursor: "pointer", transition: "background 0.2s" }}>
-          <div style={{ position: "absolute", top: 3, left: annual ? "unset" : "3px", right: annual ? "3px" : "unset", width: 18, height: 18, borderRadius: "50%", background: "white", transition: "all 0.2s" }} />
+        <div
+          onClick={() => setAnnual((a) => !a)}
+          style={{
+            width: 44,
+            height: 24,
+            borderRadius: 12,
+            background: annual ? G.accent : G.border,
+            position: "relative",
+            cursor: "pointer",
+            transition: "background 0.2s",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 3,
+              left: annual ? "unset" : "3px",
+              right: annual ? "3px" : "unset",
+              width: 18,
+              height: 18,
+              borderRadius: "50%",
+              background: "white",
+              transition: "all 0.2s",
+            }}
+          />
         </div>
-        <span style={{ fontSize: 13.5, color: annual ? G.ink : G.muted, fontWeight: annual ? 700 : 400, cursor: "pointer" }} onClick={() => setAnnual(true)}>
-          Annual <span style={{ color: G.success, fontWeight: 700, fontSize: 11 }}>Save ~17%</span>
+        <span
+          style={{
+            fontSize: 13.5,
+            color: annual ? G.ink : G.muted,
+            fontWeight: annual ? 700 : 400,
+            cursor: "pointer",
+          }}
+          onClick={() => setAnnual(true)}
+        >
+          Annual{" "}
+          <span
+            style={{
+              color: G.success,
+              fontWeight: 700,
+              fontSize: 11,
+            }}
+          >
+            Save ~17%
+          </span>
         </span>
       </div>
       <div
@@ -201,7 +334,7 @@ export default function Billing({ plan, setPlan }) {
                 {p.f.slice(0, 2).join(" · ")}
               </div>
             </div>
-                {p.id === plan ? (
+            {p.id === plan ? (
               <Pill color={G.success}>Current</Pill>
             ) : (
               <Btn

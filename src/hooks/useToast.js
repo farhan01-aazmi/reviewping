@@ -11,5 +11,5 @@ export function useToast() {
       sonner.success(message);
     }
   }, []);
-  return { toast, toasts: [] };
+  return { toast };
 }

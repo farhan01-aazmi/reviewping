@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 
-const BASE_URL = "https://reviewping-seven.vercel.app";
+const BASE_URL = "https://reviewping.pro";
 
 export default function SEO({
   title,

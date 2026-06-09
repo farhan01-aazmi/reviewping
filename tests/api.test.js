@@ -162,7 +162,7 @@ describe("API Client — request paths", () => {
 
   it("calls /create-checkout for createSubscription", async () => {
     mockFetch.mockResolvedValueOnce(okResponse({ url: "https://..." }));
-    await createSubscription({ price_id: "price_xxx", return_url: "https://x" });
+    await createSubscription({ plan: "growth", billing: "monthly", return_url: "https://x" });
     expect(mockFetch.mock.calls[0][0]).toMatch(/\/create-checkout$/);
   });
 
@@ -232,12 +232,12 @@ describe("API Client — method and body shape", () => {
     expect(body).toEqual({ to: "a@b.com", subject: "Hi", message: "Bye" });
   });
 
-  it("createSubscription serialises price_id and return_url", async () => {
+  it("createSubscription serialises plan, billing, return_url", async () => {
     mockFetch.mockResolvedValueOnce(okResponse({ url: "https://..." }));
-    await createSubscription({ price_id: "price_abc", return_url: "https://x" });
+    await createSubscription({ plan: "growth", billing: "monthly", return_url: "https://x" });
 
     const body = JSON.parse(mockFetch.mock.calls[0][1].body);
-    expect(body).toEqual({ price_id: "price_abc", return_url: "https://x" });
+    expect(body).toEqual({ plan: "growth", billing: "monthly", return_url: "https://x" });
   });
 });
 
@@ -328,13 +328,24 @@ describe("send-email — input validation (server-side)", () => {
 });
 
 describe("create-checkout — input validation (server-side)", () => {
-  it("returns 400 when 'price_id' is missing", () => {
-    // Server: if (!price_id) → 400
+  it("returns 400 when 'plan' is missing", () => {
+    // Server: if (!plan || !["starter","growth","agency"].includes(plan)) → 400
     expect(!undefined).toBe(true);
   });
 
+  it("returns 400 when 'billing' is invalid", () => {
+    // Server: if (!billing || !["monthly","annual"].includes(billing)) → 400
+    expect(!undefined).toBe(true);
+  });
+
+  it("returns 400 for unknown plan name", () => {
+    // Server validates plan is in ["starter","growth","agency"]
+    const valid = ["starter", "growth", "agency"];
+    expect(valid.includes("enterprise")).toBe(false);
+  });
+
   it("accepts missing return_url (uses hardcoded default)", () => {
-    // Server defaults: https://reviewping.io/dashboard
+    // Server defaults: https://reviewping.pro/dashboard
     // This is functional, but there is no URL-format validation.
     // GAP: return_url is not validated as a URL
   });

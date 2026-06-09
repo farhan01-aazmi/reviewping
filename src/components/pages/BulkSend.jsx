@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
+import { generateGatewayLink } from "../../api";
 import { SERVICES } from "../../data/constants";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
@@ -112,6 +113,7 @@ export default function BulkSend({ biz, templates, onSent }) {
     }
 
     const token = session.access_token;
+    const userId = session.user?.id;
     const sentList = [];
     const errors = [];
 
@@ -120,17 +122,57 @@ export default function BulkSend({ biz, templates, onSent }) {
         const isEmail = r.contact.includes("@");
         const shouldSendSms = method === "SMS" || method === "Both";
         const shouldSendEmail = method === "Email" || method === "Both";
+        const shouldSendWhatsApp = method === "WhatsApp";
+        const isPhone = !isEmail;
+        const channel = isEmail ? "email" : shouldSendWhatsApp ? "whatsapp" : "sms";
+        const bizName = biz?.business_name || biz?.biz || "our business";
+
+        // 1. Create review_request
+        let gatewayUrl = null;
+        if (userId) {
+          const { data: reqData, error: reqError } = await supabase
+            .from("review_requests")
+            .insert({
+              user_id: userId,
+              customer_name: r.name.trim(),
+              customer_email: isEmail ? r.contact.trim() : null,
+              customer_phone: !isEmail ? r.contact.trim() : null,
+              channel,
+              status: "pending",
+              sent_at: new Date().toISOString(),
+            })
+            .select("id")
+            .single();
+
+          if (!reqError && reqData?.id) {
+            // 2. Generate gateway link
+            try {
+              const gateway = await generateGatewayLink({
+                request_id: reqData.id,
+                customer_name: r.name.trim(),
+                customer_email: isEmail ? r.contact.trim() : null,
+                customer_phone: !isEmail ? r.contact.trim() : null,
+              });
+              if (gateway?.url) {
+                gatewayUrl = gateway.url;
+              }
+            } catch (gwErr) {
+              console.warn(`Gateway link failed for ${r.name}:`, gwErr.message);
+            }
+          }
+        }
+
+        const link = gatewayUrl || `[LINK]`;
 
         if (shouldSendSms && !isEmail) {
           // Send SMS
-          const bizName = biz?.business_name || biz?.biz || "our business";
           const smsRes = await fetch(`${FUNCTION_URL}/send-sms`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ to: r.contact, message: `Hi ${r.name}, thanks for choosing ${bizName}! We'd love your feedback: [LINK]` }),
+            body: JSON.stringify({ to: r.contact, message: `Hi ${r.name}, thanks for choosing ${bizName}! We'd love your feedback: ${link}` }),
           });
           if (!smsRes.ok) {
             const err = await smsRes.json();
@@ -138,9 +180,29 @@ export default function BulkSend({ biz, templates, onSent }) {
           }
         }
 
+        if (shouldSendWhatsApp && isPhone) {
+          // Send WhatsApp
+          const waRes = await fetch(`${FUNCTION_URL}/send-whatsapp`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              to: r.contact,
+              message: `Hi ${r.name}, thanks for choosing ${bizName}! We'd love your feedback: ${link}`,
+              customer_name: r.name,
+              review_link: link,
+            }),
+          });
+          if (!waRes.ok) {
+            const err = await waRes.json();
+            throw new Error(err.error || `WhatsApp failed (${waRes.status})`);
+          }
+        }
+
         if (shouldSendEmail && isEmail) {
           // Send Email
-          const bizName = biz?.business_name || biz?.biz || "our business";
           const emailRes = await fetch(`${FUNCTION_URL}/send-email`, {
             method: "POST",
             headers: {
@@ -150,7 +212,7 @@ export default function BulkSend({ biz, templates, onSent }) {
             body: JSON.stringify({
               to: r.contact,
               subject: `How was your visit to ${bizName}?`,
-              message: `Hi ${r.name},\n\nThank you for choosing ${bizName}! We'd love to hear about your experience.\n\nShare your feedback here: [LINK]\n\n— The ${bizName} Team\nSent via ReviewPing`,
+              message: `Hi ${r.name},\n\nThank you for choosing ${bizName}! We'd love to hear about your experience.\n\nShare your feedback here: ${link}\n\n— The ${bizName} Team\nSent via ReviewPing`,
             }),
           });
           if (!emailRes.ok) {
@@ -287,7 +349,7 @@ export default function BulkSend({ biz, templates, onSent }) {
           label="Send via"
           value={method}
           onChange={(e) => setMethod(e.target.value)}
-          options={["SMS", "Email", "Both"]}
+          options={["SMS", "Email", "WhatsApp", "Both"]}
         />
       </Card>
       <Card sx={{ marginBottom: 14 }}>

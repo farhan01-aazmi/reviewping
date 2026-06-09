@@ -46,10 +46,10 @@ export function sendEmail({ to, subject, message }) {
   });
 }
 
-export function createSubscription({ price_id, return_url }) {
+export function createSubscription({ plan, billing, return_url }) {
   return api("/create-checkout", {
     method: "POST",
-    body: JSON.stringify({ price_id, return_url }),
+    body: JSON.stringify({ plan, billing, return_url }),
   });
 }
 
@@ -75,4 +75,25 @@ export function disconnectGbp() {
 
 export function syncGbpReviews() {
   return api("/gpb-sync", { method: "POST" });
+}
+
+export function sendNegativeReviewAlert({ review_id, rating, review_text, author_name, user_id }) {
+  return api("/negative-review-alert", {
+    method: "POST",
+    body: JSON.stringify({ review_id, rating, review_text, author_name, user_id }),
+  });
+}
+
+export function sendWhatsApp({ to, message, customer_name, review_link }) {
+  return api("/send-whatsapp", {
+    method: "POST",
+    body: JSON.stringify({ to, message, customer_name, review_link }),
+  });
+}
+
+export function generateGatewayLink({ request_id, customer_name, customer_email, customer_phone }) {
+  return api("/generate-gateway-link", {
+    method: "POST",
+    body: JSON.stringify({ request_id, customer_name, customer_email, customer_phone }),
+  });
 }

@@ -50,6 +50,23 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [stats, setStats] = useState(null);
+  const [negCount, setNegCount] = useState(0);
+
+  // ── Handle GBP OAuth callback ──
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("gbp") === "connected") {
+      toast.success("Google Business Profile connected! 🎉");
+      window.history.replaceState({}, "", window.location.pathname);
+    } else if (params.get("gbp") === "error") {
+      toast.error(params.get("msg") === "expired" ? "Connection expired. Try again." : "Failed to connect GBP");
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
+
+  // ── Milestone celebration ──
+  const [milestone, setMilestone] = useState(null); // { emoji, message }
+  const [dismissedMilestones, setDismissedMilestones] = useState(new Set());
 
   useEffect(() => {
     if (!userId) return;
@@ -75,6 +92,11 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           recentRes,
           pendingRes,
           dailyRes,
+          negRes,
+          gatewayClicksRes,
+          gatewayConvertedRes,
+          reviewReqsRes,
+          reviewSubsRes,
         ] = await Promise.all([
           supabase
             .from("reviews")
@@ -119,6 +141,36 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
             .select("sentAt")
             .eq("user_id", userId)
             .gte("sentAt", thirtyDaysAgo),
+          supabase
+            .from("review_submissions")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", userId)
+            .lte("rating", 2)
+            .eq("moderation_status", "approved"),
+          supabase
+            .from("review_gateway_clicks")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", userId)
+            .gte("clicked_at", sMonth),
+          supabase
+            .from("review_gateway_clicks")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", userId)
+            .eq("converted", true)
+            .gte("clicked_at", sMonth),
+          supabase
+            .from("review_requests")
+            .select("id, customer_name, customer_email, channel, status, sent_at, reviewed_at, gateway_rating")
+            .eq("user_id", userId)
+            .order("sent_at", { ascending: false })
+            .limit(20),
+          supabase
+            .from("review_submissions")
+            .select("id, rating, review_text, author_name, source, created_at")
+            .eq("user_id", userId)
+            .not("rating", "is", null)
+            .order("created_at", { ascending: false })
+            .limit(5),
         ]);
 
         if (cancelled) return;
@@ -131,7 +183,12 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           replyRes.error ||
           recentRes.error ||
           pendingRes.error ||
-          dailyRes.error;
+          dailyRes.error ||
+          negRes.error ||
+          gatewayClicksRes.error ||
+          gatewayConvertedRes.error ||
+          reviewReqsRes.error ||
+          reviewSubsRes.error;
 
         if (anyError) {
           throw new Error(anyError.message || "Failed to load dashboard data");
@@ -164,6 +221,17 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           if (star >= 1 && star <= 5) distribution[star]++;
         });
 
+        // Negative review count
+        setNegCount(negRes.count ?? 0);
+
+        // Gateway analytics
+        const gatewayClicks = gatewayClicksRes.count ?? 0;
+        const gatewayConverted = gatewayConvertedRes.count ?? 0;
+        const gatewayConversionRate =
+          gatewayClicks > 0
+            ? Math.round((gatewayConverted / gatewayClicks) * 100)
+            : 0;
+
         // Recent reviewed reviews
         const recentReviews = recentRes.data || [];
 
@@ -177,6 +245,9 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           dayCounts[day] = (dayCounts[day] || 0) + 1;
         });
 
+        const reviewRequests = reviewReqsRes.data || [];
+        const recentSubmissions = reviewSubsRes.data || [];
+
         setStats({
           totalReviews,
           avgRating,
@@ -188,6 +259,11 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           recentReviews,
           pendingReviews,
           dayCounts,
+          gatewayClicks,
+          gatewayConverted,
+          gatewayConversionRate,
+          reviewRequests,
+          recentSubmissions,
         });
       } catch (err) {
         if (cancelled) return;
@@ -205,6 +281,84 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
       cancelled = true;
     };
   }, [userId]);
+
+  // ── Milestone checking effect ──
+  useEffect(() => {
+    if (!stats || !userId) return;
+    if (typeof stats.totalReviews !== "number") return;
+
+    let cancelled = false;
+
+    async function checkMilestones() {
+      try {
+        // Fetch already-reached milestones
+        const { data: existingRows } = await supabase
+          .from("milestones_reached")
+          .select("milestone_key")
+          .eq("user_id", userId);
+
+        if (cancelled) return;
+
+        const existing = new Set(
+          (existingRows || []).map((r) => r.milestone_key),
+        );
+
+        const avgRating = parseFloat(stats.avgRating);
+        const hasFiveStar = (stats.distribution?.[5] || 0) > 0;
+
+        const candidates = [];
+        const total = stats.totalReviews;
+
+        // Review count milestones
+        if (total >= 1 && !existing.has("first_review"))
+          candidates.push({ key: "first_review", emoji: "🎉", message: "First review received!" });
+        if (total >= 10 && !existing.has("reviews_10"))
+          candidates.push({ key: "reviews_10", emoji: "🎉", message: "10 reviews! You're building momentum." });
+        if (total >= 25 && !existing.has("reviews_25"))
+          candidates.push({ key: "reviews_25", emoji: "🎉", message: "25 reviews! Halfway to 50." });
+        if (total >= 50 && !existing.has("reviews_50"))
+          candidates.push({ key: "reviews_50", emoji: "🎉", message: "50 reviews! Your reputation is growing." });
+        if (total >= 100 && !existing.has("reviews_100"))
+          candidates.push({ key: "reviews_100", emoji: "🏆", message: "100 reviews! Centurion status 🏆" });
+
+        // 5-star milestone
+        if (hasFiveStar && !existing.has("first_five_star"))
+          candidates.push({ key: "first_five_star", emoji: "⭐", message: "First 5-star review!" });
+
+        // Rating milestones
+        if (avgRating >= 4.0 && !existing.has("rating_4_0"))
+          candidates.push({ key: "rating_4_0", emoji: "🌟", message: "Average rating hit 4.0!" });
+        if (avgRating >= 4.5 && !existing.has("rating_4_5"))
+          candidates.push({ key: "rating_4_5", emoji: "💫", message: "4.5 stars! Outstanding!" });
+
+        if (candidates.length === 0) return;
+
+        // Insert first candidate milestone
+        const m = candidates[0];
+        const { error: insertErr } = await supabase
+          .from("milestones_reached")
+          .insert({ user_id: userId, milestone_key: m.key });
+
+        if (insertErr) {
+          if (insertErr.code === "23505") return; // already inserted
+          console.error("Milestone insert error:", insertErr);
+          return;
+        }
+
+        if (!cancelled) {
+          setMilestone(m);
+        }
+      } catch (err) {
+        console.error("Milestone check error:", err);
+      }
+    }
+
+    checkMilestones();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [stats, userId]);
 
   const handleCopyLink = () => {
     const link = biz.googleLink || "reviewping.io/r/mybiz";
@@ -266,6 +420,36 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           })}
         </p>
       </div>
+
+      {/* ── Negative review alert banner ── */}
+      {negCount > 0 && (
+        <div
+          onClick={() => onNav && onNav('reviews')}
+          style={{
+            padding: "14px 18px",
+            marginBottom: 16,
+            background: "#fef2f2",
+            border: "1.5px solid #fca5a5",
+            borderRadius: 12,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            transition: "transform 0.15s, box-shadow 0.15s",
+          }}
+          className="action-btn"
+        >
+          <span style={{ fontSize: 22 }}>🚨</span>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 14, color: "#b91c1c" }}>
+              {negCount} negative review{negCount > 1 ? 's' : ''} need{negCount > 1 ? '' : 's'} your attention
+            </div>
+            <div style={{ fontSize: 12, color: "#991b1b", marginTop: 1 }}>
+              Click to view and respond
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Setup / empty banner ── */}
       {!hasReviews && !loading && (
@@ -337,6 +521,12 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
                 s: "replied to reviews",
                 c: G.purple,
               },
+              {
+                l: "Revenue Impact",
+                v: `$${(stats.thisMonth * 50 * 0.35).toLocaleString()}`,
+                s: `est. from ${stats.thisMonth} new reviews`,
+                c: G.success,
+              },
             ].map((s) => (
               <Card
                 key={s.l}
@@ -374,6 +564,88 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
               </Card>
             ))}
       </div>
+
+      {/* ── ROI card ── */}
+      {!loading && hasReviews && (
+        <Card sx={{ padding: "16px 18px", marginBottom: 14 }}>
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: G.muted,
+              letterSpacing: "1px",
+              textTransform: "uppercase",
+              marginBottom: 10,
+            }}
+          >
+            Your ReviewPing ROI This Month
+          </div>
+          {stats.thisMonth < 3 ? (
+            <p style={{ margin: 0, fontSize: 13, color: G.muted }}>
+              Not enough data yet — get at least 3 reviews this month to see your ROI.
+            </p>
+          ) : (() => {
+            const newReviews = stats.thisMonth;
+            const estCustomers = Math.round(newReviews * 0.35);
+            const avgValue = biz.avg_order_value || 500;
+            const estRevenue = estCustomers * avgValue;
+            const cost = 19;
+            const roi = Math.round(estRevenue / Math.max(cost, 1));
+
+            return (
+              <div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                    <span style={{ color: G.muted }}>New reviews</span>
+                    <span style={{ fontWeight: 700, color: G.inkSoft }}>+{newReviews}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                    <span style={{ color: G.muted }}>Est. new customers</span>
+                    <span style={{ fontWeight: 700, color: G.inkSoft }}>+{estCustomers}/mo</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                    <span style={{ color: G.muted }}>Est. extra revenue</span>
+                    <span style={{ fontWeight: 700, color: G.success }}>${estRevenue.toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                    <span style={{ color: G.muted }}>ReviewPing cost</span>
+                    <span style={{ fontWeight: 700, color: G.inkSoft }}>${cost}</span>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      fontSize: 15,
+                      borderTop: `1px solid ${G.border}`,
+                      paddingTop: 8,
+                      marginTop: 4,
+                    }}
+                  >
+                    <span style={{ fontWeight: 700, color: G.inkSoft }}>ROI</span>
+                    <span style={{ fontWeight: 800, color: G.gold }}>
+                      {roi}x 🔥
+                    </span>
+                  </div>
+                </div>
+                <div
+                  onClick={() => onNav('settings')}
+                  style={{
+                    fontSize: 12,
+                    color: G.accent,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                    fontWeight: 600,
+                  }}
+                >
+                  Set avg order value ✏️
+                </div>
+              </div>
+            );
+          })()}
+        </Card>
+      )}
 
       {/* ── Quick actions ── */}
       <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
@@ -425,6 +697,78 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           {copied ? "✓ Copied" : "🔗 Copy Link"}
         </button>
       </div>
+
+      {/* ── Review Gateway Analytics ── */}
+      {!loading && stats && (
+        <Card sx={{ padding: "14px 16px", marginBottom: 14 }}>
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: G.muted,
+              letterSpacing: "1px",
+              textTransform: "uppercase",
+              marginBottom: 12,
+            }}
+          >
+            Review Gateway
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 12,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontFamily: "'Instrument Serif',serif",
+                  fontSize: 28,
+                  color: G.accent,
+                  lineHeight: 1,
+                  marginBottom: 4,
+                }}
+              >
+                {stats.gatewayClicks}
+              </div>
+              <div style={{ fontSize: 12, color: G.muted }}>
+                Clicks this month
+              </div>
+            </div>
+            <div>
+              <div
+                style={{
+                  fontFamily: "'Instrument Serif',serif",
+                  fontSize: 28,
+                  color: G.success,
+                  lineHeight: 1,
+                  marginBottom: 4,
+                }}
+              >
+                {stats.gatewayConversionRate}%
+              </div>
+              <div style={{ fontSize: 12, color: G.muted }}>
+                Conversion rate
+              </div>
+            </div>
+          </div>
+          {stats.gatewayClicks > 0 && (
+            <div
+              style={{
+                fontSize: 11,
+                color: G.mutedLo,
+                marginTop: 8,
+                paddingTop: 8,
+                borderTop: `1px solid ${G.border}`,
+              }}
+            >
+              {stats.gatewayConverted} converted ·{" "}
+              {stats.gatewayClicks - stats.gatewayConverted} pending
+            </div>
+          )}
+        </Card>
+      )}
 
       {/* ── Sentiment breakdown ── */}
       {hasReviews && !loading && (
@@ -728,6 +1072,329 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
             </div>
           </Card>
         ))
+      )}
+
+      {/* ── Sent Requests ── */}
+      {!loading && stats && stats.reviewRequests.length > 0 && (
+        <>
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: G.muted,
+              letterSpacing: "1px",
+              textTransform: "uppercase",
+              margin: "18px 0 10px",
+            }}
+          >
+            Sent requests ({stats.reviewRequests.length})
+          </div>
+          {stats.reviewRequests.slice(0, 5).map((r) => (
+            <Card
+              key={r.id}
+              sx={{ marginBottom: 8, padding: "12px 14px" }}
+            >
+              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: "50%",
+                    background: G.accentBg,
+                    border: `1.5px solid ${G.accentBd}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 800,
+                    fontSize: 13,
+                    color: G.accent,
+                    flexShrink: 0,
+                  }}
+                >
+                  {r.customer_name?.[0] || "?"}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>
+                    {r.customer_name}
+                  </div>
+                  <div style={{ fontSize: 12, color: G.muted }}>
+                    {r.customer_email || ""}
+                    {r.customer_email && r.channel ? " · " : ""}
+                    {r.channel}
+                    {r.sent_at ? ` · ${fmtDate(r.sent_at)}` : ""}
+                  </div>
+                </div>
+                <Pill
+                  variant={
+                    r.status === "reviewed"
+                      ? "success"
+                      : r.status === "clicked"
+                      ? "warning"
+                      : "default"
+                  }
+                >
+                  {r.status === "reviewed"
+                    ? `Reviewed ${r.gateway_rating ? `(${r.gateway_rating}★)` : ""}`
+                    : r.status === "clicked"
+                    ? "Clicked"
+                    : "Sent"}
+                </Pill>
+              </div>
+            </Card>
+          ))}
+        </>
+      )}
+
+      {/* ── Internal Reviews (from gateway) ── */}
+      {!loading && stats && stats.recentSubmissions.length > 0 && (
+        <>
+          <div
+            style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: G.muted,
+              letterSpacing: "1px",
+              textTransform: "uppercase",
+              margin: "18px 0 10px",
+            }}
+          >
+            Customer reviews ({stats.recentSubmissions.length})
+          </div>
+          {stats.recentSubmissions.map((r) => (
+            <Card
+              key={r.id}
+              sx={{ marginBottom: 8, padding: "12px 14px" }}
+            >
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: "50%",
+                    background: G.goldBg,
+                    border: `1.5px solid ${G.goldBd}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 800,
+                    fontSize: 13,
+                    color: G.gold,
+                    flexShrink: 0,
+                  }}
+                >
+                  {r.author_name?.[0] || "?"}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                    <span style={{ fontWeight: 700, fontSize: 13.5 }}>
+                      {r.author_name}
+                    </span>
+                    <Stars rating={r.rating} size={12} />
+                  </div>
+                  {r.review_text && (
+                    <div style={{ fontSize: 12.5, color: G.muted, fontStyle: "italic", fontFamily: "'Instrument Serif',serif" }}>
+                      "{r.review_text}"
+                    </div>
+                  )}
+                  <div style={{ fontSize: 11, color: G.mutedLo, marginTop: 4 }}>
+                    {r.source === "reviewping_form" ? "ReviewPing" : r.source} · {fmtDate(r.created_at)}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </>
+      )}
+
+      {/* ── Milestone Celebration Modal ── */}
+      {milestone && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            fontFamily: "'Manrope',sans-serif",
+          }}
+          onClick={() => setMilestone(null)}
+        >
+          {/* Confetti particles */}
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", overflow: "hidden" }}>
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div
+                key={i}
+                className="confetti-particle"
+                style={{
+                  position: "absolute",
+                  top: -10,
+                  left: `${Math.random() * 100}%`,
+                  width: `${6 + Math.random() * 6}px`,
+                  height: `${6 + Math.random() * 6}px`,
+                  background: [G.accent, G.gold, G.success, G.purple, "#ff6b6b", "#ffd93d"][
+                    Math.floor(Math.random() * 6)
+                  ],
+                  borderRadius: Math.random() > 0.5 ? "50%" : "2px",
+                  animation: `confetti-fall ${1.5 + Math.random() * 2}s ease-out ${Math.random() * 0.5}s forwards`,
+                  opacity: 0,
+                }}
+              />
+            ))}
+          </div>
+
+          <div
+            style={{
+              background: G.surface,
+              borderRadius: 20,
+              padding: "40px 32px 28px",
+              maxWidth: 340,
+              width: "90%",
+              textAlign: "center",
+              position: "relative",
+              animation: "celebrate-in 0.35s ease",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontSize: 52, marginBottom: 12 }}>
+              {milestone.emoji}
+            </div>
+            <h3
+              style={{
+                fontFamily: "'Instrument Serif',serif",
+                fontSize: 22,
+                fontWeight: 400,
+                margin: "0 0 4px",
+                letterSpacing: "-0.3px",
+                color: G.ink,
+              }}
+            >
+              Milestone reached!
+            </h3>
+            <p
+              style={{
+                fontSize: 14,
+                color: G.muted,
+                margin: "0 0 20px",
+                lineHeight: 1.6,
+              }}
+            >
+              {milestone.message}
+            </p>
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                justifyContent: "center",
+                marginBottom: 16,
+              }}
+            >
+              <span
+                onClick={() => {
+                  const text = encodeURIComponent(
+                    `I just reached a milestone on ReviewPing: ${milestone.message}`,
+                  );
+                  window.open(
+                    `https://twitter.com/intent/tweet?text=${text}`,
+                    "_blank",
+                  );
+                }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  background: "#1DA1F2",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  color: "white",
+                  fontSize: 16,
+                  fontWeight: 700,
+                }}
+                title="Share on X (Twitter)"
+              >
+                𝕏
+              </span>
+              <span
+                onClick={() => {
+                  const text = encodeURIComponent(
+                    `I just reached a milestone on ReviewPing: ${milestone.message}`,
+                  );
+                  window.open(
+                    `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://reviewping.pro")}&text=${text}`,
+                    "_blank",
+                  );
+                }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  background: "#0A66C2",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  color: "white",
+                  fontSize: 16,
+                  fontWeight: 700,
+                }}
+                title="Share on LinkedIn"
+              >
+                in
+              </span>
+              <span
+                onClick={() => {
+                  const text = encodeURIComponent(
+                    `I just reached a milestone on ReviewPing: ${milestone.message}`,
+                  );
+                  window.open(
+                    `https://api.whatsapp.com/send?text=${text}`,
+                    "_blank",
+                  );
+                }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  background: "#25D366",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  color: "white",
+                  fontSize: 16,
+                  fontWeight: 700,
+                }}
+                title="Share on WhatsApp"
+              >
+                WA
+              </span>
+            </div>
+            <button
+              onClick={() => setMilestone(null)}
+              style={{
+                width: "100%",
+                padding: "12px",
+                background: G.accent,
+                color: "white",
+                border: "none",
+                borderRadius: 10,
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: "pointer",
+                fontFamily: "'Manrope',sans-serif",
+              }}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

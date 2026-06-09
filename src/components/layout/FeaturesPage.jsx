@@ -288,7 +288,6 @@ export default function FeaturesPage({ onSignup, onLogin, onBack }) {
               style={{
                 fontSize: 15,
                 color: G.muted,
-                margin: "0 0 28px",
                 lineHeight: 1.6,
                 maxWidth: 460,
                 margin: "0 auto 28px",

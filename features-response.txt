@@ -7,7 +7,7 @@
   <meta name="description" content="The page you are looking for does not exist. ReviewPing helps small businesses automate Google review requests." />
   <meta property="og:title" content="Page Not Found — ReviewPing" />
   <meta property="og:description" content="The page you are looking for does not exist. ReviewPing helps small businesses automate Google review requests." />
-  <meta property="og:url" content="https://reviewping-seven.vercel.app/features" />
+  <meta property="og:url" content="https://reviewping.pro/features" />
   <meta name="robots" content="noindex" />
   <style>
     body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;background:#faf9f6;color:#1a1a2e;text-align:center}
@@ -24,7 +24,7 @@
     <h1>404</h1>
     <div class="sep"></div>
     <p>The page you are looking for does not exist or has been moved.</p>
-    <p><a href="https://reviewping-seven.vercel.app">← Back to ReviewPing</a></p>
+    <p><a href="https://reviewping.pro">← Back to ReviewPing</a></p>
   </div>
 </body>
 </html>

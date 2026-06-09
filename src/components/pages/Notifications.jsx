@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import Btn from "../ui/Btn";
@@ -7,14 +7,61 @@ import Pill from "../ui/Pill";
 import EmptyState from "../ui/EmptyState";
 import { fmtDate } from "../../utils/formatters";
 
-export default function Notifications() {
+export default function Notifications({ userId }) {
   const [notifs, setNotifs] = useState([]);
-  const markAll = () => {
-    setNotifs((p) => p.map((n) => ({ ...n, read: true })));
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) return;
+    setLoading(true);
+    supabase
+      .from("notifications")
+      .select("*")
+      .eq("user_id", userId)
+      .order("time", { ascending: false })
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Failed to fetch notifications:", error);
+          return;
+        }
+        setNotifs(data || []);
+      })
+      .catch((err) => console.error("Failed to fetch notifications:", err))
+      .finally(() => setLoading(false));
+  }, [userId]);
+
+  const markAll = async () => {
+    try {
+      const { error } = await supabase
+        .from("notifications")
+        .update({ read: true })
+        .eq("user_id", userId)
+        .eq("read", false);
+      if (error) {
+        console.error("Failed to mark all as read:", error);
+        return;
+      }
+      setNotifs((p) => p.map((n) => ({ ...n, read: true })));
+    } catch (err) {
+      console.error("Failed to mark all as read:", err);
+    }
   };
 
-  const markOne = (id) =>
-    setNotifs((p) => p.map((n) => (n.id === id ? { ...n, read: true } : n)));
+  const markOne = async (id) => {
+    try {
+      const { error } = await supabase
+        .from("notifications")
+        .update({ read: true })
+        .eq("id", id);
+      if (error) {
+        console.error("Failed to mark notification as read:", error);
+        return;
+      }
+      setNotifs((p) => p.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    } catch (err) {
+      console.error("Failed to mark notification as read:", err);
+    }
+  };
 
   return (
     <div>
@@ -41,7 +88,9 @@ export default function Notifications() {
           Mark all read
         </Btn>
       </div>
-      {notifs.length === 0 ? (
+      {loading ? (
+        <p style={{ color: G.muted, fontSize: 13.5 }}>Loading notifications...</p>
+      ) : notifs.length === 0 ? (
         <EmptyState
           icon="🔔"
           title="No notifications yet"

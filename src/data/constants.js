@@ -34,14 +34,33 @@ export const MAIN_SCREENS = [
 
 export const D = 86400000;
 
+/**
+ * ═══════════════════════════════════════════════════════════════
+ * PLAN DEFINITIONS
+ *
+ * The frontend sends `plan` (starter/growth/agency) + `billing`
+ * (monthly/annual) to the create-checkout edge function.
+ * The edge function resolves actual Dodo Payments product IDs
+ * from environment variables:
+ *
+ *   DODO_PRODUCT_STARTER_MONTHLY
+ *   DODO_PRODUCT_STARTER_ANNUAL
+ *   DODO_PRODUCT_GROWTH_MONTHLY
+ *   DODO_PRODUCT_GROWTH_ANNUAL
+ *   DODO_PRODUCT_AGENCY_MONTHLY
+ *   DODO_PRODUCT_AGENCY_ANNUAL
+ *
+ * ⚠️ Setup: Create these 6 products in Dodo Payments Dashboard,
+ *    then set the env vars in Supabase →
+ *    Edge Functions → create-checkout → Environment Variables.
+ * ═══════════════════════════════════════════════════════════════
+ */
 export const PLANS = [
   {
     id: "starter",
     name: "Starter",
     price: 19,
     annual: 190,
-    price_id: "price_starter_monthly",
-    annual_price_id: "price_starter_annual",
     sub: "Solo owners",
     f: ["50 review requests/mo", "Email only (SMS extra)", "Dashboard & analytics", "Google review link", "Email support"],
   },
@@ -50,8 +69,6 @@ export const PLANS = [
     name: "Growth",
     price: 49,
     annual: 490,
-    price_id: "price_growth_monthly",
-    annual_price_id: "price_growth_annual",
     sub: "Most popular",
     f: [
       "Unlimited review requests",
@@ -68,8 +85,6 @@ export const PLANS = [
     name: "Agency",
     price: 99,
     annual: 990,
-    price_id: "price_agency_monthly",
-    annual_price_id: "price_agency_annual",
     sub: "Multi-location",
     f: [
       "Everything in Growth",

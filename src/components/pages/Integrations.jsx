@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "../../config/supabase";
 import { getGbpAuthUrl, disconnectGbp, syncGbpReviews } from "../../api";
 import { G } from "../../data/theme";
@@ -12,18 +12,30 @@ export default function Integrations({ plan }) {
   const [gbpLoading, setGbpLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
+  // Listen for postMessage from GBP OAuth popup
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("gbp") === "connected") {
-      toast("Google Business Profile connected!");
-      window.history.replaceState({}, "", "/integrations");
-    } else if (params.get("gbp") === "error") {
-      toast(params.get("msg") === "expired" ? "Connection expired. Try again." : "Failed to connect", "error");
-      window.history.replaceState({}, "", "/integrations");
-    }
+    const handler = (e) => {
+      // Accept from any origin (popup is on supabase.co)
+      if (e.data?.type === "gbp_success") {
+        toast.success("Google Business Profile connected! 🎉");
+        // Re-fetch the GBP connection status
+        supabase.from("gbp_connections").select("*").single().then(({ data, error }) => {
+          if (error) { console.error("Failed to load GBP connection:", error); return; }
+          if (data?.is_connected) setGbp(data);
+        }).catch(console.error);
+      } else if (e.data?.type === "gbp_error") {
+        toast.error(e.data?.error === "expired" ? "Connection expired. Try again." : "Failed to connect GBP");
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
   }, []);
 
   useEffect(() => {
+    loadGbpStatus();
+  }, []);
+
+  const loadGbpStatus = useCallback(() => {
     supabase.from("gbp_connections").select("*").single().then(({ data, error }) => {
       if (error) { console.error("Failed to load GBP connection:", error); return; }
       if (data?.is_connected) setGbp(data);
@@ -32,16 +44,25 @@ export default function Integrations({ plan }) {
 
   const doGbpConnect = async () => {
     if (plan === "starter") {
-      toast("Upgrade to Growth to connect integrations", "error");
+      toast.error("Upgrade to Growth to connect integrations");
       return;
     }
     setGbpLoading(true);
+
+    // Open popup synchronously (avoids popup blockers)
+    const popup = window.open("", "gbp-connect", "width=600,height=720,scrollbars=yes");
+
     try {
       const { url } = await getGbpAuthUrl();
-      // Full-page redirect instead of popup (avoids popup blockers)
-      window.location.href = url;
+      if (popup && !popup.closed) {
+        popup.location.href = url;
+      } else {
+        // Popup blocked — fallback to full-page redirect
+        window.location.href = url;
+      }
     } catch (err) {
-      toast(err.message || "Failed to start connection", "error");
+      if (popup && !popup.closed) popup.close();
+      toast.error(err.message || "Failed to start connection");
       setGbpLoading(false);
     }
   };
@@ -52,7 +73,7 @@ export default function Integrations({ plan }) {
       setGbp(null);
       toast("GBP disconnected");
     } catch (err) {
-      toast(err.message, "error");
+      toast.error(err.message);
     }
   };
 
@@ -62,7 +83,7 @@ export default function Integrations({ plan }) {
       const result = await syncGbpReviews();
       toast(`${result.stored} new reviews synced from GBP`);
     } catch (err) {
-      toast(err.message || "Sync failed", "error");
+      toast.error(err.message || "Sync failed");
     }
     setSyncing(false);
   };

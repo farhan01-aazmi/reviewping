@@ -1,37 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
 import { G } from "../../data/theme";
 import Card from "../ui/Card";
 import { supabase } from "../../config/supabase";
 import { toast } from "sonner";
-
-const SENTIMENT_COLORS = {
-  positive: G.success,
-  neutral: G.gold,
-  negative: G.accent,
-};
-
-const tooltipStyle = {
-  background: G.surface,
-  border: `1px solid ${G.border}`,
-  borderRadius: 8,
-  fontSize: 12,
-  fontFamily: "'Manrope',sans-serif",
-};
-
-const tickStyle = { fontSize: 10, fill: G.muted };
 
 function Skeleton() {
   return (
@@ -139,21 +110,34 @@ function NotEnoughData() {
             marginRight: "auto",
           }}
         >
-          Collect at least 3 reviews to see your analytics.
+          Collect at least one review or send your first review request to see analytics.
         </p>
       </Card>
     </div>
   );
 }
 
-function formatDateTick(val) {
-  const d = new Date(val + "T00:00:00");
+/** Generate last 30 day labels as YYYY-MM-DD strings */
+function buildDayLabels() {
+  const days = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    d.setHours(0, 0, 0, 0);
+    days.push(d.toISOString().slice(0, 10));
+  }
+  return days;
+}
+
+function formatDateShort(iso) {
+  const d = new Date(iso + "T00:00:00");
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 export default function Analytics({ userId }) {
   const [reviews, setReviews] = useState([]);
   const [reviewRequests, setReviewRequests] = useState([]);
+  const [reviewSubmissions, setReviewSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -173,24 +157,31 @@ export default function Analytics({ userId }) {
         Date.now() - 30 * 24 * 60 * 60 * 1000,
       ).toISOString();
 
-      const [reviewsResult, requestsResult] = await Promise.all([
-        supabase
-          .from("reviews")
-          .select("sentAt, rating")
-          .eq("user_id", userId)
-          .gte("sentAt", thirtyDaysAgo),
-        supabase
-          .from("review_requests")
-          .select("sent_at")
-          .eq("user_id", userId)
-          .gte("sent_at", thirtyDaysAgo),
-      ]);
+      const [reviewsResult, requestsResult, submissionsResult] =
+        await Promise.all([
+          supabase
+            .from("reviews")
+            .select("sentAt, rating")
+            .eq("user_id", userId)
+            .gte("sentAt", thirtyDaysAgo),
+          supabase
+            .from("review_requests")
+            .select("status")
+            .eq("user_id", userId),
+          supabase
+            .from("review_submissions")
+            .select("source")
+            .eq("user_id", userId)
+            .gte("created_at", thirtyDaysAgo),
+        ]);
 
       if (reviewsResult.error) throw reviewsResult.error;
       if (requestsResult.error) throw requestsResult.error;
+      if (submissionsResult.error) throw submissionsResult.error;
 
       setReviews(reviewsResult.data || []);
       setReviewRequests(requestsResult.data || []);
+      setReviewSubmissions(submissionsResult.data || []);
     } catch (err) {
       setError(err.message);
       toast.error("Failed to load analytics: " + err.message);
@@ -208,8 +199,8 @@ export default function Analytics({ userId }) {
           ? (rated.reduce((s, r) => s + r.rating, 0) / rated.length).toFixed(1)
           : "0.0";
       const rate =
-        reviewRequests.length > 0
-          ? Math.round((total / reviewRequests.length) * 100)
+        total > 0
+          ? Math.round((total / Math.max(total, 1)) * 100)
           : 0;
       return {
         totalReviews: total,
@@ -217,7 +208,7 @@ export default function Analytics({ userId }) {
         responseRate: rate,
         ratedReviews: rated,
       };
-    }, [reviews, reviewRequests]);
+    }, [reviews]);
 
   // Chart 1: Reviews per day (last 30 days)
   const reviewsPerDay = useMemo(() => {
@@ -226,52 +217,64 @@ export default function Analytics({ userId }) {
       const day = r.sentAt?.slice(0, 10);
       if (day) map[day] = (map[day] || 0) + 1;
     });
-    return Object.entries(map)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, count]) => ({ date, count }));
-  }, [reviews]);
-
-  // Chart 2: Sentiment breakdown
-  const sentimentData = useMemo(() => {
-    const counts = { positive: 0, neutral: 0, negative: 0 };
-    reviews.forEach((r) => {
-      const rating = Number(r.rating);
-      if (rating >= 4) counts.positive++;
-      else if (rating === 3) counts.neutral++;
-      else if (rating >= 1) counts.negative++;
-    });
-    return Object.entries(counts).map(([name, value]) => ({
-      name: name.charAt(0).toUpperCase() + name.slice(1),
-      value,
-      fill: SENTIMENT_COLORS[name],
+    return buildDayLabels().map((day) => ({
+      date: day,
+      count: map[day] || 0,
     }));
   }, [reviews]);
 
-  // Chart 3: Rating distribution (1–5)
+  const maxDailyCount = useMemo(
+    () => Math.max(...reviewsPerDay.map((d) => d.count), 1),
+    [reviewsPerDay],
+  );
+
+  // Chart 2: Rating Distribution (1-5)
   const ratingDist = useMemo(() => {
     const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
     ratedReviews.forEach((r) => {
       const rating = Number(r.rating);
       if (rating >= 1 && rating <= 5) dist[rating]++;
     });
+    const maxVal = Math.max(...Object.values(dist), 1);
     return [5, 4, 3, 2, 1].map((n) => ({
-      name: `${n}★`,
-      value: dist[n],
+      star: n,
+      count: dist[n],
+      pct: Math.round((dist[n] / maxVal) * 100),
       fill: n >= 4 ? G.success : n === 3 ? G.gold : G.accent,
     }));
   }, [ratedReviews]);
 
-  // Chart 4: Requests sent per day (last 30 days)
-  const requestsPerDay = useMemo(() => {
-    const map = {};
-    reviewRequests.forEach((r) => {
-      const day = r.sent_at?.slice(0, 10);
-      if (day) map[day] = (map[day] || 0) + 1;
-    });
-    return Object.entries(map)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, count]) => ({ date, count }));
+  // Chart 3: Request Funnel — sent, clicked, reviewed
+  const funnel = useMemo(() => {
+    const requests = reviewRequests.length;
+    const clicked = reviewRequests.filter(
+      (r) => r.status === "clicked" || r.status === "reviewed",
+    ).length;
+    const reviewed = reviewRequests.filter(
+      (r) => r.status === "reviewed",
+    ).length;
+    return { sent: requests, clicked, reviewed };
   }, [reviewRequests]);
+
+  const maxFunnel = useMemo(
+    () => Math.max(funnel.sent, funnel.clicked, funnel.reviewed, 1),
+    [funnel],
+  );
+
+  // Chart 4: Source Breakdown
+  const sourceBreakdown = useMemo(() => {
+    const counts = {};
+    reviewSubmissions.forEach((s) => {
+      const src = s.source || "unknown";
+      counts[src] = (counts[src] || 0) + 1;
+    });
+    const total = reviewSubmissions.length || 1;
+    return Object.entries(counts).map(([name, count]) => ({
+      name: name === "reviewping_form" ? "ReviewPing" : name === "google" ? "Google" : name,
+      count,
+      pct: Math.round((count / total) * 100),
+    }));
+  }, [reviewSubmissions]);
 
   if (!userId) {
     return (
@@ -304,7 +307,8 @@ export default function Analytics({ userId }) {
 
   if (loading) return <Skeleton />;
 
-  if (reviews.length < 3) return <NotEnoughData />;
+  // Show at least some data if there are review requests or reviews
+  if (reviews.length === 0 && reviewRequests.length === 0) return <NotEnoughData />;
 
   return (
     <div>
@@ -349,16 +353,14 @@ export default function Analytics({ userId }) {
             >
               {s.v}
             </div>
-            <div
-              style={{ fontSize: 11, color: G.muted, fontWeight: 600 }}
-            >
+            <div style={{ fontSize: 11, color: G.muted, fontWeight: 600 }}>
               {s.l}
             </div>
           </Card>
         ))}
       </div>
 
-      {/* Chart 1 — Reviews per Day (Line) */}
+      {/* ── Chart 1: Reviews Over Time ── */}
       <Card sx={{ marginBottom: 14 }}>
         <div
           style={{
@@ -367,7 +369,7 @@ export default function Analytics({ userId }) {
             marginBottom: 4,
           }}
         >
-          Reviews per Day
+          Reviews Over Time
         </div>
         <div
           style={{
@@ -378,152 +380,34 @@ export default function Analytics({ userId }) {
         >
           Last 30 days
         </div>
-        <ResponsiveContainer width="100%" height={160}>
-          <LineChart data={reviewsPerDay}>
-            <XAxis
-              dataKey="date"
-              tick={tickStyle}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={formatDateTick}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            gap: 2,
+            height: 100,
+          }}
+        >
+          {reviewsPerDay.map((d) => (
+            <div
+              key={d.date}
+              title={`${formatDateShort(d.date)}: ${d.count}`}
+              style={{
+                flex: 1,
+                height: `${Math.max((d.count / maxDailyCount) * 100, d.count > 0 ? 4 : 1)}%`,
+                background: d.count > 0 ? G.accent : G.border,
+                borderRadius: "3px 3px 0 0",
+                opacity: d.count > 0 ? 1 : 0.2,
+                minHeight: d.count > 0 ? 4 : 1,
+                transition: "height 0.3s ease",
+              }}
             />
-            <YAxis
-              tick={tickStyle}
-              axisLine={false}
-              tickLine={false}
-              width={22}
-              allowDecimals={false}
-            />
-            <Tooltip
-              contentStyle={tooltipStyle}
-              labelFormatter={formatDateTick}
-            />
-            <Line
-              type="monotone"
-              dataKey="count"
-              stroke={G.accent}
-              strokeWidth={2.5}
-              dot={{ fill: G.accent, r: 4 }}
-              activeDot={{ r: 5 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+          ))}
+        </div>
       </Card>
 
-      {/* Charts 2 & 3 — side by side */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 14,
-          marginBottom: 14,
-        }}
-      >
-        {/* Chart 2 — Sentiment Breakdown (Donut) */}
-        <Card>
-          <div
-            style={{
-              fontWeight: 700,
-              fontSize: 13.5,
-              marginBottom: 14,
-            }}
-          >
-            Sentiment
-          </div>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <div style={{ width: 140, height: 140 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={sentimentData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={42}
-                    outerRadius={66}
-                    paddingAngle={3}
-                    dataKey="value"
-                  >
-                    {sentimentData.map((e, i) => (
-                      <Cell key={i} fill={e.fill} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={tooltipStyle} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 16,
-              marginTop: 12,
-            }}
-          >
-            {sentimentData.map((s) => (
-              <div
-                key={s.name}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 5,
-                  fontSize: 12,
-                  color: G.muted,
-                }}
-              >
-                <div
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: 2,
-                    background: s.fill,
-                  }}
-                />
-                {s.name} ({s.value})
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Chart 3 — Rating Distribution (Bar) */}
-        <Card>
-          <div
-            style={{
-              fontWeight: 700,
-              fontSize: 13.5,
-              marginBottom: 14,
-            }}
-          >
-            Rating Distribution
-          </div>
-          <ResponsiveContainer width="100%" height={160}>
-            <BarChart data={ratingDist} barGap={4}>
-              <XAxis
-                dataKey="name"
-                tick={tickStyle}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={tickStyle}
-                axisLine={false}
-                tickLine={false}
-                width={22}
-                allowDecimals={false}
-              />
-              <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey="value" radius={[4, 4, 0, 0]} name="Count">
-                {ratingDist.map((e, i) => (
-                  <Cell key={i} fill={e.fill} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-      </div>
-
-      {/* Chart 4 — Requests Sent per Day (Bar) */}
-      <Card>
+      {/* ── Chart 2: Rating Distribution ── */}
+      <Card sx={{ marginBottom: 14 }}>
         <div
           style={{
             fontWeight: 700,
@@ -531,7 +415,7 @@ export default function Analytics({ userId }) {
             marginBottom: 4,
           }}
         >
-          Requests Sent per Day
+          Rating Distribution
         </div>
         <div
           style={{
@@ -540,36 +424,207 @@ export default function Analytics({ userId }) {
             marginBottom: 14,
           }}
         >
-          Last 30 days
+          How customers rate you
         </div>
-        <ResponsiveContainer width="100%" height={160}>
-          <BarChart data={requestsPerDay} barGap={3}>
-            <XAxis
-              dataKey="date"
-              tick={tickStyle}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={formatDateTick}
-            />
-            <YAxis
-              tick={tickStyle}
-              axisLine={false}
-              tickLine={false}
-              width={22}
-              allowDecimals={false}
-            />
-            <Tooltip
-              contentStyle={tooltipStyle}
-              labelFormatter={formatDateTick}
-            />
-            <Bar
-              dataKey="count"
-              fill={G.accent}
-              radius={[4, 4, 0, 0]}
-              name="Requests"
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        {ratingDist.map((r) => (
+          <div
+            key={r.star}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              marginBottom: 6,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: G.inkSoft,
+                width: 16,
+                textAlign: "right",
+              }}
+            >
+              {r.star}
+            </span>
+            <span style={{ fontSize: 10, color: G.muted }}>★</span>
+            <div
+              style={{
+                flex: 1,
+                height: 12,
+                background: G.border,
+                borderRadius: 6,
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  width: `${r.pct}%`,
+                  height: "100%",
+                  background: r.fill,
+                  borderRadius: 6,
+                  transition: "width 0.4s ease",
+                }}
+              />
+            </div>
+            <span style={{ fontSize: 11, color: G.muted, width: 24, textAlign: "right" }}>
+              {r.count}
+            </span>
+          </div>
+        ))}
+      </Card>
+
+      {/* ── Chart 3: Request Funnel ── */}
+      <Card sx={{ marginBottom: 14 }}>
+        <div
+          style={{
+            fontWeight: 700,
+            fontSize: 13.5,
+            marginBottom: 4,
+          }}
+        >
+          Request Funnel
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: G.muted,
+            marginBottom: 14,
+          }}
+        >
+          Sent → Clicked → Reviewed
+        </div>
+        <div style={{ display: "flex", gap: 10 }}>
+          {[
+            { label: "Sent", count: funnel.sent, color: G.accent },
+            { label: "Clicked", count: funnel.clicked, color: G.gold },
+            { label: "Reviewed", count: funnel.reviewed, color: G.success },
+          ].map((f) => (
+            <div key={f.label} style={{ flex: 1, textAlign: "center" }}>
+              <div
+                style={{
+                  fontFamily: "'Instrument Serif',serif",
+                  fontSize: 28,
+                  color: f.color,
+                  lineHeight: 1,
+                  marginBottom: 2,
+                }}
+              >
+                {f.count}
+              </div>
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  color: G.muted,
+                  letterSpacing: "0.5px",
+                  textTransform: "uppercase",
+                  marginBottom: 8,
+                }}
+              >
+                {f.label}
+              </div>
+              <div
+                style={{
+                  height: 8,
+                  background: G.border,
+                  borderRadius: 4,
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${(f.count / maxFunnel) * 100}%`,
+                    height: "100%",
+                    background: f.color,
+                    borderRadius: 4,
+                    transition: "width 0.4s ease",
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* ── Chart 4: Source Breakdown ── */}
+      <Card sx={{ marginBottom: 14 }}>
+        <div
+          style={{
+            fontWeight: 700,
+            fontSize: 13.5,
+            marginBottom: 4,
+          }}
+        >
+          Source Breakdown
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: G.muted,
+            marginBottom: 14,
+          }}
+        >
+          Where reviews come from
+        </div>
+        {sourceBreakdown.length === 0 ? (
+          <p style={{ fontSize: 12, color: G.muted, margin: 0 }}>
+            No submission data yet.
+          </p>
+        ) : (
+          sourceBreakdown.map((s) => (
+            <div
+              key={s.name}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginBottom: 6,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: G.inkSoft,
+                  width: 80,
+                  textAlign: "left",
+                }}
+              >
+                {s.name}
+              </span>
+              <div
+                style={{
+                  flex: 1,
+                  height: 12,
+                  background: G.border,
+                  borderRadius: 6,
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${s.pct}%`,
+                    height: "100%",
+                    background: G.purple,
+                    borderRadius: 6,
+                    transition: "width 0.4s ease",
+                  }}
+                />
+              </div>
+              <span
+                style={{
+                  fontSize: 11,
+                  color: G.muted,
+                  width: 40,
+                  textAlign: "right",
+                }}
+              >
+                {s.count} ({s.pct}%)
+              </span>
+            </div>
+          ))
+        )}
       </Card>
     </div>
   );

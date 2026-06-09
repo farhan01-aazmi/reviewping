@@ -172,7 +172,7 @@ export default function Changelog() {
         <p style={{ margin: "0 0 14px", fontSize: 13.5, color: G.inkSoft }}>
           We build what our customers ask for.
         </p>
-        <Btn size="sm">Submit a request →</Btn>
+        <Btn size="sm" onClick={() => window.location.href = "mailto:hello@reviewping.io?subject=Feature%20Request"}>Submit a request →</Btn>
       </Card>
     </div>
   );

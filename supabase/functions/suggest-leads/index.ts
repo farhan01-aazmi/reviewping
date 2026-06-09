@@ -20,7 +20,7 @@ import { verifyAuth, CORS } from '../_shared/auth.ts';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 // ── CORS headers (restricted to production origin) ──────────────────────────
-const ALLOWED_ORIGIN = Deno.env.get('CORS_ORIGIN') || 'https://reviewping-seven.vercel.app';
+const ALLOWED_ORIGIN = Deno.env.get('CORS_ORIGIN') || 'https://reviewping.pro';
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
