@@ -54,6 +54,24 @@ export default async function middleware(request) {
     const targetUrl = `${SUPABASE_FN_URL}/${functionPath}`;
 
     try {
+      // Handle OPTIONS (no body)
+      if (request.method === 'OPTIONS') {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'authorization, content-type, x-client-info, apikey',
+          },
+        });
+      }
+
+      // Read the body to avoid ReadableStream issues
+      let body;
+      if (request.method !== 'GET' && request.method !== 'HEAD') {
+        body = await request.text();
+      }
+
       // Forward headers (auth, content-type, etc.)
       const headers = new Headers(request.headers);
       headers.delete('host');
@@ -62,7 +80,7 @@ export default async function middleware(request) {
       const upstream = await fetch(targetUrl, {
         method: request.method,
         headers,
-        body: request.body,
+        body: body || null,
       });
 
       // Build response with CORS headers
