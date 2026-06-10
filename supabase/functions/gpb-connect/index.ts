@@ -184,16 +184,23 @@ serve(async (req) => {
       // Silently fail — user can set link manually in Settings
     }
 
-    // Return HTML that sends postMessage to the popup opener and closes
+    // Return HTML that:
+    // 1. If in a popup (window.opener exists): send postMessage to parent, closes popup
+    // 2. If in the main window (old full-page redirect): redirect back to dashboard
     return html(
       `<html><body><script>
-        if (window.opener) {
-          window.opener.postMessage({ type: "gbp_success" }, "${SITE_URL}");
-          window.close();
-        } else {
-          document.body.innerHTML = '<p style="font-family:sans-serif;padding:2rem;text-align:center;color:#333"><strong>Connected to Google Business Profile!</strong><br><br>You can close this tab and return to ReviewPing.</p>';
-        }
-      </script><noscript><p>GBP connected! Close this tab.</p></noscript></body></html>`
+        (function() {
+          try {
+            if (window.opener && !window.opener.closed) {
+              window.opener.postMessage({ type: "gbp_success" }, "${SITE_URL}");
+              window.close();
+              return;
+            }
+          } catch(e) {}
+          // No opener — redirect back to dashboard (handles cached old JS)
+          window.location.href = "${SITE_URL}/dashboard?gbp=connected";
+        })();
+      </script><noscript><p>GBP connected! Redirecting...</p><meta http-equiv="refresh" content="0;url=${SITE_URL}/dashboard?gbp=connected"></noscript></body></html>`
     )
   }
 
