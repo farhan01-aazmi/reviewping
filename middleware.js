@@ -41,12 +41,21 @@ const STATIC_EXTENSIONS = [
 ];
 
 const ALLOWED_HOST = 'reviewping.pro';
+const ALLOWED_HOSTS = ['reviewping.pro', 'www.reviewping.pro'];
 
 export default async function middleware(request) {
   const url = new URL(request.url);
   
   // Redirect any vercel.app subdomain to custom domain
   if (url.hostname.endsWith('.vercel.app') || url.hostname.includes('.vercel.app')) {
+    url.hostname = ALLOWED_HOST;
+    return Response.redirect(url.toString(), 301);
+  }
+
+  // Allow both www and non-www for API proxy (handle Vercel www redirect)
+  const isAllowedHost = ALLOWED_HOSTS.includes(url.hostname);
+  if (!isAllowedHost && !url.hostname.endsWith('.vercel.app')) {
+    // Unknown host - redirect to canonical
     url.hostname = ALLOWED_HOST;
     return Response.redirect(url.toString(), 301);
   }
