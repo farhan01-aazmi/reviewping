@@ -36,13 +36,23 @@ function html(body) {
   })
 }
 
-function popupResponse(type, payload) {
+function popupResponse(type, payload, redirectOnNoOpener = true) {
   const data = JSON.stringify(payload)
+  const isError = type === "gbp_error"
+  const redirectParams = isError ? `gbp=error&msg=${payload?.error || "unknown"}` : `gbp=connected`
   return html(
     `<html><body><script>
-      window.opener?.postMessage({ type: ${JSON.stringify(type)}, ...JSON.parse(${JSON.stringify(data)}) }, "${SITE_URL}");
-      window.close();
-    </script><p>You can close this tab.</p></body></html>`
+      (function() {
+        try {
+          if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({ type: ${JSON.stringify(type)}, ...JSON.parse(${JSON.stringify(data)}) }, "${SITE_URL}");
+            window.close();
+            return;
+          }
+        } catch(e) {}
+        ${redirectOnNoOpener ? `window.location.href = "${SITE_URL}/dashboard?${redirectParams}";` : 'window.close();'}
+      })();
+    </script><noscript><p>Redirecting...</p><meta http-equiv="refresh" content="0;url=${SITE_URL}/dashboard?${redirectParams}"></noscript></body></html>`
   )
 }
 
