@@ -12,6 +12,7 @@ const SUPABASE_FN_URL = 'https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1';
 // Map URL paths to actual Supabase function names
 const FUNCTION_MAP = {
   'gbp-connect': 'gpb-connect',  // URL uses gbp-connect, function is gpb-connect
+  'gpb-sync': 'gpb-sync',        // URL uses gpb-sync, function is gpb-sync
 };
 
 const KNOWN_ROUTES = new Set([

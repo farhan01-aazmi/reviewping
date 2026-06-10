@@ -46,7 +46,8 @@ serve(async (req) => {
 
     if (updateError) throw updateError;
 
-    const gatewayUrl = `https://reviewping-eight.vercel.app/r/${token}`;
+    const siteUrl = Deno.env.get("SITE_URL") || "https://reviewping.pro";
+    const gatewayUrl = `${siteUrl}/r/${token}`;
 
     return new Response(JSON.stringify({ token, url: gatewayUrl }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
