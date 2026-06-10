@@ -9,6 +9,11 @@
 
 const SUPABASE_FN_URL = 'https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1';
 
+// Map URL paths to actual Supabase function names
+const FUNCTION_MAP = {
+  'gbp-connect': 'gpb-connect',  // URL uses gbp-connect, function is gpb-connect
+};
+
 const KNOWN_ROUTES = new Set([
   "/",
   "/auth/callback",
@@ -68,7 +73,11 @@ export default async function middleware(request) {
   // EDGE PROXY: /api/edge/* → Supabase Edge Functions
   // ═══════════════════════════════════════════════════════════
   if (normalized.startsWith('/api/edge/')) {
-    const functionPath = normalized.replace(/^\/api\/edge\//, '');
+    let functionPath = normalized.replace(/^\/api\/edge\//, '');
+    // Map URL path to actual Supabase function name
+    if (FUNCTION_MAP[functionPath]) {
+      functionPath = FUNCTION_MAP[functionPath];
+    }
     // Include query string in the forwarded URL
     const queryString = url.search;
     const targetUrl = `${SUPABASE_FN_URL}/${functionPath}${queryString}`;
