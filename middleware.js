@@ -40,8 +40,17 @@ const STATIC_EXTENSIONS = [
   ".css", ".js", ".json", ".xml", ".txt", ".woff2", ".woff", ".eot", ".ttf", ".otf",
 ];
 
+const ALLOWED_HOST = 'reviewping.pro';
+
 export default async function middleware(request) {
   const url = new URL(request.url);
+  
+  // Redirect any vercel.app subdomain to custom domain
+  if (url.hostname.endsWith('.vercel.app') || url.hostname.includes('.vercel.app')) {
+    url.hostname = ALLOWED_HOST;
+    return Response.redirect(url.toString(), 301);
+  }
+
   let pathname = url.pathname;
   const hasTrailingSlash = pathname.length > 1 && pathname.endsWith("/");
   const normalized = hasTrailingSlash ? pathname.slice(0, -1) : pathname;
@@ -130,7 +139,7 @@ export default async function middleware(request) {
 
   // Unknown route - return proper 404 status
   const title = "Page Not Found - ReviewPing";
-  const homeUrl = "https://reviewping.pro";
+  const homeUrl = `https://${ALLOWED_HOST}`;
 
   return new Response(
     `<!DOCTYPE html>
