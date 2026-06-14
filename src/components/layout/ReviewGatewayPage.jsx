@@ -5,7 +5,7 @@ import { Spinner } from "../ui";
 
 const STAR_LABELS = ["Poor", "Fair", "Good", "Great", "Excellent"];
 const API_BASE = import.meta.env.VITE_SUPABASE_URL || "";
-const GATEWAY_URL = "https://reviewping-eight.vercel.app";
+const GATEWAY_URL = import.meta.env.VITE_SITE_URL || "https://reviewping.pro";
 
 /**
  * Smart Review Gateway Page (/r/:token)

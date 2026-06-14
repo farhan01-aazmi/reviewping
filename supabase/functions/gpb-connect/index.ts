@@ -5,7 +5,7 @@ const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_OAUTH_CLIENT_ID") || ""
 const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_OAUTH_CLIENT_SECRET") || ""
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || ""
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
-const SITE_URL = Deno.env.get("SITE_URL") || "https://reviewping-eight.vercel.app"
+const SITE_URL = Deno.env.get("SITE_URL") || "https://reviewping.pro"
 
 const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/gpb-connect`
 

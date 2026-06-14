@@ -1,0 +1,61 @@
+-- ============================================================
+-- 014_gbp_cleanup_and_required.sql
+-- Clean stale GBP connections + add GBP requirement at login
+-- ============================================================
+
+-- 1. Delete all stale/expired GBP connections
+DELETE FROM gbp_connections 
+WHERE is_connected = true 
+  AND (token_expires_at < now() OR access_token IS NULL OR access_token = '');
+
+-- 2. Also clean orphaned oauth states
+DELETE FROM gbp_oauth_states 
+WHERE expires_at < now();
+
+-- 3. Add a flag to users table to track if GBP onboarding is complete
+ALTER TABLE auth.users ADD COLUMN IF NOT EXISTS raw_user_meta_data jsonb DEFAULT '{}'::jsonb;
+
+-- Note: We can't directly alter auth.users, so we use a profile table instead
+-- The user_profiles table already exists, add GBP required flag there
+
+-- 4. Create a view to check if user has valid GBP connection
+CREATE OR REPLACE VIEW user_gbp_status AS
+SELECT 
+  u.id as user_id,
+  u.email,
+  CASE 
+    WHEN gc.is_connected = true 
+         AND gc.token_expires_at > now() 
+         AND gc.access_token IS NOT NULL 
+         AND gc.access_token != '' 
+    THEN true 
+    ELSE false 
+  END as has_valid_gbp,
+  gc.gbp_location_name,
+  gc.gbp_location_id,
+  gc.token_expires_at
+FROM auth.users u
+LEFT JOIN gbp_connections gc ON gc.user_id = u.id AND gc.is_connected = true;
+
+-- 5. Add RLS policy for the view
+ALTER VIEW user_gbp_status OWNER TO postgres;
+GRANT SELECT ON user_gbp_status TO authenticated;
+
+-- 6. Function to check if user has valid GBP (for middleware/API use)
+CREATE OR REPLACE FUNCTION public.user_has_valid_gbp(user_uuid uuid)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM gbp_connections 
+    WHERE user_id = user_uuid 
+      AND is_connected = true 
+      AND token_expires_at > now() 
+      AND access_token IS NOT NULL 
+      AND access_token != ''
+  );
+$$;
+
+GRANT EXECUTE ON FUNCTION public.user_has_valid_gbp(uuid) TO authenticated;

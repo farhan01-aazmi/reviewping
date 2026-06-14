@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
-import { Card, Field, Btn, Wordmark } from "../ui";
+import { Card, Field, Btn, Wordmark, Pill } from "../ui";
+import { getGbpAuthUrl } from "../../api";
 
 const CATEGORIES = [
   "Restaurant",
@@ -290,6 +291,29 @@ export default function Onboarding({ user, onComplete }) {
                 placeholder="https://g.page/r/..."
                 hint="Google Maps → Your Business → Share → Copy review link"
               />
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: G.inkSoft, marginBottom: 6 }}>
+                  Connect Google Business Profile (Recommended)
+                </label>
+                <Btn
+                  variant="secondary"
+                  fullWidth
+                  onClick={async () => {
+                    try {
+                      const { url } = await getGbpAuthUrl();
+                      window.location.href = url;
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }}
+                  style={{ marginBottom: 8 }}
+                >
+                  Connect Google Business Profile →
+                </Btn>
+                <p style={{ fontSize: 11, color: G.muted, margin: 0 }}>
+                  Connect GBP to auto-fetch reviews, auto-generate review links, and enable review replies.
+                </p>
+              </div>
               <div
                 style={{
                   padding: "14px 16px",
@@ -300,7 +324,7 @@ export default function Onboarding({ user, onComplete }) {
                 }}
               >
                 <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4 }}>
-                  Don't have it yet?
+                  Don't have review link yet?
                 </div>
                 <p
                   style={{

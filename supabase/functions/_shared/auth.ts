@@ -6,8 +6,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // Use CORS constant for quick responses (uses first allowed origin).
 
 const ALLOWED_ORIGINS = [
-  "https://reviewping-eight.vercel.app",
   "https://reviewping.pro",
+  "https://www.reviewping.pro",
   "http://localhost:5173",
   "http://localhost:3000",
 ];
