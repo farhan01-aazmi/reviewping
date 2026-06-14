@@ -1,6 +1,6 @@
 import { supabase } from "../config/supabase";
 
-const API_BASE = import.meta.env.VITE_API_URL || "";
+const API_BASE = window.location.origin + "/api/edge";
 
 async function api(path, options = {}) {
   const { data: { session } } = await supabase.auth.getSession();
