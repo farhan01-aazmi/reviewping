@@ -7,7 +7,7 @@ export default function More({ onNav, onLogout, unreadCount }) {
   const { isDark, toggleDark } = useTheme();
   const items = [
     { e: "📋", l: "Sent Log", s: "sentlog" },
-    { e: "📤", l: "Bulk Send", s: "bulksend" },
+    { e: "📤", l: "Bulk Send", s: "bulk" },
     { e: "📒", l: "Contacts", s: "contacts" },
     { e: "📱", l: "QR Code", s: "qrcode" },
     { e: "🖼️", l: "Widget", s: "widget" },

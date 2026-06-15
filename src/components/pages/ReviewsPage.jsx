@@ -31,8 +31,9 @@ export default function ReviewsPage({ userId, onSend }) {
 
   // Fetch main reviews
   useEffect(() => {
+    if (!userId) return;
     let cancelled = false;
-    supabase.from("reviews").select("*").order("sentAt", { ascending: false }).then(({ data, error: err }) => {
+    supabase.from("reviews").select("*").eq("user_id", userId).order("sentAt", { ascending: false }).then(({ data, error: err }) => {
       if (!cancelled) {
         if (err) { setError(err.message); setLoading(false); return; }
         setReviews(data || []);
@@ -42,7 +43,7 @@ export default function ReviewsPage({ userId, onSend }) {
       if (!cancelled) { setError(e.message); setLoading(false); }
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [userId]);
 
   // Fetch negative reviews (1-2 star, approved = unresolved)
   useEffect(() => {
