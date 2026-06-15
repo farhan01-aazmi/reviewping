@@ -138,6 +138,7 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
             .order("sentAt", { ascending: false })
             .limit(5),
           supabase
+            .from("reviews")
             .select("*")
             .eq("user_id", userId)
             .eq("status", "pending")
