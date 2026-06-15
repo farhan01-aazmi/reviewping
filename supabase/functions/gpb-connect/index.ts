@@ -140,22 +140,30 @@ serve(async (req) => {
     )
     const accounts = await accountsRes.json()
     const account = accounts.accounts?.[0]
-    if (account) {
-      accountName = account.accountName || ""
-      accountId = account.name || ""
-      const locRes = await fetch(
-        `https://mybusinessbusinessinformation.googleapis.com/v1/accounts/${account.name}/locations?pageSize=1`,
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      )
-      const locData = await locRes.json()
-      const loc = locData.locations?.[0]
-      if (loc) {
-        locationName = loc.locationName || loc.title || ""
-        locationId = loc.name || ""
-        locationAddress = loc.address?.addressLines?.[0] || ""
-        locationPhone = loc.phoneNumbers?.primaryPhone || ""
-      }
+    
+    // Check if user has any GBP accounts
+    if (!account) {
+      return popupResponse("gbp_error", { error: "No Google Business Profile accounts found for this Google account. Please use an account that owns/manages a Google Business Profile." })
     }
+    
+    accountName = account.accountName || ""
+    accountId = account.name || ""
+    const locRes = await fetch(
+      `https://mybusinessbusinessinformation.googleapis.com/v1/accounts/${account.name}/locations?pageSize=1`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    )
+    const locData = await locRes.json()
+    const loc = locData.locations?.[0]
+    
+    // Check if account has any locations
+    if (!loc) {
+      return popupResponse("gbp_error", { error: "This Google Business Profile account has no locations. Please add a location in Google Business Profile first." })
+    }
+    
+    locationName = loc.locationName || loc.title || ""
+    locationId = loc.name || ""
+    locationAddress = loc.address?.addressLines?.[0] || ""
+    locationPhone = loc.phoneNumbers?.primaryPhone || ""
 
     await supabase.from("gbp_connections").upsert({
       user_id: userId,

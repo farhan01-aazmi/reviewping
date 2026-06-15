@@ -14,6 +14,7 @@ const FUNCTION_MAP = {
   'gbp-connect': 'gpb-connect',  // URL uses gbp-connect, function is gpb-connect
   'gpb-sync': 'gpb-sync',        // URL uses gpb-sync, function is gpb-sync
   'competitor-sync': 'competitor-sync',
+  'weekly-digest': 'weekly-digest',
 };
 
 const KNOWN_ROUTES = new Set([

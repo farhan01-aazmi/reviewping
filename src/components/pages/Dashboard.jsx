@@ -4,6 +4,10 @@ import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Btn, Card, Pill, Stars, Spinner, EmptyState } from "../ui";
 import { fmtDate } from "../../utils/formatters";
+import CompetitorRadar from "../layout/CompetitorRadar";
+import ReputationScore from "../ui/ReputationScore";
+import VelocityInsight from "../ui/VelocityInsight";
+import { listCompetitors, syncCompetitors, sendTestDigest } from "../../api";
 
 const THIRTY_DAYS = 30 * 86400000;
 
@@ -51,6 +55,9 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
   const [copied, setCopied] = useState(false);
   const [stats, setStats] = useState(null);
   const [negCount, setNegCount] = useState(0);
+  const [competitors, setCompetitors] = useState([]);
+  const [competitorsLoading, setCompetitorsLoading] = useState(true);
+  const [sendingDigest, setSendingDigest] = useState(false);
 
   // ── Handle GBP OAuth callback ──
   useEffect(() => {
@@ -97,6 +104,7 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           gatewayConvertedRes,
           reviewReqsRes,
           reviewSubsRes,
+          competitorsRes,
         ] = await Promise.all([
           supabase
             .from("reviews")
@@ -130,7 +138,6 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
             .order("sentAt", { ascending: false })
             .limit(5),
           supabase
-            .from("reviews")
             .select("*")
             .eq("user_id", userId)
             .eq("status", "pending")
@@ -171,6 +178,11 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
             .not("rating", "is", null)
             .order("created_at", { ascending: false })
             .limit(5),
+          supabase
+            .from("competitors")
+            .select("*")
+            .eq("user_id", userId)
+            .order("created_at", { ascending: true }),
         ]);
 
         if (cancelled) return;
@@ -265,6 +277,8 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           reviewRequests,
           recentSubmissions,
         });
+        setCompetitors(competitorsRes.data || []);
+        setCompetitorsLoading(false);
       } catch (err) {
         if (cancelled) return;
         const msg = err?.message || "Something went wrong";
@@ -359,6 +373,18 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
       cancelled = true;
     };
   }, [stats, userId]);
+
+  const handleSendDigest = async (frequency) => {
+    setSendingDigest(true);
+    try {
+      const res = await sendTestDigest(frequency);
+      toast.success(`${frequency === "weekly" ? "Weekly" : "Daily"} digest sent! Check your email.`);
+    } catch (err) {
+      toast.error(err.message || "Failed to send digest");
+    } finally {
+      setSendingDigest(false);
+    }
+  };
 
   const handleCopyLink = () => {
     const link = biz.googleLink || "reviewping.io/r/mybiz";
@@ -647,8 +673,36 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
         </Card>
       )}
 
+      {/* ── Competitor Radar ── */}
+      {!loading && stats && (
+        <CompetitorRadar
+          userRating={stats.avgRating !== "—" ? parseFloat(stats.avgRating) : 0}
+          userReviewCount={stats.totalReviews || 0}
+          businessName={biz?.bizName || biz?.biz || "Your Business"}
+        />
+      )}
+
+      {/* ── Reputation Score ── */}
+      {!loading && stats && (
+        <ReputationScore
+          avgRating={stats.avgRating}
+          reviewCount={stats.totalReviews}
+          responseRate={stats.responseRate}
+          positiveRatio={
+            stats.sentiments.positive + stats.sentiments.neutral + stats.sentiments.negative > 0
+              ? stats.sentiments.positive / (stats.sentiments.positive + stats.sentiments.neutral + stats.sentiments.negative)
+              : 0
+          }
+        />
+      )}
+
+      {/* ── Review Velocity ── */}
+      {!loading && stats && stats.totalReviews > 0 && (
+        <VelocityInsight />
+      )}
+
       {/* ── Quick actions ── */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
         <button
           onClick={onSend}
           style={{
@@ -695,6 +749,31 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           title="Copy review link"
         >
           {copied ? "✓ Copied" : "🔗 Copy Link"}
+        </button>
+        <button
+          onClick={() => handleSendDigest("daily")}
+          disabled={sendingDigest}
+          style={{
+            padding: "14px 16px",
+            background: G.infoBg,
+            border: `1.5px solid ${G.infoBd}`,
+            borderRadius: 10,
+            cursor: "pointer",
+            fontFamily: "'Manrope',sans-serif",
+            fontWeight: 700,
+            fontSize: 13,
+            color: G.accent,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            flexShrink: 0,
+            transition: "transform 0.15s",
+            opacity: sendingDigest ? 0.6 : 1,
+          }}
+          className="action-btn"
+          title="Send test daily digest email"
+        >
+          {sendingDigest ? "⏳" : "☀️ Test Daily Digest"}
         </button>
       </div>
 
