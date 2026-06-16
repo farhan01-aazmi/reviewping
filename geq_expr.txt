@@ -1,0 +1,1 @@
+r=r:g=g:b=b:a='if(lt(r+g+b,350)*lt(abs(r-g)+abs(g-b)+abs(r-b),80),0,255)'
