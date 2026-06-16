@@ -307,7 +307,7 @@ export default function BlogPage({ onSignup, onLogin, onBack }) {
               }}
             >
               Join 2,400+ small businesses using ReviewPing to automate review
-              requests and grow their reputation — starting at $19/month.
+              requests and grow their reputation — starting at $29/month.
             </p>
             <Btn size="lg" onClick={onSignup}>
               Start free — no card needed →

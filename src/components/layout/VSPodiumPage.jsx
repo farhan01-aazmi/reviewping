@@ -380,7 +380,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
     {
       feature: "Price",
       podium: <span style={styles.priceHighlight}><span style={styles.podiumPrice}>$400+</span>/mo</span>,
-      ping: <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>$19/mo</span>,
+      ping: <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>$29/mo</span>,
       highlight: true,
     },
     {
@@ -408,7 +408,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       podium: <Check />,
       ping: (
         <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$99/mo</span>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
         </>
       ),
     },
@@ -417,7 +417,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       podium: <Cross />,
       ping: (
         <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$99/mo</span>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
         </>
       ),
     },
@@ -445,8 +445,8 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
   return (
     <div style={styles.page}>
       <SEO
-        title="ReviewPing vs Podium: The $19/mo Alternative"
-        description="Compare ReviewPing ($19/mo) vs Podium ($400+/mo). Same core review request functionality at 95% less cost. Built for small businesses."
+        title="ReviewPing vs Podium: The $29/mo Alternative"
+        description="Compare ReviewPing ($29/mo) vs Podium ($400+/mo). Same core review request functionality at 95% less cost. Built for small businesses."
         path="/vs-podium"
       />
 
@@ -488,7 +488,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
         </p>
         <div style={styles.heroCtaRow}>
           <button style={styles.primaryCta} onClick={onSignup}>
-            Start Free Trial — $19/mo
+            Start Free Trial — $29/mo
           </button>
           <button style={styles.secondaryCta} onClick={onLogin}>
             See My Dashboard
@@ -601,7 +601,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
         <div style={styles.ctaWrap}>
           <h2 style={styles.ctaTitle}>
             Switch from Podium. Start at{" "}
-            <span style={{ color: G.gold }}>$19/mo</span>.
+            <span style={{ color: G.gold }}>$29/mo</span>.
           </h2>
           <p style={styles.ctaSub}>
             No setup fees. No onboarding call required. No long-term

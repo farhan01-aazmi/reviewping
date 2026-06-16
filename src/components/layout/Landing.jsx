@@ -30,7 +30,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
     <>
       <SEO
         title="Automate Your Google Reviews"
-        description="Send AI-personalised review requests via SMS or email. No chasing. No copy-pasting. The $19/mo alternative to Podium. 2-minute setup, no contract."
+        description="Send AI-personalised review requests via SMS or email. No chasing. No copy-pasting. The $29/mo alternative to Podium. 2-minute setup, no contract."
         path="/"
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{
@@ -42,7 +42,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
               "@id": "https://reviewping.pro/#organization",
               "name": "ReviewPing",
               "url": "https://reviewping.pro",
-              "description": "AI-powered review request automation for small businesses. The $19/mo alternative to Podium.",
+              "description": "AI-powered review request automation for small businesses. The $29/mo alternative to Podium.",
               "foundingDate": "2025",
               "contactPoint": {
                 "@type": "ContactPoint",
@@ -58,9 +58,9 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
               "operatingSystem": "Web",
               "description": "Automated review request platform for Google Reviews. Send AI-personalised SMS and email review requests.",
               "offers": [
-                { "@type": "Offer", "name": "Starter", "price": "19", "priceCurrency": "USD" },
-                { "@type": "Offer", "name": "Growth", "price": "49", "priceCurrency": "USD" },
-                { "@type": "Offer", "name": "Agency", "price": "99", "priceCurrency": "USD" }
+                { "@type": "Offer", "name": "Starter", "price": "29", "priceCurrency": "USD" },
+                { "@type": "Offer", "name": "Pro", "price": "79", "priceCurrency": "USD" },
+                { "@type": "Offer", "name": "Agency", "price": "149", "priceCurrency": "USD" }
               ]
             },
             {
@@ -541,7 +541,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
             </thead>
             <tbody>
               {[
-                ["Price / month", "$19", "$249+"],
+                ["Price / month", "$29", "$249+"],
                 ["Setup time", "2 minutes", "2 weeks + sales call"],
                 ["AI messages", "Included", "Extra cost"],
                 ["No contract", "✓", "✗"],
@@ -779,38 +779,40 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
         {[
           {
             name: "Starter",
-            price: 19,
-            annualPrice: 190,
+            price: 29,
+            annualPrice: 278,
             sub: "Solo owners",
-            f: ["50 review requests/mo", "Email only (SMS extra)", "Dashboard & analytics", "Google review link"],
+            f: ["100 review requests/mo", "Email only (SMS extra)", "Dashboard & analytics", "Google review link"],
             pop: false,
             hint: "Good for small shops testing the waters",
           },
           {
-            name: "Growth",
-            price: 49,
-            annualPrice: 490,
+            name: "Pro",
+            price: 79,
+            annualPrice: 758,
             sub: "Most popular",
             pop: true,
             f: [
               "Unlimited review requests",
               "AI-personalized SMS & email",
               "AI reply generator",
+              "Reputation Score & insights",
               "Full analytics & charts",
+              "Competitor Radar",
             ],
             hint: "Best value for growing businesses",
           },
           {
             name: "Agency",
-            price: 99,
-            annualPrice: 990,
+            price: 149,
+            annualPrice: 1430,
             sub: "Multi-location",
             pop: false,
             f: [
-              "Everything in Growth",
-              "Up to 5 locations",
+              "Everything in Pro",
+              "Up to 10 locations",
               "White-label & API",
-              "Team members",
+              "Team members (up to 10)",
             ],
             hint: "For agencies & multi-location brands",
           },

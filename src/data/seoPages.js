@@ -105,7 +105,7 @@ export const BLOG_POSTS = [
       "The honest truth: Podium has more features. They offer AI chatbot, payment processing, and team inbox features that ReviewPing doesn't have. But most small businesses don't need those features. They just need more reviews.",
       "ReviewPing focuses on doing one thing exceptionally well: getting you more Google reviews automatically. No bloated features, no forced upsells, no long-term contracts. Just a simple system that works.",
       "Feature comparison: Automated review requests (both), SMS & email (both), Direct Google review link (both), Analytics dashboard (both), AI reply generator (both), Multi-location (both), Chatbot (Podium only), Payment processing (Podium only), Team inbox (Podium only).",
-      "Pricing comparison: Podium starts at $400/month and can go over $1,000/month with add-ons. ReviewPing starts at $19/month (Starter, 50 requests), $49/month (Growth, 300 requests), $99/month (Agency, unlimited requests). That's 20x cheaper.",
+      "Pricing comparison: Podium starts at $400/month and can go over $1,000/month with add-ons. ReviewPing starts at $29/month (Starter, 100 requests), $79/month (Pro, unlimited), $149/month (Agency, up to 10 locations). That's 5-10x cheaper than Podium.",
       "If you're a multi-location enterprise with complex needs, Podium might be the right fit. But if you're a small business owner who just wants more 5-star Google reviews without breaking the bank, ReviewPing is the obvious choice.",
       "Ready to switch? Importing your contacts takes 2 minutes. Try ReviewPing free for 30 days — no credit card required. If it's not for you, we'll refund every penny.",
       "Real talk: we built ReviewPing because we were small business owners ourselves. We needed a tool that would get us more reviews without costing more than our rent. If you're tired of enterprise software pretending to be for small businesses, give ReviewPing a try. Set up takes 2 minutes. Your first 50 review requests are free. No hidden fees, no cancellation charges, no guilt trips.",
@@ -125,7 +125,7 @@ export const BLOG_POSTS = [
       "Automated review requests work on a simple principle: timing. Send a review request 30-60 minutes after service, while the positive experience is still fresh. Customers are 7x more likely to leave a review when asked at the right moment.",
       "Here's how to set it up in 5 minutes with ReviewPing: Step 1 — Create your account at reviewping.pro (30 seconds). Step 2 — Connect your Google Business Profile (60 seconds). Step 3 — Choose your SMS and/or email template (60 seconds). Step 4 — Add your first customer and send a review request (30 seconds). Step 5 — Watch the reviews come in automatically.",
       "That's it. No coding, no complex integrations, no training your staff. Every customer gets a personalised review request at exactly the right time. You don't think about it again.",
-      "The best part? ReviewPing tracks everything. You can see exactly how many requests were sent, how many customers clicked the review link, and how your rating trends over time. It's like having a reputation manager on your team for $19/month.",
+      "The best part? ReviewPing tracks everything. You can see exactly how many requests were sent, how many customers clicked the review link, and how your rating trends over time. It's like having a reputation manager on your team for $29/month.",
       "Pro tip: Don't just set it and forget it. Check your analytics dashboard weekly. You'll spot patterns — like which days of the week get the most review link clicks (Sundays, by a wide margin) or which SMS templates get the best response rates. A/B test your messaging. A simple change from 'How was your experience?' to 'We'd love your feedback!' can boost conversion by 15%.",
       "Another common question: 'What if someone has a bad experience and leaves a negative review?' Here's the truth — if someone had a bad experience, they were going to leave that review anyway. The difference is that with automation, you get 5-10x more reviews, so the occasional negative review is statistically diluted. Plus, responding quickly and professionally to a negative review shows future customers that you care about feedback. It's a win-win.",
       "Stop chasing reviews. Start automating them. Sign up for ReviewPing today and get your first 50 review requests free.",
@@ -205,7 +205,7 @@ export const FEATURES_DATA = [
 export const FAQ_DATA = [
   {
     q: "What is ReviewPing?",
-    a: "ReviewPing is an automated review request platform that helps small businesses get more Google reviews via SMS and email. It's the $19/month alternative to Podium — built for restaurants, clinics, salons, and e-commerce businesses.",
+    a: "ReviewPing is an automated review request platform that helps small businesses get more Google reviews via SMS and email. It's the $29/month alternative to Podium — built for restaurants, clinics, salons, and e-commerce businesses.",
   },
   {
     q: "How does the review request automation work?",
@@ -225,15 +225,15 @@ export const FAQ_DATA = [
   },
   {
     q: "Can I try before I buy?",
-    a: "Yes. You can use our free Google Review Link Generator without signing up. The Starter plan is $19/month with 50 review requests, no commitment, cancel anytime.",
+    a: "Yes. You can use our free Google Review Link Generator without signing up. The Starter plan is $29/month with 100 review requests, no commitment, cancel anytime.",
   },
   {
     q: "How is ReviewPing different from Podium?",
-    a: "ReviewPing is built for small businesses who don't need Podium's enterprise complexity. We charge $19/month instead of Podium's $400+. Same core review request functionality, no bloated features, no long-term contracts.",
+    a: "ReviewPing is built for small businesses who don't need Podium's enterprise complexity. We charge $29/month instead of Podium's $400+. Same core review request functionality, no bloated features, no long-term contracts.",
   },
   {
     q: "Do you offer white-label?",
-    a: "Yes. Our Agency plan ($99/month) includes white-label branding, multi-location management, up to 5 team members, and dedicated onboarding. Perfect for marketing agencies managing reviews for clients.",
+    a: "Yes. Our Agency plan ($149/month) includes white-label branding, multi-location management, up to 10 team members, and dedicated onboarding. Perfect for marketing agencies managing reviews for clients.",
   },
 ];
 

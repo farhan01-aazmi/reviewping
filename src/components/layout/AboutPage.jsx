@@ -215,7 +215,7 @@ export default function AboutPage({ onSignup, onLogin, onBack }) {
             review management. Podium costs <strong>$400+/month</strong> for what
             most solo shop owners actually need. We deliver the same core
             functionality for{" "}
-            <strong style={{ color: G.accent }}>$19</strong>.
+            <strong style={{ color: G.accent }}>$29</strong>.
           </p>
           <p
             style={{
