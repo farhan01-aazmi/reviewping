@@ -2,44 +2,82 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Btn, Field, Spinner, Card, Pill } from "../ui";
-import { listCompetitors, addCompetitor, syncCompetitors, deleteCompetitor } from "../../api";
+import { syncCompetitors, deleteCompetitor } from "../../api";
+import { toast } from "sonner";
 
-export default function CompetitorRadar({ userRating, userReviewCount, businessName }) {
+// ── Extract Place ID from Google Maps link ──
+function extractPlaceId(gbpLink) {
+  try {
+    const url = new URL(gbpLink);
+
+    // Format: ?cid=123456
+    const cid = url.searchParams.get("cid");
+    if (cid) return cid;
+
+    // Format: /place/.../data=!3m1!4b1!4m8... (extract place_id from path)
+    const pathParts = url.pathname.split("/");
+    const placeIdx = pathParts.indexOf("place");
+    if (placeIdx !== -1 && pathParts[placeIdx + 2]) {
+      return pathParts[placeIdx + 2];
+    }
+
+    // Format: g.page/r/XXXXX
+    if (url.hostname === "g.page") {
+      const parts = url.pathname.split("/").filter(Boolean);
+      return parts[parts.length - 1] || null;
+    }
+
+    // Try to find place_id in search params (encoded)
+    const pb = url.searchParams.get("pb");
+    if (pb) {
+      const m = pb.match(/!1s([^!]+)/);
+      if (m) return m[1];
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+// ── Category dropdown options ──
+const CATEGORIES = [
+  "",
+  "Restaurant",
+  "Salon",
+  "Clinic",
+  "Hotel",
+  "E-commerce",
+  "Agency",
+  "Other",
+];
+
+// ── Validate GBP link format ──
+const VALID_GBP_DOMAINS = [
+  "maps.google.com",
+  "google.com/maps",
+  "g.page",
+  "goo.gl/maps",
+];
+
+function isValidGbpLink(link) {
+  return VALID_GBP_DOMAINS.some((d) => link.includes(d));
+}
+
+export default function CompetitorRadar({ userRating, userReviewCount, businessName, userId }) {
   const [competitors, setCompetitors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [syncingId, setSyncingId] = useState(null);
   const [adding, setAdding] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [form, setForm] = useState({ name: "", city: "", google_maps_url: "" });
-  const [error, setError] = useState("");
-  const [lastSynced, setLastSynced] = useState(null);
-
-  // Compute user's rank and leaderboard
-  const allEntries = [
-    {
-      id: "user",
-      name: businessName || "Your Business",
-      city: "",
-      rating: userRating || 0,
-      review_count: userReviewCount || 0,
-      isUser: true,
-    },
-    ...competitors.map(c => ({
-      id: c.id,
-      name: c.name,
-      city: c.city || "",
-      rating: c.current_rating,
-      review_count: c.current_review_count,
-      isUser: false,
-      previous_review_count: c.previous_review_count,
-    })),
-  ].filter(e => e.review_count > 0 || e.isUser)
-    .sort((a, b) => b.review_count - a.review_count)
-    .map((e, i) => ({ ...e, rank: i + 1 }));
-
-  const userEntry = allEntries.find(e => e.isUser);
-  const topCompetitor = allEntries.find(e => !e.isUser);
-  const gap = userEntry && topCompetitor ? userEntry.review_count - topCompetitor.review_count : 0;
+  const [form, setForm] = useState({
+    business_name: "",
+    gbp_link: "",
+    website_url: "",
+    category: "",
+  });
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     loadCompetitors();
@@ -48,12 +86,13 @@ export default function CompetitorRadar({ userRating, userReviewCount, businessN
   const loadCompetitors = async () => {
     setLoading(true);
     try {
-      const data = await listCompetitors();
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${window.location.origin}/api/edge/competitor-sync?action=list`,
+        { headers: { Authorization: `Bearer ${session?.access_token}` } }
+      );
+      const data = await res.json();
       setCompetitors(data.competitors || []);
-      const lastSync = competitors
-        .filter(c => c.last_synced_at)
-        .sort((a, b) => new Date(b.last_synced_at) - new Date(a.last_synced_at))[0];
-      setLastSynced(lastSync?.last_synced_at || null);
     } catch (err) {
       console.error("Failed to load competitors:", err);
     } finally {
@@ -61,45 +100,119 @@ export default function CompetitorRadar({ userRating, userReviewCount, businessN
     }
   };
 
+  // ── Validate form ──
+  const validateForm = () => {
+    const errors = {};
+    if (!form.business_name.trim() || form.business_name.trim().length < 2) {
+      errors.business_name = "Business name is required (min 2 characters)";
+    }
+    if (!form.gbp_link.trim()) {
+      errors.gbp_link = "Google Maps link is required";
+    } else if (!isValidGbpLink(form.gbp_link)) {
+      errors.gbp_link =
+        "Please paste a valid Google Maps link (maps.google.com, g.page, or goo.gl/maps)";
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // ── Add competitor ──
   const handleAdd = async (e) => {
     e.preventDefault();
-    if (!form.name.trim()) return;
+    if (!validateForm()) return;
+
     setAdding(true);
-    setError("");
     try {
-      const res = await addCompetitor({
-        name: form.name.trim(),
-        city: form.city.trim() || null,
-        google_maps_url: form.google_maps_url.trim() || null,
-      });
-      if (res.success) {
-        setShowAddForm(false);
-        setForm({ name: "", city: "", google_maps_url: "" });
-        loadCompetitors();
-      } else {
-        setError(res.error || "Failed to add competitor");
+      const placeId = extractPlaceId(form.gbp_link.trim());
+
+      // Call edge function to add
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${window.location.origin}/api/edge/competitor-sync?action=add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            business_name: form.business_name.trim(),
+            google_place_id: placeId,
+            website_url: form.website_url.trim() || null,
+            category: form.category || null,
+          }),
+        }
+      );
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        toast.error(data.error || "Failed to add competitor");
+        return;
       }
+
+      toast.success(`${form.business_name.trim()} added to tracking!`);
+      setShowAddForm(false);
+      setForm({ business_name: "", gbp_link: "", website_url: "", category: "" });
+      setFormErrors({});
+      loadCompetitors();
     } catch (err) {
-      setError(err.message || "Failed to add competitor");
+      toast.error(err.message || "Failed to add competitor");
     } finally {
       setAdding(false);
     }
   };
 
-  const handleSync = async () => {
+  // ── Sync all ──
+  const handleSyncAll = async () => {
     setSyncing(true);
     try {
-      const res = await syncCompetitors();
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${window.location.origin}/api/edge/competitor-sync?action=sync-all`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+        }
+      );
+      const data = await res.json();
+      toast.success(`Synced ${data.synced || 0} competitors!`);
       loadCompetitors();
     } catch (err) {
-      console.error("Sync failed:", err);
+      toast.error("Sync failed: " + err.message);
     } finally {
       setSyncing(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Remove this competitor?")) return;
+  // ── Sync one ──
+  const handleSyncOne = async (id) => {
+    setSyncingId(id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${window.location.origin}/api/edge/competitor-sync?action=sync`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ competitor_id: id }),
+        }
+      );
+      const data = await res.json();
+      if (data.synced > 0) toast.success("Competitor synced!");
+      loadCompetitors();
+    } catch (err) {
+      toast.error("Sync failed");
+    } finally {
+      setSyncingId(null);
+    }
+  };
+
+  // ── Remove ──
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Remove ${name} from tracking?`)) return;
     try {
       await deleteCompetitor(id);
       loadCompetitors();
@@ -108,20 +221,40 @@ export default function CompetitorRadar({ userRating, userReviewCount, businessN
     }
   };
 
-  const formatGap = (userCount, compCount) => {
-    const diff = userEntry?.review_count - compCount;
-    if (diff > 0) return `+${diff} ahead`;
-    if (diff < 0) return `${Math.abs(diff)} behind`;
-    return "tied";
+  // ── Determine status between user and competitor ──
+  const getStatus = (comp) => {
+    const userCount = userReviewCount || 0;
+    const compCount = comp.google_review_count || 0;
+    const userRate = userRating || 0;
+    const compRate = comp.google_rating || 0;
+
+    const reviewDiff = userCount - compCount;
+    const ratingDiff = userRate - compRate;
+
+    if (reviewDiff > 0 && ratingDiff >= 0) return "ahead";
+    if (reviewDiff < 0 && ratingDiff <= 0) return "behind";
+    if (reviewDiff === 0 && ratingDiff === 0) return "tied";
+    // Mixed signals — check which metric is more important
+    return reviewDiff > 0 ? "ahead" : "behind";
   };
 
-  const getRatingColor = (rating) => {
-    if (rating >= 4.5) return G.success;
-    if (rating >= 4) return G.warning;
-    if (rating >= 3) return G.accent;
-    return G.danger;
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "ahead": return G.success;
+      case "behind": return "#F59E0B"; // orange
+      default: return G.border;
+    }
   };
 
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "ahead": return "YOU'RE AHEAD 🏆";
+      case "behind": return "BEHIND ⚡";
+      default: return "TIED";
+    }
+  };
+
+  // ── Loading state ──
   if (loading) {
     return (
       <Card>
@@ -135,9 +268,25 @@ export default function CompetitorRadar({ userRating, userReviewCount, businessN
 
   return (
     <Card sx={{ marginBottom: 14 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+        }}
+      >
         <div>
-          <h3 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 20, fontWeight: 400, margin: 0, letterSpacing: "-0.3px" }}>
+          <h3
+            style={{
+              fontFamily: "'Instrument Serif',serif",
+              fontSize: 20,
+              fontWeight: 400,
+              margin: 0,
+              letterSpacing: "-0.3px",
+            }}
+          >
             Competitor Radar
           </h3>
           <p style={{ color: G.muted, fontSize: 13, margin: "4px 0 0" }}>
@@ -145,111 +294,348 @@ export default function CompetitorRadar({ userRating, userReviewCount, businessN
           </p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <Btn size="sm" variant="secondary" onClick={handleSync} loading={syncing} disabled={syncing}>
-            {syncing ? <Spinner size="sm" /> : "↻ Sync Now"}
-          </Btn>
-          <Btn size="sm" onClick={() => setShowAddForm(true)} disabled={competitors.length >= 5}>
+          {competitors.length > 0 && (
+            <Btn
+              size="sm"
+              variant="secondary"
+              onClick={handleSyncAll}
+              loading={syncing}
+              disabled={syncing}
+            >
+              {syncing ? "Syncing..." : "↻ Sync All"}
+            </Btn>
+          )}
+          <Btn
+            size="sm"
+            onClick={() => setShowAddForm(true)}
+            disabled={competitors.length >= 5}
+          >
             + Add Competitor
           </Btn>
         </div>
       </div>
 
-      {error && (
-        <div style={{ background: "#FEF2F2", color: "#991B1B", fontSize: 13, padding: "10px 14px", borderRadius: 8, marginBottom: 16, border: "1px solid #FECACA" }}>
-          {error}
+      {/* Empty state */}
+      {competitors.length === 0 && !showAddForm && (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "32px 16px",
+            background: G.bg,
+            borderRadius: 10,
+            border: `1px dashed ${G.border}`,
+          }}
+        >
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🏪</div>
+          <p
+            style={{
+              color: G.muted,
+              margin: "0 0 16px",
+              fontSize: 14,
+              lineHeight: 1.6,
+            }}
+          >
+            No competitors added yet. Add your first competitor to see how you
+            compare.
+          </p>
+          <Btn size="sm" onClick={() => setShowAddForm(true)}>
+            + Add Your First Competitor
+          </Btn>
         </div>
       )}
 
-      {/* Leaderboard */}
-      <div style={{ marginBottom: 16 }}>
-        {allEntries.length === 1 ? (
-          <div style={{ textAlign: "center", padding: "32px 16px", background: G.bg, borderRadius: 10, border: `1px dashed ${G.border}` }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🏪</div>
-            <p style={{ color: G.muted, margin: "0 0 16px", fontSize: 14, lineHeight: 1.6 }}>
-              No competitors added yet. Add your first competitor to see how you compare.
-            </p>
-            <Btn size="sm" onClick={() => setShowAddForm(true)}>+ Add Your First Competitor</Btn>
-          </div>
-        ) : (
-          <div style={{ border: `1px solid ${G.border}`, borderRadius: 10, overflow: "hidden" }}>
-            {/* Header */}
-            <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 80px 100px 60px 60px", padding: "12px 16px", background: G.surface, borderBottom: `1px solid ${G.border}`, fontSize: 11, fontWeight: 700, color: G.muted, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-              <span>#</span>
-              <span>Business</span>
-              <span>City</span>
-              <span>Rating</span>
-              <span>Reviews</span>
-              <span>Gap</span>
-            </div>
-            {/* Rows */}
-            {allEntries.map((entry, i) => (
+      {/* Competitor Cards */}
+      {competitors.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {competitors.map((comp) => {
+            const status = getStatus(comp);
+            const borderColor = getStatusColor(status);
+            const userCount = userReviewCount || 0;
+            const compCount = comp.google_review_count || 0;
+            const userRate = userRating || 0;
+            const compRate = comp.google_rating || 0;
+            const reviewDiff = userCount - compCount;
+            const ratingDiff = (userRate - compRate).toFixed(1);
+
+            return (
               <div
-                key={entry.id}
+                key={comp.id}
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "40px 1fr 80px 100px 60px 60px",
-                  padding: "12px 16px",
-                  borderBottom: i < allEntries.length - 1 ? `1px solid ${G.border}` : "none",
-                  background: entry.isUser ? G.successBg : "transparent",
-                  borderLeft: entry.isUser ? `3px solid ${G.success}` : "none",
-                  transition: "background 0.2s",
+                  border: `1.5px solid ${borderColor}`,
+                  borderRadius: 12,
+                  padding: 16,
+                  background: status === "ahead" ? G.successBg : G.surface,
+                  transition: "border-color 0.2s",
                 }}
               >
-                <span style={{ fontWeight: 700, color: entry.isUser ? G.success : G.muted, display: "flex", alignItems: "center" }}>
-                  {entry.rank}{entry.isUser && <span style={{ marginLeft: 6, fontSize: 10, background: G.success, color: "white", padding: "1px 5px", borderRadius: 4 }}>YOU</span>}
-                </span>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontWeight: entry.isUser ? 700 : 500 }}>{entry.name}</span>
-                  {entry.isUser && <Pill color={G.success} style={{ fontSize: 9 }}>YOU</Pill>}
+                {/* Top row: name + status */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: 10,
+                  }}
+                >
+                  <div>
+                    <strong style={{ fontSize: 15 }}>
+                      🏪 {comp.business_name}
+                    </strong>
+                    {comp.category && (
+                      <Pill
+                        color={G.purple}
+                        style={{ marginLeft: 8, fontSize: 10 }}
+                      >
+                        {comp.category}
+                      </Pill>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: borderColor,
+                      background: `${borderColor}15`,
+                      padding: "3px 10px",
+                      borderRadius: 20,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {getStatusLabel(status)}
+                  </div>
                 </div>
-                <span style={{ color: G.muted, fontSize: 12 }}>{entry.city || "—"}</span>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ color: getRatingColor(entry.rating || 0), fontWeight: 600 }}>{entry.rating ? entry.rating.toFixed(1) : "—"}</span>
-                  <span style={{ fontSize: 14 }}>⭐</span>
+
+                {/* Ratings comparison */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr auto 1fr",
+                    gap: 12,
+                    alignItems: "center",
+                    marginBottom: 10,
+                  }}
+                >
+                  {/* Your stats */}
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 11, color: G.muted, marginBottom: 4 }}>
+                      You
+                    </div>
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>
+                      ⭐ {userRate.toFixed(1)}
+                    </div>
+                    <div style={{ fontSize: 12, color: G.muted }}>
+                      {userCount.toLocaleString()} reviews
+                    </div>
+                  </div>
+
+                  {/* VS */}
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 800,
+                      color: G.mutedLo,
+                      textAlign: "center",
+                    }}
+                  >
+                    VS
+                  </div>
+
+                  {/* Their stats */}
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 11, color: G.muted, marginBottom: 4 }}>
+                      {comp.business_name}
+                    </div>
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>
+                      ⭐ {compRate ? compRate.toFixed(1) : "—"}
+                    </div>
+                    <div style={{ fontSize: 12, color: G.muted }}>
+                      {compCount.toLocaleString()} reviews
+                    </div>
+                  </div>
                 </div>
-                <span style={{ fontWeight: 700, fontSize: 14 }}>{entry.review_count?.toLocaleString() || 0}</span>
-                <span style={{
-                  fontWeight: 600,
-                  fontSize: 12,
-                  color: entry.isUser ? "transparent" : (userEntry && userEntry.review_count > entry.review_count ? G.success : G.danger),
-                }}>
-                  {entry.isUser ? "—" : formatGap(userEntry?.review_count || 0, entry.review_count)}
-                </span>
+
+                {/* Difference row */}
+                <div
+                  style={{
+                    background: G.bg,
+                    borderRadius: 8,
+                    padding: "8px 12px",
+                    marginBottom: 10,
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: 16,
+                    fontSize: 13,
+                  }}
+                >
+                  <span>
+                    Rating:{" "}
+                    <strong
+                      style={{
+                        color:
+                          parseFloat(ratingDiff) >= 0 ? G.success : "#F59E0B",
+                      }}
+                    >
+                      {parseFloat(ratingDiff) >= 0 ? "+" : ""}
+                      {ratingDiff} ★
+                    </strong>
+                  </span>
+                  <span>
+                    Reviews:{" "}
+                    <strong
+                      style={{
+                        color: reviewDiff >= 0 ? G.success : "#F59E0B",
+                      }}
+                    >
+                      {reviewDiff >= 0 ? "+" : ""}
+                      {reviewDiff}
+                    </strong>
+                  </span>
+                </div>
+
+                {/* Last synced + actions */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <span style={{ fontSize: 11.5, color: G.mutedLo }}>
+                    Last synced:{" "}
+                    {comp.last_synced_at
+                      ? new Date(comp.last_synced_at).toLocaleString()
+                      : "never"}
+                  </span>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <Btn
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleSyncOne(comp.id)}
+                      loading={syncingId === comp.id}
+                      disabled={syncingId === comp.id}
+                    >
+                      {syncingId === comp.id ? "..." : "↻"}
+                    </Btn>
+                    <Btn
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleDelete(comp.id, comp.business_name)}
+                    >
+                      ✕
+                    </Btn>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Add Competitor Form */}
       {showAddForm && (
-        <div style={{ marginTop: 16, padding: 16, background: G.bg, border: `1px solid ${G.border}`, borderRadius: 10 }}>
-          <h4 style={{ margin: "0 0 16", fontSize: 14, fontWeight: 600 }}>Add Competitor</h4>
-          <form onSubmit={handleAdd} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 16,
+            background: G.bg,
+            border: `1px solid ${G.border}`,
+            borderRadius: 10,
+          }}
+        >
+          <h4 style={{ margin: "0 0 16", fontSize: 14, fontWeight: 600 }}>
+            Add Competitor
+          </h4>
+          <form
+            onSubmit={handleAdd}
+            style={{ display: "flex", flexDirection: "column", gap: 12 }}
+          >
             <Field
               label="Business Name *"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="Competitor business name"
-              error={error}
+              value={form.business_name}
+              onChange={(e) =>
+                setForm({ ...form, business_name: e.target.value })
+              }
+              placeholder="e.g. Pizza Palace"
+              error={formErrors.business_name}
             />
+
             <Field
-              label="City (optional)"
-              value={form.city}
-              onChange={(e) => setForm({ ...form, city: e.target.value })}
-              placeholder="City"
+              label="Google Business Profile Link *"
+              value={form.gbp_link}
+              onChange={(e) => setForm({ ...form, gbp_link: e.target.value })}
+              placeholder="https://maps.google.com/?cid=xxx"
+              error={formErrors.gbp_link}
+              hint="Go to Google Maps → Search competitor → Click Share → Copy link"
             />
+
             <Field
-              label="Google Maps URL (optional)"
-              value={form.google_maps_url}
-              onChange={(e) => setForm({ ...form, google_maps_url: e.target.value })}
-              placeholder="https://maps.google.com/..."
+              label="Website URL (optional)"
+              value={form.website_url}
+              onChange={(e) =>
+                setForm({ ...form, website_url: e.target.value })
+              }
+              placeholder="https://competitor.com"
             />
+
+            {/* Category dropdown */}
+            <div>
+              <label
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: G.inkSoft,
+                  marginBottom: 6,
+                  display: "block",
+                }}
+              >
+                Category (optional)
+              </label>
+              <select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  border: `1.5px solid ${G.border}`,
+                  background: G.surface,
+                  color: G.ink,
+                  fontSize: 13.5,
+                  fontFamily: "'Manrope',sans-serif",
+                  outline: "none",
+                }}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c || "Select category..."}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-              <Btn variant="secondary" type="button" onClick={() => { setShowAddForm(false); setForm({ name: "", city: "", google_maps_url: "" }); }}>
+              <Btn
+                variant="secondary"
+                type="button"
+                onClick={() => {
+                  setShowAddForm(false);
+                  setForm({
+                    business_name: "",
+                    gbp_link: "",
+                    website_url: "",
+                    category: "",
+                  });
+                  setFormErrors({});
+                }}
+              >
                 Cancel
               </Btn>
-              <Btn fullWidth type="submit" loading={adding} disabled={adding}>
+              <Btn
+                fullWidth
+                type="submit"
+                loading={adding}
+                disabled={adding}
+              >
                 {adding ? "Adding..." : "Add Competitor"}
               </Btn>
             </div>
@@ -257,16 +643,16 @@ export default function CompetitorRadar({ userRating, userReviewCount, businessN
         </div>
       )}
 
-      {/* Last synced */}
-      {lastSynced && (
-        <p style={{ marginTop: 16, fontSize: 11.5, color: G.mutedLo, textAlign: "right" }}>
-          Last synced: {new Date(lastSynced).toLocaleString()}
-        </p>
-      )}
-
       {/* Max limit notice */}
       {competitors.length >= 5 && (
-        <p style={{ marginTop: 12, fontSize: 11, color: G.warning, textAlign: "center" }}>
+        <p
+          style={{
+            marginTop: 12,
+            fontSize: 11,
+            color: G.warning,
+            textAlign: "center",
+          }}
+        >
           Maximum 5 competitors reached. Remove one to add more.
         </p>
       )}

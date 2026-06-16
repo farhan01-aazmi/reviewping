@@ -680,6 +680,7 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
           userRating={stats.avgRating !== "—" ? parseFloat(stats.avgRating) : 0}
           userReviewCount={stats.totalReviews || 0}
           businessName={biz?.bizName || biz?.biz || "Your Business"}
+          userId={userId}
         />
       )}
 

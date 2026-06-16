@@ -31,10 +31,10 @@ serve(async (req) => {
   const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
   if (authErr || !user) return json({ error: "Unauthorized" }, 401)
 
-  // LIST
+  // ─── LIST ─────────────────────────────────────────────
   if (action === "list") {
     const { data, error } = await supabase
-      .from("competitors")
+      .from("competitor_tracking")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: true })
@@ -42,57 +42,91 @@ serve(async (req) => {
     return json({ competitors: data || [] })
   }
 
-  // ADD
+  // ─── ADD ──────────────────────────────────────────────
   if (action === "add") {
     const body = await req.json().catch(() => ({}))
-    const { name, google_place_id, google_maps_url, business_category, city } = body
-    if (!name?.trim()) return json({ error: "Business name is required" }, 400)
+    const { business_name, google_place_id, website_url, category } = body
 
+    if (!business_name?.trim()) return json({ error: "Business name is required" }, 400)
+
+    // Check max 5 competitors
     const { count } = await supabase
-      .from("competitors")
+      .from("competitor_tracking")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
     if ((count || 0) >= 5) return json({ error: "Maximum 5 competitors allowed" }, 400)
 
-    let currentRating = null
-    let currentReviewCount = 0
+    // Fetch initial data from Google Places API
+    let googleRating = null
+    let googleReviewCount = 0
+    let address = null
     if (google_place_id && GOOGLE_PLACES_API_KEY) {
       try {
         const r = await fetch(
-          `https://places.googleapis.com/v1/places/${google_place_id}?fields=rating,userRatingCount&key=${GOOGLE_PLACES_API_KEY}`
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${google_place_id}&fields=rating,user_ratings_total,formatted_address,name&key=${GOOGLE_PLACES_API_KEY}`
         )
         const d = await r.json()
-        currentRating = d.rating || null
-        currentReviewCount = d.userRatingCount || 0
+        if (d.result) {
+          googleRating = d.result.rating || null
+          googleReviewCount = d.result.user_ratings_total || 0
+          address = d.result.formatted_address || null
+        }
       } catch (_) { /* silently skip */ }
     }
 
     const { data, error } = await supabase
-      .from("competitors")
+      .from("competitor_tracking")
       .insert({
         user_id: user.id,
-        name: name.trim(),
+        business_name: business_name.trim(),
         google_place_id: google_place_id || null,
-        google_maps_url: google_maps_url || null,
-        business_category: business_category || null,
-        city: city || null,
-        current_rating: currentRating,
-        current_review_count: currentReviewCount,
+        google_rating: googleRating,
+        google_review_count: googleReviewCount,
+        website_url: website_url || null,
+        address: address || null,
+        category: category || null,
         last_synced_at: new Date().toISOString(),
       })
       .select()
       .single()
     if (error) return json({ error: error.message }, 500)
+
     return json({ success: true, competitor: data })
   }
 
-  // SYNC
-  if (action === "sync") {
+  // ─── SYNC (single or all) ────────────────────────────
+  if (action === "sync" || action === "sync-all") {
     if (!GOOGLE_PLACES_API_KEY) return json({ error: "Google Places API key not configured" }, 500)
-    const { data: competitors } = await supabase
-      .from("competitors")
-      .select("*")
-      .eq("user_id", user.id)
+
+    let competitors
+    if (action === "sync") {
+      const body = await req.json().catch(() => ({}))
+      // If competitor_id specified, sync just that one
+      if (body?.competitor_id) {
+        const { data } = await supabase
+          .from("competitor_tracking")
+          .select("*")
+          .eq("id", body.competitor_id)
+          .eq("user_id", user.id)
+          .single()
+        competitors = data ? [data] : []
+      } else {
+        // Sync all user's competitors
+        const { data } = await supabase
+          .from("competitor_tracking")
+          .select("*")
+          .eq("user_id", user.id)
+        competitors = data || []
+      }
+    } else {
+      // sync-all
+      const { data } = await supabase
+        .from("competitor_tracking")
+        .select("*")
+        .eq("user_id", user.id)
+      competitors = data || []
+    }
+
     if (!competitors?.length) return json({ synced: 0 })
 
     const results = []
@@ -100,53 +134,66 @@ serve(async (req) => {
       if (!comp.google_place_id) continue
       try {
         const r = await fetch(
-          `https://places.googleapis.com/v1/places/${comp.google_place_id}?fields=rating,userRatingCount&key=${GOOGLE_PLACES_API_KEY}`
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${comp.google_place_id}&fields=rating,user_ratings_total,business_status,name&key=${GOOGLE_PLACES_API_KEY}`
         )
         const d = await r.json()
-        const newRating = d.rating || comp.current_rating
-        const newCount = d.userRatingCount || comp.current_review_count
-        await supabase.from("competitors").update({
-          previous_rating: comp.current_rating,
-          previous_review_count: comp.current_review_count,
-          current_rating: newRating,
-          current_review_count: newCount,
-          last_synced_at: new Date().toISOString(),
-        }).eq("id", comp.id)
-        await supabase.from("competitor_history").insert({
-          competitor_id: comp.id,
-          user_id: user.id,
+        if (!d.result) continue
+        const newRating = d.result.rating || comp.google_rating
+        const newCount = d.result.user_ratings_total || comp.google_review_count
+
+        await supabase
+          .from("competitor_tracking")
+          .update({
+            google_rating: newRating,
+            google_review_count: newCount,
+            last_synced_at: new Date().toISOString(),
+          })
+          .eq("id", comp.id)
+
+        // Insert snapshot
+        await supabase
+          .from("competitor_snapshots")
+          .insert({
+            competitor_id: comp.id,
+            user_id: user.id,
+            rating: newRating,
+            review_count: newCount,
+          })
+          .catch(() => {}) // silently fail if table doesn't exist
+
+        results.push({
+          id: comp.id,
+          name: comp.business_name,
           rating: newRating,
-          review_count: newCount,
+          reviews: newCount,
         })
-        results.push({ name: comp.name, rating: newRating, reviews: newCount })
       } catch (_) { /* continue */ }
     }
+
     return json({ synced: results.length, results })
   }
 
-  // DELETE
+  // ─── DELETE ───────────────────────────────────────────
   if (action === "delete") {
     const body = await req.json().catch(() => ({}))
     const { competitor_id } = body
     if (!competitor_id) return json({ error: "competitor_id required" }, 400)
-    await supabase.from("competitors").delete().eq("id", competitor_id).eq("user_id", user.id)
+    await supabase.from("competitor_tracking").delete().eq("id", competitor_id).eq("user_id", user.id)
     return json({ success: true })
   }
 
-  // ANALYZE PATTERNS (review velocity)
+  // ─── ANALYZE PATTERNS (unchanged — uses reviews table) ─
   if (action === "analyze-patterns") {
     const now = Date.now()
     const thirtyDaysAgo = new Date(now - 30 * 86400000).toISOString()
     const sixtyDaysAgo = new Date(now - 60 * 86400000).toISOString()
 
-    // Current period (last 30 days)
     const { data: currentReviews } = await supabase
       .from("reviews")
       .select("sentAt, rating, reply")
       .eq("user_id", user.id)
       .gte("sentAt", thirtyDaysAgo)
 
-    // Previous period (30-60 days ago)
     const { data: previousReviews } = await supabase
       .from("reviews")
       .select("sentAt, rating, reply")
@@ -166,7 +213,6 @@ serve(async (req) => {
     const currentReplied = current.filter(r => !!r.reply).length
     const currentResponseRate = currentCount > 0 ? Math.round((currentReplied / currentCount) * 100) : 0
 
-    // Day-of-week breakdown (current period)
     const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     const dayCounts: Record<string, number> = { Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0 }
     current.forEach(r => {
@@ -174,20 +220,16 @@ serve(async (req) => {
       dayCounts[day] = (dayCounts[day] || 0) + 1
     })
 
-    // Best day
     const bestDay = Object.entries(dayCounts).sort((a, b) => b[1] - a[1])[0]
 
-    // Velocity trend
     const velocityChange = previousCount > 0
       ? Math.round(((currentCount - previousCount) / previousCount) * 100)
       : currentCount > 0 ? 100 : 0
 
-    // Rating trend
     const ratingChange = previousAvg > 0
       ? (currentAvg - previousAvg).toFixed(2)
       : "0.00"
 
-    // Positive ratio
     const currentPositive = current.filter(r => (r.rating || 0) >= 4).length
     const currentPositiveRatio = currentCount > 0 ? Math.round((currentPositive / currentCount) * 100) : 0
 
