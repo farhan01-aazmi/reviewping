@@ -15,7 +15,8 @@ export default function Integrations({ plan }) {
   // Listen for postMessage from GBP OAuth popup
   useEffect(() => {
     const handler = (e) => {
-      // Accept from any origin (popup is on supabase.co)
+      // Accept from supabase.co or our domain
+      if (!e.origin.includes('supabase.co') && e.origin !== 'https://reviewping.pro') return;
       if (e.data?.type === "gbp_success") {
         toast.success("Google Business Profile connected! 🎉");
         // Re-fetch the GBP connection status
@@ -32,6 +33,10 @@ export default function Integrations({ plan }) {
   }, []);
 
   useEffect(() => {
+    // Check if redirected back from GBP OAuth
+    if (sessionStorage.getItem("gbp_connected") === "true") {
+      sessionStorage.removeItem("gbp_connected");
+    }
     loadGbpStatus();
   }, []);
 

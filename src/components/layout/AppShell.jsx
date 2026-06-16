@@ -38,11 +38,18 @@ export default function AppShell({ user: initUser, onLogout }) {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("gbp") === "connected") {
-      toast("Google Business Profile connected!");
+      toast.success("Google Business Profile connected! 🎉");
+      // Re-fetch to sync latest data when navigating to Integrations
+      supabase.from("gbp_connections").select("*").single().then(({ data }) => {
+        if (data?.is_connected) {
+          // Store in session for Integrations page to pick up
+          sessionStorage.setItem("gbp_connected", "true");
+        }
+      }).catch(() => {});
       window.history.replaceState({}, "", "/dashboard");
     } else if (params.get("gbp") === "error") {
       const msg = params.get("msg");
-      toast(msg === "expired" ? "Connection expired. Try again." : "Failed to connect GBP", "error");
+      toast.error(msg === "expired" ? "Connection expired. Try again." : "Failed to connect GBP");
       window.history.replaceState({}, "", "/dashboard");
     }
   }, []);
