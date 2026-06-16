@@ -10,6 +10,7 @@ import EmptyState from "../ui/EmptyState";
 import Spinner from "../ui/Spinner";
 import ReviewCard from "../ui/ReviewCard";
 import { exportCSV, fmtDate, getRating } from "../../utils/formatters";
+import { generateReviewReply } from "../../api";
 
 function Skeleton({ h = 14, w = "100%" }) {
   return <div style={{ height: h, background: G.border, borderRadius: 6, width: w, animation: "pulse 1.5s ease-in-out infinite", marginBottom: 8 }} />;
@@ -92,31 +93,30 @@ export default function ReviewsPage({ userId, onSend }) {
   const generateAiReplyForNeg = async (r) => {
     setAiLoading(r.id);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const res = await fetch(AI_FN_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
-        },
-        body: JSON.stringify({
-          review_text: r.review_text || "",
-          rating: r.rating || 1,
-          author_name: r.author_name,
-          tone: "Apologetic",
-        }),
+      const data = await generateReviewReply({
+        review_text: r.review_text || "",
+        rating: r.rating || 1,
+        author_name: r.author_name,
+        tone: "Apologetic",
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "AI generation failed");
-      const reply = data.reply || data.message || "Thank you for your feedback!";
-      // Copy reply to clipboard since review_submissions has no reply field
-      await navigator.clipboard.writeText(reply);
-      toast.success("AI reply copied to clipboard!");
-    } catch (e) {
-      console.error("AI reply error:", e);
-      toast.error("Failed to generate AI reply");
+      if (data?.reply) {
+        const { error: updateErr } = await supabase
+          .from("review_submissions")
+          .update({ ai_reply: data.reply })
+          .eq("id", r.id);
+        if (updateErr) throw updateErr;
+        setNegReviews((prev) =>
+          prev.map((x) => (x.id === r.id ? { ...x, ai_reply: data.reply } : x))
+        );
+        toast.success("AI reply generated");
+      } else {
+        toast.error(data?.error || "Failed to generate reply");
+      }
+    } catch (err) {
+      toast.error(err.message || "Failed to generate AI reply");
+    } finally {
+      setAiLoading(null);
     }
-    setAiLoading(null);
   };
 
   // Mark negative review as resolved
