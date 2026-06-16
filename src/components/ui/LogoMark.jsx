@@ -1,7 +1,20 @@
-export default function LogoMark({ size = 48, style, ...rest }) {
+import { useEffect, useState } from "react";
+
+export default function LogoMark({ size = 56, style, ...rest }) {
+  const [src, setSrc] = useState("/logo.png");
+
+  useEffect(() => {
+    const el = document.documentElement;
+    const update = () => setSrc(el.getAttribute("data-theme") === "dark" ? "/logo.png" : "/logo-light.png");
+    update();
+    const obs = new MutationObserver(update);
+    obs.observe(el, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => obs.disconnect();
+  }, []);
+
   return (
     <img
-      src="/logo.png"
+      src={src}
       height={size}
       alt="ReviewPing"
       aria-hidden="true"
@@ -9,7 +22,6 @@ export default function LogoMark({ size = 48, style, ...rest }) {
         width: "auto",
         objectFit: "contain",
         borderRadius: 6,
-        filter: "var(--logo-filter, none)",
         ...style,
       }}
       {...rest}
