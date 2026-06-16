@@ -220,7 +220,7 @@ export default function AppShell({ user: initUser, onLogout }) {
             ← Back
           </button>
         ) : (
-          <Wordmark size={14} />
+          <Wordmark size={28} />
         )}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button

@@ -67,7 +67,7 @@ export default function FAQPage({ onSignup, onLogin, onBack }) {
             <Btn variant="ghost" size="sm" onClick={onBack}>
               ← Back
             </Btn>
-            <Wordmark size={15} />
+            <Wordmark size={30}/>
           </div>
           <nav style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <Btn variant="ghost" size="sm" onClick={onLogin}>
@@ -274,7 +274,7 @@ export default function FAQPage({ onSignup, onLogin, onBack }) {
             textAlign: "center",
           }}
         >
-          <Wordmark size={13} />
+          <Wordmark size={26}/>
           <div
             style={{
               display: "flex",

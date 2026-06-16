@@ -59,7 +59,7 @@ export default function Terms({ onBack }) {
           background: G.surface,
         }}
       >
-        <Wordmark size={15} />
+        <Wordmark size={30}/>
         <Btn variant="ghost" size="sm" onClick={onBack}>
           ← Back
         </Btn>
