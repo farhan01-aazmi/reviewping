@@ -57,7 +57,7 @@ export default function RefundPage({ onSignup, onLogin, onBack }) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <Wordmark size={40} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
+            <Wordmark size={56} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
           </div>
           <div style={{ display: "flex", gap: 6 }}>
             <Btn variant="ghost" size="sm" onClick={onLogin}>

@@ -71,7 +71,7 @@ export default function Onboarding({ user, onComplete }) {
           alignItems: "center",
         }}
       >
-        <Wordmark size={36} />
+        <Wordmark size={48} />
         <span style={{ fontSize: 12.5, color: G.muted }}>
           Step {step} of 3
         </span>

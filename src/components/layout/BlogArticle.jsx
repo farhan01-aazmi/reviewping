@@ -137,7 +137,7 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               background: G.bg,
             }}
           >
-            <Wordmark size={40} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
+            <Wordmark size={56} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
             <Btn size="sm" onClick={onSignup}>
               Start free trial →
             </Btn>
@@ -241,7 +241,7 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               gap: 10,
             }}
           >
-            <Wordmark size={34} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
+            <Wordmark size={44} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
             <div style={{ display: "flex", gap: 16 }}>
               <span
                 style={{ fontSize: 12, color: G.muted, cursor: "pointer" }}
@@ -314,7 +314,7 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <Wordmark size={40} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
+            <Wordmark size={56} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
             <nav style={{ display: "flex", gap: 14, alignItems: "center" }}>
               <span
                 style={blogLink}

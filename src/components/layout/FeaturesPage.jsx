@@ -41,7 +41,7 @@ export default function FeaturesPage({ onSignup, onLogin, onBack }) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <Wordmark size={40}/>
+            <Wordmark size={56}/>
           </div>
           <nav
             style={{
@@ -319,7 +319,7 @@ export default function FeaturesPage({ onSignup, onLogin, onBack }) {
             textAlign: "center",
           }}
         >
-          <Wordmark size={34}/>
+          <Wordmark size={44}/>
           <div
             style={{
               display: "flex",

@@ -54,7 +54,7 @@ export default function BlogPage({ onSignup, onLogin, onBack }) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <Wordmark size={40} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
+            <Wordmark size={56} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
             <nav style={{ display: "flex", gap: 14, alignItems: "center" }}>
               <span
                 style={blogLinkActive}

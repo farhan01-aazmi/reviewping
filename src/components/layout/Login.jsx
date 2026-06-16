@@ -150,7 +150,7 @@ export default function Login({ onDone, onLoginComplete, onSignup, onBack, onFor
               marginBottom: 16,
             }}
           >
-            <LogoMark size={52} />
+            <LogoMark size={68} />
           </div>
           <h1
             style={{

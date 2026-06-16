@@ -59,7 +59,7 @@ export default function PrivacyPolicy({ onBack }) {
           background: G.surface,
         }}
       >
-        <Wordmark size={40}/>
+        <Wordmark size={56}/>
         <Btn variant="ghost" size="sm" onClick={onBack}>
           ← Back
         </Btn>

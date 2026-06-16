@@ -169,7 +169,7 @@ export default function IndustryPage({ type, onSignup, onLogin, onBack }) {
               window.location.href = "/";
             }}
           >
-            <Wordmark size={40}/>
+            <Wordmark size={56}/>
           </div>
           <nav
             className="ind-header-nav"
@@ -617,7 +617,7 @@ export default function IndustryPage({ type, onSignup, onLogin, onBack }) {
             }}
             style={{ cursor: "pointer", display: "inline-block" }}
           >
-            <Wordmark size={34}/>
+            <Wordmark size={44}/>
           </div>
           <div
             style={{

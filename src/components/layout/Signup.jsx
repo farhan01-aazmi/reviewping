@@ -133,7 +133,7 @@ export default function Signup({ onDone, onLogin }) {
       <div style={{ width: "100%", maxWidth: 420 }}>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
-            <LogoMark size={52} />
+            <LogoMark size={68} />
           </div>
           <h1
             style={{

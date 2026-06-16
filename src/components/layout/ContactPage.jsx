@@ -33,7 +33,7 @@ export default function ContactPage({ onSignup, onLogin, onBack }) {
             zIndex: 50,
           }}
         >
-          <Wordmark size={40}/>
+          <Wordmark size={56}/>
           <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
             <span
               onClick={onBack}
@@ -293,7 +293,7 @@ export default function ContactPage({ onSignup, onLogin, onBack }) {
             textAlign: "center",
           }}
         >
-          <Wordmark size={34}/>
+          <Wordmark size={44}/>
           <div
             style={{
               display: "flex",

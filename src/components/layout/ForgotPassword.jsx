@@ -50,7 +50,7 @@ export default function ForgotPassword({ onBack }) {
               marginBottom: 16,
             }}
           >
-            <LogoMark size={52} />
+            <LogoMark size={68} />
           </div>
           <h1
             style={{

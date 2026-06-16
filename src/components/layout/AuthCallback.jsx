@@ -165,7 +165,7 @@ export default function AuthCallback({ onDone, onError }) {
     return (
       <div style={{ background: G.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Manrope',sans-serif", color: G.ink }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ marginBottom: 24 }}><LogoMark size={48} /></div>
+          <div style={{ marginBottom: 24 }}><LogoMark size={64} /></div>
           <Spinner size={32} />
           <p style={{ marginTop: 16, fontSize: 14, color: G.muted }}>{status}</p>
         </div>
@@ -179,7 +179,7 @@ export default function AuthCallback({ onDone, onError }) {
       <div style={{ background: G.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Manrope',sans-serif", color: G.ink, padding: 24 }}>
         <div style={{ width: "100%", maxWidth: 400 }}>
           <div style={{ textAlign: "center", marginBottom: 28 }}>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}><LogoMark size={52} /></div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}><LogoMark size={68} /></div>
             <h1 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, fontWeight: 400, margin: "0 0 6px", letterSpacing: "-0.5px" }}>
               Set new password
             </h1>
