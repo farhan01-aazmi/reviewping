@@ -49,7 +49,7 @@ export default function NotFoundPage({ onSignup, onLogin, onBack }) {
         >
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
             <Wordmark
-              size={30}
+              size={40}
               onClick={() => {
                 window.history.pushState({}, "", "/");
                 window.dispatchEvent(new PopStateEvent("popstate"));
@@ -188,7 +188,7 @@ export default function NotFoundPage({ onSignup, onLogin, onBack }) {
           }}
         >
           <Wordmark
-            size={26}
+            size={34}
             onClick={() => {
               window.history.pushState({}, "", "/");
               window.dispatchEvent(new PopStateEvent("popstate"));

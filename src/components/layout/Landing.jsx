@@ -105,7 +105,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
           zIndex: 50,
         }}
       >
-        <Wordmark size={30} />
+        <Wordmark size={40}/>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div className="hide-xs" style={{ display: "flex", gap: 14, marginRight: 14 }}>
             {[
@@ -949,7 +949,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
           textAlign: "center",
         }}
       >
-        <Wordmark size={26} />
+        <Wordmark size={34}/>
         <div
           style={{
             display: "flex",

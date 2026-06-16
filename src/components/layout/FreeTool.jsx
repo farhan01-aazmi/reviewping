@@ -57,7 +57,7 @@ export default function FreeTool({ onSignup }) {
           background: G.surface,
         }}
       >
-        <Wordmark size={30}/>
+        <Wordmark size={40}/>
         <Btn size="sm" onClick={onSignup}>
           Start free trial →
         </Btn>
@@ -377,7 +377,7 @@ export default function FreeTool({ onSignup }) {
           gap: 10,
         }}
       >
-        <Wordmark size={26}/>
+        <Wordmark size={34}/>
         <div style={{ display: "flex", gap: 16 }}>
           <span
             style={{ fontSize: 12, color: G.muted, cursor: "pointer" }}

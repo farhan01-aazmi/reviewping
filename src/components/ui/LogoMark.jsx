@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function LogoMark({ size = 56, style, ...rest }) {
+export default function LogoMark({ size = 72, style, ...rest }) {
   const [src, setSrc] = useState("/logo.png");
 
   useEffect(() => {

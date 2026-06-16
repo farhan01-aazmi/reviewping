@@ -105,7 +105,7 @@ export default function AboutPage({ onSignup, onLogin, onBack }) {
             zIndex: 50,
           }}
         >
-          <Wordmark size={30}/>
+          <Wordmark size={40}/>
           <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
             <span
               onClick={onBack}
@@ -515,7 +515,7 @@ export default function AboutPage({ onSignup, onLogin, onBack }) {
             textAlign: "center",
           }}
         >
-          <Wordmark size={26}/>
+          <Wordmark size={34}/>
           <div
             style={{
               display: "flex",

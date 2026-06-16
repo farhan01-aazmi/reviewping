@@ -73,7 +73,7 @@ export default function TermsPage({ onSignup, onLogin, onBack }) {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-            <Wordmark size={30} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
+            <Wordmark size={40} onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }} />
           </div>
           <div style={{ display: "flex", gap: 6 }}>
             <Btn variant="ghost" size="sm" onClick={onLogin}>
@@ -165,7 +165,7 @@ export default function TermsPage({ onSignup, onLogin, onBack }) {
           }}
         >
           <Wordmark
-            size={26}
+            size={34}
             onClick={() => window.location.href = "/"}
             style={{ cursor: "pointer" }}
           />
