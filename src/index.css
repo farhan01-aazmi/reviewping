@@ -43,6 +43,7 @@ a {
 }
 
 :root {
+  --logo-filter: invert(1);
   --bg: #F6F3EE;
   --surface: #FFFFFF;
   --ink: #1A1714;
@@ -70,6 +71,7 @@ a {
 }
 
 [data-theme="dark"] {
+  --logo-filter: none;
   --bg: #121212;
   --surface: #1E1E1E;
   --ink: #E8E2D8;

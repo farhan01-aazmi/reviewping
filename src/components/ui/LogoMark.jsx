@@ -1,4 +1,4 @@
-export default function LogoMark({ size = 40, style, ...rest }) {
+export default function LogoMark({ size = 48, style, ...rest }) {
   return (
     <img
       src="/logo.png"
@@ -9,6 +9,7 @@ export default function LogoMark({ size = 40, style, ...rest }) {
         width: "auto",
         objectFit: "contain",
         borderRadius: 6,
+        filter: "var(--logo-filter, none)",
         ...style,
       }}
       {...rest}
