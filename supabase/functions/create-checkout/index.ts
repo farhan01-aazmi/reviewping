@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { CORS, verifyAuth } from "../_shared/auth.ts";
 
 /**
@@ -74,6 +75,17 @@ serve(async (req) => {
       );
     }
 
+    // Fetch user profile to get email for Dodo customer pre-fill
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("email, name")
+      .eq("id", userId)
+      .single();
+
     // Determine Dodo API endpoint (test vs live)
     const mode = Deno.env.get("DODO_MODE") || "test";
     const baseUrl = mode === "live"
@@ -81,49 +93,56 @@ serve(async (req) => {
       : "https://test.dodopayments.com";
 
     // Call Dodo Payments API to create checkout session
+    const dodoBody: Record<string, unknown> = {
+      product_cart: [{ product_id: productId, quantity: 1 }],
+      return_url: return_url || "https://reviewping-eight.vercel.app/dashboard",
+      metadata: {
+        user_id: userId,
+        plan: plan,
+        billing: billing,
+      },
+    };
+
+    // Pre-fill customer email if available (reduces checkout friction)
+    if (profile?.email) {
+      dodoBody.customer = { email: profile.email };
+      if (profile?.name) dodoBody.customer.name = profile.name;
+    }
+
     const dodoRes = await fetch(`${baseUrl}/checkouts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        product_cart: [{ product_id: productId, quantity: 1 }],
-        return_url: return_url || "https://reviewping-eight.vercel.app/dashboard",
-        metadata: {
-          user_id: userId,
-          plan: plan,
-          billing: billing,
-        },
-      }),
+      body: JSON.stringify(dodoBody),
     });
 
     const session = await dodoRes.json();
 
     if (!dodoRes.ok) {
-      throw new Error(session.error?.message || session.message || "Dodo Payments API error");
+      // Log full error for debugging
+      console.error("Dodo API error response:", JSON.stringify(session));
+      throw new Error(
+        session.error?.message
+        || session.message
+        || `Dodo Payments API error (HTTP ${dodoRes.status})`
+      );
     }
 
     // Store the session info in database for webhook verification
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-    if (supabaseUrl && supabaseKey) {
-      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
-      const supabase = createClient(supabaseUrl, supabaseKey);
+    const { error: dbError } = await supabase.from("dodo_sessions").upsert({
+      user_id: userId,
+      session_id: session.session_id,
+      plan: plan,
+      billing: billing,
+      status: "pending",
+      created_at: new Date().toISOString(),
+    }, { onConflict: "session_id" });
 
-      const { error: dbError } = await supabase.from("dodo_sessions").upsert({
-        user_id: userId,
-        session_id: session.session_id,
-        plan: plan,
-        billing: billing,
-        status: "pending",
-        created_at: new Date().toISOString(),
-      }, { onConflict: "session_id" });
-
-      if (dbError) {
-        console.error("Failed to store session metadata:", dbError);
-        return new Response(JSON.stringify({ error: "Failed to initialize checkout session" }), { status: 500, headers: { "Content-Type": "application/json" } });
-      }
+    if (dbError) {
+      console.error("Failed to store session metadata:", dbError);
+      // Non-fatal — session was already created in Dodo
     }
 
     return new Response(JSON.stringify({ url: session.checkout_url }), {
