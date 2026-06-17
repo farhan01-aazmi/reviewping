@@ -216,7 +216,7 @@ BEGIN
     NEW.email,
     COALESCE(NEW.raw_user_meta_data ->> 'full_name', NEW.email),
     '',
-    'growth'
+    'free'
   )
   ON CONFLICT (id) DO NOTHING;
   RETURN NEW;

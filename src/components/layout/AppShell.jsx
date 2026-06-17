@@ -54,7 +54,7 @@ export default function AppShell({ user: initUser, onLogout }) {
     }
   }, []);
 
-  const [plan, setPlan] = useState("growth");
+  const [plan, setPlan] = useState("free");
   const [biz, setBiz] = useState({
     bizName: initUser?.biz || "My Business",
     bizType: "",
@@ -274,13 +274,15 @@ export default function AppShell({ user: initUser, onLogout }) {
           </button>
           <Pill
             label={
-              plan === "starter"
+              plan === "free"
+                ? "Free"
+                : plan === "starter"
                 ? "Starter"
                 : plan === "agency"
                 ? "Agency"
-                : "Growth"
+                : "Pro"
             }
-            variant={plan === "growth" ? "success" : "info"}
+            variant={plan === "free" ? "info" : "success"}
           />
         </div>
       </header>

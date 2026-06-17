@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
-import { CORS, verifyAuth } from "../_shared/auth.ts"
+import { CORS, verifyAuth, checkDailyLimit } from "../_shared/auth.ts"
 
 serve(async (req) => {
   // Handle CORS preflight
@@ -24,6 +24,15 @@ serve(async (req) => {
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
+
+  // Check daily limit for free plan
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", auth.userId)
+    .single()
+  const limit = await checkDailyLimit(supabase, auth.userId, profile?.plan || "free")
+  if (limit instanceof Response) return limit
 
   const { customer_name, customer_email, review_link, business_name } = await req.json()
   const from = Deno.env.get("FROM_EMAIL") || "ReviewPing <reviews@reviewping.io>"

@@ -92,7 +92,7 @@ export default function Billing({ userId, plan, setPlan }) {
     {
       l: "Review requests",
       v: usage.requests,
-      max: plan === "starter" ? 50 : null,
+      max: plan === "free" ? 150 : plan === "starter" ? 100 : null,
     },
     { l: "SMS messages", v: usage.sms, max: null },
     { l: "Email messages", v: usage.email, max: null },
@@ -391,6 +391,16 @@ export default function Billing({ userId, plan, setPlan }) {
           No billing history yet.
         </div>
       </Card>
+
+      <ConfirmModal
+        open={!!confirm}
+        title={confirm ? `Upgrade to ${confirm.name}` : ""}
+        message={confirm ? `Switch to the ${confirm.name} plan at $${annual ? Math.round(confirm.annual / 12) : confirm.price}/mo?` : ""}
+        confirmLabel={loading ? "Processing…" : "Confirm upgrade"}
+        onConfirm={() => doSwitch(confirm)}
+        onCancel={() => setConfirm(null)}
+        loading={loading}
+      />
     </div>
   );
 }

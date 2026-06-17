@@ -58,7 +58,7 @@ export default function Signup({ onDone, onLogin }) {
       email,
       name,
       business_name: biz,
-      plan: "growth",
+      plan: "free",
     });
 
     if (profileErr) {

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { CORS, verifyAuth } from "../_shared/auth.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { CORS, verifyAuth, checkDailyLimit } from "../_shared/auth.ts";
 
 serve(async (req) => {
   // Handle CORS preflight
@@ -19,6 +20,20 @@ serve(async (req) => {
     // Verify JWT authentication — all SMS sending requires an authenticated user
     const auth = await verifyAuth(req);
     if (auth instanceof Response) return auth;
+
+    // Check daily limit for free plan
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan")
+      .eq("id", auth.userId)
+      .single();
+    const plan = profile?.plan || "free";
+    const limit = await checkDailyLimit(supabase, auth.userId, plan);
+    if (limit instanceof Response) return limit;
 
     // Parse and validate request body
     let body;

@@ -1,5 +1,55 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+/**
+ * Check if a user has exceeded their daily request limit.
+ * Returns the check result, or a 429 Response if limit reached.
+ *
+ * Usage:
+ *   const limit = await checkDailyLimit(supabase, userId, plan);
+ *   if (limit instanceof Response) return limit;
+ *   // limit.remaining is safe to use
+ */
+export async function checkDailyLimit(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+  plan: string,
+  maxPerDay = 5,
+): Promise<{ allowed: true; used: number; remaining: number } | Response> {
+  // Only enforce for free plan
+  if (plan !== "free") {
+    return { allowed: true, used: 0, remaining: Infinity };
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const { count, error } = await supabase
+    .from("review_requests")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("sent_at", today.toISOString());
+
+  if (error) {
+    console.error("checkDailyLimit error:", error);
+    throw error;
+  }
+
+  const used = count ?? 0;
+  const remaining = maxPerDay - used;
+
+  if (remaining <= 0) {
+    console.warn(`Daily limit hit for user ${userId}: ${used} used, max ${maxPerDay}`);
+    return new Response(
+      JSON.stringify({
+        error: `Daily limit reached (${used}/${maxPerDay}). Upgrade your plan to send more review requests.`,
+      }),
+      { status: 429, headers: { ...CORS, "Content-Type": "application/json" } },
+    );
+  }
+
+  return { allowed: true, used, remaining };
+}
+
 // CORS helpers.
 // CORS_ORIGIN env var can be a comma-separated list of allowed origins.
 // Use corsHeaders(req) in response constructors for proper origin echo.

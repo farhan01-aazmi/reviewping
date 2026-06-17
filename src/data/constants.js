@@ -57,6 +57,14 @@ export const D = 86400000;
  */
 export const PLANS = [
   {
+    id: "free",
+    name: "Free",
+    price: 0,
+    annual: 0,
+    sub: "Get started",
+    f: ["5 review requests/day", "Email requests only", "Dashboard & analytics", "Google review link"],
+  },
+  {
     id: "starter",
     name: "Starter",
     price: 29,

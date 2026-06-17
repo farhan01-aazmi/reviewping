@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
-import { CORS, verifyAuth } from "../_shared/auth.ts"
+import { CORS, verifyAuth, checkDailyLimit } from "../_shared/auth.ts"
 
 serve(async (req) => {
   // Handle CORS preflight
@@ -19,6 +19,19 @@ serve(async (req) => {
     const auth = await verifyAuth(req)
     if (auth instanceof Response) return auth
     const { userId } = auth
+
+    // Check daily limit for free plan
+    const supabaseCheck = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    )
+    const { data: profile } = await supabaseCheck
+      .from("profiles")
+      .select("plan")
+      .eq("id", userId)
+      .single()
+    const limit = await checkDailyLimit(supabaseCheck, userId, profile?.plan || "free")
+    if (limit instanceof Response) return limit
 
     // Parse and validate request body
     let body
