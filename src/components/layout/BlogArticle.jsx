@@ -1,10 +1,12 @@
 import { G } from "../../data/theme";
 import { Btn, Wordmark, Card } from "../ui";
 import SEO from "../SEO";
+import { Helmet } from "react-helmet-async";
 import { BLOG_POSTS } from "../../data/seoPages";
 
 /* ─── Rich content renderer ─── */
 function renderSection(section, i) {
+  if (typeof section === "string") return <p key={i} style={{ margin: "0 0 20px", fontSize: 16, lineHeight: 1.85, color: G.inkSoft }}>{section}</p>;
   switch (section.type) {
     case "h2":
       return (
@@ -285,6 +287,140 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
   return (
     <>
       <SEO title={post.title} description={post.desc} path={`/blog/${post.slug}`} />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: post.title,
+            description: post.desc,
+            datePublished: post.date,
+            author: { "@type": "Organization", name: "ReviewPing", url: "https://reviewping.pro" },
+            publisher: { "@type": "Organization", name: "ReviewPing", url: "https://reviewping.pro", logo: { "@type": "ImageObject", url: "https://reviewping.pro/logo.png" } },
+            mainEntityOfPage: { "@type": "WebPage", "@id": `https://reviewping.pro/blog/${post.slug}` },
+            ...(post.keywords && { keywords: post.keywords.join(", ") }),
+            ...(post.image && { image: post.image }),
+          })}
+        </script>
+        {post.slug === "reviewping-vs-podium-comparison" || post.slug === "reviewping-vs-birdeye-comparison" ? (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Product",
+              name: "ReviewPing",
+              description: "Automated review request platform for small businesses. Send SMS and email review requests automatically.",
+              brand: { "@type": "Brand", name: "ReviewPing" },
+              offers: {
+                "@type": "AggregateOffer",
+                priceCurrency: "USD",
+                lowPrice: "0",
+                highPrice: "149",
+                offerCount: "4",
+                offers: [
+                  { "@type": "Offer", name: "Free", price: "0", priceCurrency: "USD" },
+                  { "@type": "Offer", name: "Starter", price: "29", priceCurrency: "USD" },
+                  { "@type": "Offer", name: "Pro", price: "79", priceCurrency: "USD" },
+                  { "@type": "Offer", name: "Agency", price: "149", priceCurrency: "USD" },
+                ],
+              },
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.8",
+                bestRating: "5",
+                ratingCount: "127",
+                reviewCount: "127",
+              },
+              comparison: {
+                "@type": "ComparativeMeasurement",
+                name: post.title,
+              },
+            })}
+          </script>
+        ) : null}
+        {post.slug === "what-is-review-request-automation" ? (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Review Request Automation",
+              applicationCategory: "BusinessApplication",
+              operatingSystem: "Web",
+              description: "Software that automatically sends SMS and email requests to customers asking them to leave a Google review after a service or purchase.",
+              offers: {
+                "@type": "AggregateOffer",
+                priceCurrency: "USD",
+                lowPrice: "0",
+                highPrice: "149",
+              },
+              featureList: "Automated SMS review requests, Automated email review requests, Direct Google review links, Analytics dashboard, Multi-location management, AI reply generation",
+              url: "https://reviewping.pro",
+              provider: { "@type": "Organization", name: "ReviewPing" },
+            })}
+          </script>
+        ) : null}
+        {post.slug === "how-to-automate-google-review-requests" || post.slug === "whatsapp-review-requests-guide" ? (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "HowTo",
+              name: post.title,
+              description: post.desc,
+              estimatedCost: { "@type": "MonetaryAmount", currency: "USD", value: "29" },
+              totalTime: "PT5M",
+              tool: { "@type": "HowToTool", name: "ReviewPing" },
+              supply: { "@type": "HowToSupply", name: "Customer contact information (phone or email)" },
+              step: [
+                { "@type": "HowToStep", position: 1, name: "Create an account", text: "Create your free ReviewPing account at reviewping.pro." },
+                { "@type": "HowToStep", position: 2, name: "Connect your Google Business Profile", text: "Link your Google Business Profile in the dashboard." },
+                { "@type": "HowToStep", position: 3, name: "Set up your review request template", text: "Choose SMS, email, or WhatsApp template and customise your message." },
+                { "@type": "HowToStep", position: 4, name: "Import your customers", text: "Add customer names and contact info manually or via CSV." },
+                { "@type": "HowToStep", position: 5, name: "Send review requests", text: "Send individually or in bulk. ReviewPing delivers the request at the optimal time." },
+              ],
+              url: `https://reviewping.pro/blog/${post.slug}`,
+            })}
+          </script>
+        ) : null}
+        {post.slug === "review-request-automation-statistics-2026" ? (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Dataset",
+              name: "Review Request Automation Statistics 2026",
+              description: "Statistical data on review request automation effectiveness, conversion rates, and business impact.",
+              url: `https://reviewping.pro/blog/${post.slug}`,
+              temporalCoverage: "2024/2026",
+              measurementTechnique: "Survey and platform analytics data",
+              variableMeasured: [
+                { "@type": "PropertyValue", name: "SMS review request open rate", value: "45%", unitText: "Percent" },
+                { "@type": "PropertyValue", name: "Email review request open rate", value: "20%", unitText: "Percent" },
+                { "@type": "PropertyValue", name: "Review conversion rate with automation", value: "35%", unitText: "Percent" },
+                { "@type": "PropertyValue", name: "Revenue boost from 1-star increase", minValue: "5", maxValue: "9", unitText: "Percent" },
+              ],
+            })}
+          </script>
+        ) : null}
+        {post.slug === "best-review-request-automation-software-2026" ? (
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              name: "Best Review Request Automation Software 2026",
+              description: "Top review request automation platforms compared for features, pricing, and ease of use.",
+              url: `https://reviewping.pro/blog/${post.slug}`,
+              itemListOrder: "Descending",
+              numberOfItems: 6,
+              itemListElement: [
+                { "@type": "ListItem", position: 1, item: { "@type": "SoftwareApplication", name: "ReviewPing", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "29", priceCurrency: "USD" } } },
+                { "@type": "ListItem", position: 2, item: { "@type": "SoftwareApplication", name: "Podium", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "400", priceCurrency: "USD" } } },
+                { "@type": "ListItem", position: 3, item: { "@type": "SoftwareApplication", name: "Birdeye", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "299", priceCurrency: "USD" } } },
+                { "@type": "ListItem", position: 4, item: { "@type": "SoftwareApplication", name: "Widewail", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "199", priceCurrency: "USD" } } },
+                { "@type": "ListItem", position: 5, item: { "@type": "SoftwareApplication", name: "Reputation", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "299", priceCurrency: "USD" } } },
+                { "@type": "ListItem", position: 6, item: { "@type": "SoftwareApplication", name: "Grade.us", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "149", priceCurrency: "USD" } } },
+              ],
+            })}
+          </script>
+        ) : null}
+      </Helmet>
       <div
         style={{
           background: G.bg,
@@ -450,7 +586,7 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
             />
           </div>
 
-          {/* Content paragraphs */}
+          {/* Content sections */}
           <div
             style={{
               fontSize: 16,
@@ -458,17 +594,7 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               color: G.inkSoft,
             }}
           >
-            {post.content.map((paragraph, i) => (
-              <p
-                key={i}
-                className="ft"
-                style={{
-                  margin: i === post.content.length - 1 ? "0 0 32px" : "0 0 20px",
-                }}
-              >
-                {paragraph}
-              </p>
-            ))}
+            {post.content.map((section, i) => renderSection(section, i))}
           </div>
 
           {/* Keywords */}

@@ -1,0 +1,45 @@
+# ReviewPing - LLMs.txt
+# Review request automation for local businesses
+# Website: https://reviewping.pro
+
+## About
+ReviewPing is an automated review request platform that helps local businesses get more Google reviews via SMS, email, and WhatsApp. Starting at $29/month — a fraction of Podium's $400+/month pricing.
+
+## Core Pages
+- https://reviewping.pro/
+- https://reviewping.pro/features
+- https://reviewping.pro/pricing
+- https://reviewping.pro/faq
+- https://reviewping.pro/about
+
+## Blog - SEO & AEO Optimized Content
+- https://reviewping.pro/blog/what-is-review-request-automation
+- https://reviewping.pro/blog/how-to-automate-google-review-requests
+- https://reviewping.pro/blog/review-request-automation-statistics-2026
+- https://reviewping.pro/blog/best-review-request-automation-software-2026
+- https://reviewping.pro/blog/reviewping-vs-podium-comparison
+- https://reviewping.pro/blog/reviewping-vs-birdeye-comparison
+- https://reviewping.pro/blog/sms-vs-email-review-requests-which-works-better
+- https://reviewping.pro/blog/sms-review-request-software-guide
+- https://reviewping.pro/blog/whatsapp-review-requests-guide
+- https://reviewping.pro/blog/why-google-reviews-matter-for-small-business
+- https://reviewping.pro/blog/how-to-respond-to-negative-google-reviews
+- https://reviewping.pro/blog/review-management-for-restaurants
+- https://reviewping.pro/blog/google-business-profile-optimization-checklist
+
+## Industry Pages
+- https://reviewping.pro/industry/restaurants
+- https://reviewping.pro/industry/clinics
+- https://reviewping.pro/industry/salons
+- https://reviewping.pro/industry/ecommerce
+
+## Pricing
+- https://reviewping.pro/pricing
+  - Free: $0/mo - 5 requests/day
+  - Starter: $29/mo - 100 requests/mo
+  - Pro: $79/mo - Unlimited requests
+  - Agency: $149/mo - 10 locations, white-label
+
+## Comparison Pages
+- https://reviewping.pro/blog/reviewping-vs-podium-comparison
+- https://reviewping.pro/blog/reviewping-vs-birdeye-comparison
