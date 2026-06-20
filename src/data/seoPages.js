@@ -248,7 +248,7 @@ export const BLOG_POSTS = [
   {
     slug: "reviewping-vs-podium-comparison",
     title: "ReviewPing vs Podium: The Honest Comparison for Small Business (2026)",
-    desc: "Podium charges $400+/month. ReviewPing delivers the same core review request features for $19/month. Here's the honest comparison — features, pricing, and who should use which.",
+    desc: "Podium charges $400+/month. ReviewPing delivers the same core review request features for $29/month. Here's the honest comparison — features, pricing, and who should use which.",
     date: "2026-06-03",
     readTime: "6 min read",
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
@@ -256,7 +256,7 @@ export const BLOG_POSTS = [
     keywords: ["ReviewPing vs Podium", "Podium alternative", "review request software", "small business review tool", "Podium pricing", "affordable review platform"],
     content: [
       "Every small business owner has heard of Podium. It's the industry leader — but at $400+ per month, it's built for enterprises with marketing budgets, not for the local coffee shop or dental practice that just wants more Google reviews.",
-      "ReviewPing was built to solve exactly this problem. We took the core functionality that makes Podium work — automated SMS and email review requests, direct Google review links, real-time analytics — and made it accessible at $19/month.",
+      "ReviewPing was built to solve exactly this problem. We took the core functionality that makes Podium work — automated SMS and email review requests, direct Google review links, real-time analytics — and made it accessible at $29/month.",
       "The honest truth: Podium has more features. They offer AI chatbot, payment processing, and team inbox features that ReviewPing doesn't have. But most small businesses don't need those features. They just need more reviews.",
       "ReviewPing focuses on doing one thing exceptionally well: getting you more Google reviews automatically. No bloated features, no forced upsells, no long-term contracts. Just a simple system that works.",
       "Feature comparison: Automated review requests (both), SMS & email (both), Direct Google review link (both), Analytics dashboard (both), AI reply generator (both), Multi-location (both), Chatbot (Podium only), Payment processing (Podium only), Team inbox (Podium only).",
@@ -450,3 +450,4 @@ export const INDUSTRIES_DATA = {
     ],
   },
 };
+
