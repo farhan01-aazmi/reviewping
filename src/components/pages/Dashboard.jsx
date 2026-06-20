@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Btn, Card, Pill, Stars, Spinner, EmptyState } from "../ui";
+import PremiumFeature from "../ui/PremiumFeature";
 import { fmtDate } from "../../utils/formatters";
 import CompetitorRadar from "../layout/CompetitorRadar";
 import ReputationScore from "../ui/ReputationScore";
@@ -49,7 +50,7 @@ function buildDayLabels() {
   return days;
 }
 
-export default function Dashboard({ userId, biz, onSend, onNav }) {
+export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -674,33 +675,39 @@ export default function Dashboard({ userId, biz, onSend, onNav }) {
         </Card>
       )}
 
-      {/* ── Competitor Radar ── */}
+      {/* ── Competitor Radar (Growth+) ── */}
       {!loading && stats && (
-        <CompetitorRadar
-          userRating={stats.avgRating !== "—" ? parseFloat(stats.avgRating) : 0}
-          userReviewCount={stats.totalReviews || 0}
-          businessName={biz?.bizName || biz?.biz || "Your Business"}
-          userId={userId}
-        />
+        <PremiumFeature feature="competitorRadar" plan={plan}>
+          <CompetitorRadar
+            userRating={stats.avgRating !== "—" ? parseFloat(stats.avgRating) : 0}
+            userReviewCount={stats.totalReviews || 0}
+            businessName={biz?.bizName || biz?.biz || "Your Business"}
+            userId={userId}
+          />
+        </PremiumFeature>
       )}
 
-      {/* ── Reputation Score ── */}
+      {/* ── Reputation Score (Growth+) ── */}
       {!loading && stats && (
-        <ReputationScore
-          avgRating={stats.avgRating}
-          reviewCount={stats.totalReviews}
-          responseRate={stats.responseRate}
-          positiveRatio={
-            stats.sentiments.positive + stats.sentiments.neutral + stats.sentiments.negative > 0
-              ? stats.sentiments.positive / (stats.sentiments.positive + stats.sentiments.neutral + stats.sentiments.negative)
-              : 0
-          }
-        />
+        <PremiumFeature feature="reputationScore" plan={plan}>
+          <ReputationScore
+            avgRating={stats.avgRating}
+            reviewCount={stats.totalReviews}
+            responseRate={stats.responseRate}
+            positiveRatio={
+              stats.sentiments.positive + stats.sentiments.neutral + stats.sentiments.negative > 0
+                ? stats.sentiments.positive / (stats.sentiments.positive + stats.sentiments.neutral + stats.sentiments.negative)
+                : 0
+            }
+          />
+        </PremiumFeature>
       )}
 
-      {/* ── Review Velocity ── */}
+      {/* ── Review Velocity (Growth+) ── */}
       {!loading && stats && stats.totalReviews > 0 && (
-        <VelocityInsight />
+        <PremiumFeature feature="competitorRadar" plan={plan}>
+          <VelocityInsight />
+        </PremiumFeature>
       )}
 
       {/* ── Quick actions ── */}

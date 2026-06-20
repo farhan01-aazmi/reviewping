@@ -222,11 +222,20 @@ export default function AuthCallback({ onDone, onError }) {
   return null;
 }
 
-/** Fetch user profile */
+/** Fetch user profile — creates a default one if none exists */
 async function fetchProfile(userId) {
   try {
     const { data } = await supabase.from("profiles").select("*").eq("id", userId).single();
     if (data) return { name: data.name, email: data.email, biz: data.business_name, id: data.id };
+    // No profile yet — upsert one with free plan
+    await supabase.from("profiles").upsert({
+      id: userId,
+      email: "",
+      name: "",
+      business_name: "",
+      plan: "free",
+    });
+    return { name: "", email: "", biz: "", id: userId };
   } catch (e) { console.error("Profile fetch error:", e); }
   return null;
 }

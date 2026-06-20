@@ -63,6 +63,20 @@ export const PLANS = [
     annual: 0,
     sub: "Get started",
     f: ["5 review requests/day", "Email requests only", "Dashboard & analytics", "Google review link"],
+    features: {
+      aiReplies: false,
+      bulkSend: false,
+      automations: false,
+      competitorRadar: false,
+      analytics: false,
+      customTemplates: false,
+      qrCode: false,
+      widgetEmbed: false,
+      teamMembers: false,
+      gbpSync: false,
+      reputationScore: false,
+      whatsappChannel: false,
+    },
   },
   {
     id: "starter",
@@ -71,6 +85,20 @@ export const PLANS = [
     annual: 278,
     sub: "Solo owners",
     f: ["100 review requests/mo", "Email only (SMS extra)", "Dashboard & analytics", "Google review link", "Email support"],
+    features: {
+      aiReplies: true,
+      bulkSend: true,
+      automations: false,
+      competitorRadar: false,
+      analytics: true,
+      customTemplates: true,
+      qrCode: true,
+      widgetEmbed: true,
+      teamMembers: false,
+      gbpSync: true,
+      reputationScore: false,
+      whatsappChannel: false,
+    },
   },
   {
     id: "growth",
@@ -89,6 +117,20 @@ export const PLANS = [
       "Custom templates",
       "Priority support",
     ],
+    features: {
+      aiReplies: true,
+      bulkSend: true,
+      automations: true,
+      competitorRadar: true,
+      analytics: true,
+      customTemplates: true,
+      qrCode: true,
+      widgetEmbed: true,
+      teamMembers: true,
+      gbpSync: true,
+      reputationScore: true,
+      whatsappChannel: true,
+    },
   },
   {
     id: "agency",
@@ -104,5 +146,44 @@ export const PLANS = [
       "Team members (up to 10)",
       "Dedicated onboarding",
     ],
+    features: {
+      aiReplies: true,
+      bulkSend: true,
+      automations: true,
+      competitorRadar: true,
+      analytics: true,
+      customTemplates: true,
+      qrCode: true,
+      widgetEmbed: true,
+      teamMembers: true,
+      gbpSync: true,
+      reputationScore: true,
+      whatsappChannel: true,
+    },
   },
 ];
+
+/**
+ * Check if a given plan has access to a specific feature.
+ * Usage: hasFeature(userPlan, "competitorRadar") → true/false
+ */
+export function hasFeature(plan, feature) {
+  const p = PLANS.find((x) => x.id === plan);
+  if (!p) return false;
+  return p.features?.[feature] === true;
+}
+
+/** Get the daily request limit for a plan. */
+export function getDailyLimit(plan) {
+  if (plan === "free") return 5;
+  if (plan === "starter") return 100;
+  return 99999; // effectively unlimited for growth/agency
+}
+
+/** Get the plan that unlocks a given feature (lowest plan with access). */
+export function planForFeature(feature) {
+  for (const p of PLANS) {
+    if (p.features?.[feature]) return p;
+  }
+  return PLANS[1]; // fallback to starter
+}

@@ -1,66 +1,64 @@
-# ReviewPing — Progress Tracker
+# ReviewPing — Plan System, Feature Gating & Pricing Page
 
 ## Goal
-Ship a fully stable review management SaaS.
+Fix plan system, upgrade flow, premium feature gating, and add standalone pricing page
 
-## Status Overview
-| Category | Count |
-|----------|-------|
-| ✅ Completed | 14 |
-| 🟡 In Progress | 0 |
-| 🔴 Remaining | 0 |
+## Overall Status: 🟢 Ready to Deploy
 
 ---
 
-## Subtasks
+## Completed
 
-### 1. ✅ GBP OAuth — Popup+postMessage Flow (with fallback redirect)
-**Status:** 🟢 Done  
-**What changed:**
-- `gpb-connect/index.ts`: Returns HTML that first tries `postMessage` to opener (popup flow), and if no opener exists, redirects to `dashboard?gbp=connected` (old redirect flow fallback)
-- `popupResponse()` helper updated to handle both cases
-- Dashboard.jsx: Already had `?gbp=connected` handler with toast
-- **Why:** Old code only handled popup case — users with cached JS saw static "Connected" page
+### 🟢 Plan System
+- Free plan added to PLANS array (id "free", $0, 5 requests/day, 12 feature flags)
+- Default plan changed from "growth" to "free" in Signup, AppShell, SQL trigger
+- **SQL trigger updated** — `handle_new_user()` sets `plan = 'free'`
+- Signup.jsx: `insert` → `upsert` to overwrite trigger's value
+- AuthCallback.jsx: `fetchProfile` now creates profile with `plan = 'free'` if none exists
 
-### 2. ✅ AI Email Writer — Vercel Proxy (Edge Middleware)
-**Status:** 🟢 Done  
-**What changed:**
-- `middleware.js`: Added edge proxy handler for `/api/edge/*` → forwards to Supabase with all headers + query params
-- `AIEmailWriter.jsx`: Added `callEdgeFn()` — tries direct Supabase, falls back to same-origin proxy
-- `SendReq.jsx`: send-email/send-sms/send-whatsapp now use `callEdgeFn()` too
-- `gpb-connect`: Deployed `--no-verify-jwt` (gateway was blocking requests)
+### 🟢 Feature Gating
+- `PremiumFeature.jsx` — rewritten: **no blur**, shows upgrade CTA card → opens PricingModal
+- `hasFeature()`, `planForFeature()`, `getDailyLimit()` utilities in constants.js
+- **Dashboard** — CompetitorRadar, ReputationScore, VelocityInsight gated
+- **SendReq** — WhatsApp channel gated (dimmed for free/starter)
+- **Automations** — entire page gated
+- **BulkSend** — entire page gated
+- **ReviewsPage** — AI Reply button gated
+- **Integrations** — blocks free + starter
+- **Team** — blocks free + starter
+- **Daily limit check** in SendReq, BulkSend + edge functions
 
-### 3. ✅ Show Sent Requests + Internal Reviews on Dashboard
-**Status:** 🟢 Done
+### 🟢 Pricing Page & Modal
+- **`PricingPage.jsx`** — standalone pricing page at `/pricing` with all 4 plans, monthly/annual toggle, "Most Popular" badge on Pro
+- **`PricingModal.jsx`** — full-screen overlay modal showing Starter/Pro/Agency plans
+- **`PremiumFeature`** opens PricingModal on click
+- **Daily limit hit** in SendReq/BulkSend opens PricingModal (not just toast)
+- AppShell: `/pricing` route added
+- More menu: "Pricing" link added (navigates to pricing page)
 
-### 4. ✅ GBP OAuth Redirect Fix
-**Status:** 🟢 Done
+### 🟢 Upgrade Flow
+- ConfirmModal rendering fixed in Billing.jsx
+- DODO_MODE set to "live"
+- Agency product IDs set
+- create-checkout improved (customer email sent, HTTP status in errors)
 
-### 5. ✅ Gateway Redirect Fix
-**Status:** 🟢 Done
+### 🟢 Daily Limit Enforcement (Edge Functions)
+- `checkDailyLimit()` in `_shared/auth.ts`
+- `send-sms`, `send-email`, `send-whatsapp`, `send-review-request` — all enforce limit
 
-### 6. ✅ Analytics Threshold Lowered
-**Status:** 🟢 Done
+## Deployment Instructions
+```bash
+git add .
+git commit -m "feat: standalone pricing page, pricing modal, premium gating, daily limit UX"
+git push origin master
+npx supabase functions deploy send-sms
+npx supabase functions deploy send-email
+npx supabase functions deploy send-whatsapp
+npx supabase functions deploy send-review-request
+npx supabase functions deploy create-checkout
+```
 
-### 7. ✅ SendReq Fallback URL Fixed
-**Status:** 🟢 Done
-
-### 8. ✅ All auth-protected edge functions → `--no-verify-jwt`
-**Status:** 🟢 Done
-
----
-
-## Deployment Status
-| Component | Status | URL |
-|-----------|--------|-----|
-| Frontend (Vercel + GitHub) | ✅ Auto-deployed | https://reviewping-eight.vercel.app |
-| gpb-connect (no-verify-jwt) | ✅ Deployed | Supabase Edge Function |
-| ai-generate-email (with JWT) | ✅ Deployed | Supabase Edge Function |
-| Edge Middleware (proxy) | ✅ Active | `/api/edge/*` → Supabase |
-
-## Key Env Vars
-| Var | Value |
-|-----|-------|
-| VITE_API_URL | `https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1` |
-| VITE_SITE_URL | `https://reviewping-eight.vercel.app` |
-| SITE_URL (Supabase) | Should be `https://reviewping-eight.vercel.app` |
+## Key URLs
+- Live: `https://reviewping.pro`
+- Pricing: `https://reviewping.pro/pricing`
+- Supabase: `fvugrcqjrtwabaobuigb` (West US)

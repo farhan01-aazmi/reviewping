@@ -3,7 +3,7 @@ import { useTheme } from "../../data/ThemeProvider";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 
-export default function More({ onNav, onLogout, unreadCount }) {
+export default function More({ onNav, onLogout, unreadCount, plan }) {
   const { isDark, toggleDark } = useTheme();
   const items = [
     { e: "📋", l: "Sent Log", s: "sentlog" },
@@ -17,6 +17,7 @@ export default function More({ onNav, onLogout, unreadCount }) {
     { e: "🔗", l: "Referral", s: "referral" },
     { e: "📝", l: "Changelog", s: "changelog" },
     { e: "🔔", l: "Notifications", s: "notifications", badge: unreadCount > 0 ? unreadCount : null },
+    { e: "💰", l: "Pricing", s: "pricing" },
     { e: "💳", l: "Billing", s: "billing" },
     { e: "⚙️", l: "Settings", s: "settings" },
     { e: "❓", l: "Help", s: "help" },

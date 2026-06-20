@@ -7,8 +7,9 @@ import Field from "../ui/Field";
 import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
 import { toast } from "sonner";
+import PremiumFeature from "../ui/PremiumFeature";
 
-export default function Automations({ userId }) {
+export default function Automations({ userId, plan }) {
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
@@ -87,14 +88,15 @@ export default function Automations({ userId }) {
   };
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: 20,
-        }}
+    <PremiumFeature feature="automations" plan={plan}>
+      <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: 20,
+          }}
       >
         <div>
           <h2
@@ -280,5 +282,6 @@ export default function Automations({ userId }) {
         </Btn>
       </Card>
     </div>
+    </PremiumFeature>
   );
 }

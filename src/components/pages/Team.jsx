@@ -39,7 +39,7 @@ export default function Team({ plan, userId }) {
       toast.error("Enter an email address");
       return;
     }
-    if (plan === "starter") {
+    if (plan === "free" || plan === "starter") {
       toast.error("Upgrade to Growth or Agency to invite team members");
       return;
     }
@@ -109,7 +109,7 @@ export default function Team({ plan, userId }) {
         {team.length} member{team.length !== 1 ? "s" : ""} ·{" "}
         {plan === "agency" ? "5 locations" : "1 location"}
       </p>
-      {plan === "starter" && (
+      {(plan === "free" || plan === "starter") && (
         <Card
           sx={{
             background: G.goldBg,
@@ -160,7 +160,7 @@ export default function Team({ plan, userId }) {
           onChange={(e) => setInviteRole(e.target.value)}
           options={roles}
         />
-        <Btn onClick={invite} disabled={plan === "starter" || inviting}>
+        <Btn onClick={invite} disabled={plan === "free" || plan === "starter" || inviting}>
           {inviting ? "Sending…" : "Send invitation →"}
         </Btn>
       </Card>

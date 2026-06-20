@@ -2,19 +2,21 @@ import { useState } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { generateGatewayLink } from "../../api";
-import { SERVICES } from "../../data/constants";
+import { SERVICES, getDailyLimit } from "../../data/constants";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Field from "../ui/Field";
 import Sel from "../ui/Sel";
 import { toast } from "sonner";
+import PremiumFeature from "../ui/PremiumFeature";
+import PricingModal from "../ui/PricingModal";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
 const FUNCTION_URL = SUPABASE_URL
   ? `${SUPABASE_URL}/functions/v1`
   : "https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1";
 
-export default function BulkSend({ biz, templates, onSent }) {
+export default function BulkSend({ biz, templates, onSent, plan, userId }) {
   const [rows, setRows] = useState([]);
   const [file, setFile] = useState(null);
   const [sending, setSending] = useState(false);
@@ -23,6 +25,7 @@ export default function BulkSend({ biz, templates, onSent }) {
   const [method, setMethod] = useState("SMS");
   const [rowErrors, setRowErrors] = useState({});
   const [results, setResults] = useState([]);
+  const [showPricing, setShowPricing] = useState(false);
 
   const parseCsv = (e) => {
     const f = e.target.files[0];
@@ -102,6 +105,21 @@ export default function BulkSend({ biz, templates, onSent }) {
 
     setSending(true);
     setResults([]);
+
+    // ── Daily limit check ──
+    const limit = getDailyLimit(plan);
+    const todayStart = new Date().toISOString().slice(0, 10);
+    const { count, error: countError } = await supabase
+      .from("review_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("created_at", todayStart)
+      .lt("created_at", todayStart + "T23:59:59.999Z");
+    if (!countError && count !== null && count >= limit) {
+      setSending(false);
+      setShowPricing(true);
+      return;
+    }
 
     const {
       data: { session },
@@ -254,6 +272,7 @@ export default function BulkSend({ biz, templates, onSent }) {
 
   if (done2)
     return (
+      <PremiumFeature feature="bulkSend" plan={plan}>
       <div style={{ textAlign: "center", padding: "36px 0" }}>
         <div
           style={{
@@ -320,9 +339,11 @@ export default function BulkSend({ biz, templates, onSent }) {
           Send another batch
         </Btn>
       </div>
+      </PremiumFeature>
     );
 
   return (
+    <PremiumFeature feature="bulkSend" plan={plan}>
     <div>
       <h2
         style={{
@@ -628,5 +649,17 @@ export default function BulkSend({ biz, templates, onSent }) {
         AI personalises every message · GDPR compliant · Opt-out included
       </p>
     </div>
+
+      <PricingModal
+        open={showPricing}
+        plan={plan}
+        onClose={() => setShowPricing(false)}
+        onUpgrade={(planId) => {
+          setShowPricing(false);
+          window.history.pushState({}, "", "/billing");
+          window.dispatchEvent(new PopStateEvent("popstate"));
+        }}
+      />
+    </PremiumFeature>
   );
 }

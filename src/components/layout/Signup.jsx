@@ -53,7 +53,7 @@ export default function Signup({ onDone, onLogin }) {
       return;
     }
 
-    const { error: profileErr } = await supabase.from("profiles").insert({
+    const { error: profileErr } = await supabase.from("profiles").upsert({
       id: data.user.id,
       email,
       name,
@@ -62,7 +62,7 @@ export default function Signup({ onDone, onLogin }) {
     });
 
     if (profileErr) {
-      console.error("Profile insert error:", profileErr);
+      console.error("Profile upsert error:", profileErr);
     }
 
     setLoading(false);

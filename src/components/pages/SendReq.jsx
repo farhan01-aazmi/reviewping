@@ -4,7 +4,9 @@ import { G } from "../../data/theme";
 import { Btn, Card, Field, Sel } from "../ui";
 import { toast } from "sonner";
 import { generateGatewayLink } from "../../api";
+import { getDailyLimit } from "../../data/constants";
 import { getLanguages } from "../../data/i18n";
+import PricingModal from "../ui/PricingModal";
 
 const DIRECT_API = import.meta.env.VITE_API_URL || "";
 const PROXY_API = window.location.origin + "/api/edge";
@@ -35,7 +37,7 @@ async function callEdgeFn(path, body, token) {
   }
 }
 
-export default function SendReq({ onBack, onSent, biz, userId }) {
+export default function SendReq({ onBack, onSent, biz, userId, plan }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -49,6 +51,7 @@ export default function SendReq({ onBack, onSent, biz, userId }) {
   const [subject, setSubject] = useState("");
   const [messageBody, setMessageBody] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  const [showPricing, setShowPricing] = useState(false);
 
   // Fallback review link (gateway link is generated per-request below)
   const reviewLink = biz.googleLink || biz.gbp_url || `${VITE_SITE_URL}/r/review`;
@@ -99,6 +102,21 @@ export default function SendReq({ onBack, onSent, biz, userId }) {
   // ── Send ──
   const send = async () => {
     if (!validate()) return;
+
+    // ── Daily limit check ──
+    const limit = getDailyLimit(plan);
+    const todayStart = new Date().toISOString().slice(0, 10);
+    const { count, error: countError } = await supabase
+      .from("review_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("created_at", todayStart)
+      .lt("created_at", todayStart + "T23:59:59.999Z");
+    if (!countError && count !== null && count >= limit) {
+      setLoading(false);
+      setShowPricing(true);
+      return;
+    }
 
     // Use AI-generated message or fallback to default
     const finalSubject = subject.trim() || `How was your experience at ${biz.bizName || "My Business"}?`;
@@ -248,15 +266,21 @@ export default function SendReq({ onBack, onSent, biz, userId }) {
             }}>
               💬 SMS
             </button>
-            <button onClick={() => setChannel("whatsapp")} style={{
-              flex: 1, padding: "10px 14px",
-              background: channel === "whatsapp" ? G.accent : G.surface,
-              color: channel === "whatsapp" ? "white" : G.ink,
-              border: `1.5px solid ${channel === "whatsapp" ? G.accent : G.border}`,
-              borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: 13,
-              fontFamily: "'Manrope',sans-serif", transition: "all 0.15s",
-            }}>
-              📱 WhatsApp <span style={{ fontSize: 10, opacity: 0.8 }}>— 3x higher open rate</span>
+            <button onClick={() => plan === "growth" || plan === "agency" ? setChannel("whatsapp") : null}
+              style={{
+                flex: 1, padding: "10px 14px",
+                background: channel === "whatsapp" ? G.accent : G.surface,
+                color: channel === "whatsapp" ? "white" : G.ink,
+                border: `1.5px solid ${channel === "whatsapp" ? G.accent : G.border}`,
+                borderRadius: 10,
+                cursor: plan !== "free" && plan !== "starter" ? "pointer" : "not-allowed",
+                fontWeight: 700, fontSize: 13,
+                fontFamily: "'Manrope',sans-serif", transition: "all 0.15s",
+                opacity: plan === "free" || plan === "starter" ? 0.5 : 1,
+              }}>
+              📱 WhatsApp <span style={{ fontSize: 10, opacity: 0.8 }}>
+                {plan === "free" || plan === "starter" ? "🔒 Growth plan only" : "— 3x higher open rate"}
+              </span>
             </button>
           </div>
         </div>
@@ -374,6 +398,17 @@ export default function SendReq({ onBack, onSent, biz, userId }) {
       <p style={{ textAlign: "center", fontSize: 12, color: G.muted, marginTop: 8 }}>
         GDPR compliant · Encrypted · Opt-out included
       </p>
+
+      <PricingModal
+        open={showPricing}
+        plan={plan}
+        onClose={() => setShowPricing(false)}
+        onUpgrade={(planId) => {
+          setShowPricing(false);
+          window.history.pushState({}, "", "/billing");
+          window.dispatchEvent(new PopStateEvent("popstate"));
+        }}
+      />
     </div>
   );
 }

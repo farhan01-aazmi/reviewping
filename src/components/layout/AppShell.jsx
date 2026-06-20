@@ -25,6 +25,7 @@ const SentLog = lazy(() => import("../pages/SentLog"));
 const Referral = lazy(() => import("../pages/Referral"));
 const Changelog = lazy(() => import("../pages/Changelog"));
 const BulkSend = lazy(() => import("../pages/BulkSend"));
+const PricingPage = lazy(() => import("../pages/PricingPage"));
 import AppPrivacyPolicy from "./PrivacyPolicy";
 import AppTerms from "./Terms";
 
@@ -317,6 +318,7 @@ export default function AppShell({ user: initUser, onLogout }) {
             <Dashboard
               userId={userId}
               biz={biz}
+              plan={plan}
               onSend={() => navigate("send")}
               onNav={navigate}
             />
@@ -327,22 +329,27 @@ export default function AppShell({ user: initUser, onLogout }) {
               onSent={handleSent}
               biz={biz}
               userId={userId}
+              plan={plan}
             />
           )}
           {screen === "reviews" && (
             <ReviewsPage
               userId={userId}
+              plan={plan}
               onSend={() => navigate("send")}
             />
           )}
-          {screen === "analytics" && <Analytics userId={userId} />}
-          {screen === "templates" && <Templates userId={userId} />}
-          {screen === "automations" && <Automations userId={userId} />}
-          {screen === "contacts" && <Contacts userId={userId} />}
-          {screen === "qrcode" && <QRCode biz={biz} />}
-          {screen === "widget" && <WidgetEmbed biz={biz} />}
+          {screen === "analytics" && <Analytics userId={userId} plan={plan} />}
+          {screen === "templates" && <Templates userId={userId} plan={plan} />}
+          {screen === "automations" && <Automations userId={userId} plan={plan} />}
+          {screen === "contacts" && <Contacts userId={userId} plan={plan} />}
+          {screen === "qrcode" && <QRCode biz={biz} plan={plan} />}
+          {screen === "widget" && <WidgetEmbed biz={biz} plan={plan} />}
           {screen === "integrations" && <Integrations plan={plan} />}
-          {screen === "notifications" && <Notifications userId={userId} />}
+          {screen === "notifications" && <Notifications userId={userId} plan={plan} />}
+          {screen === "pricing" && (
+            <PricingPage plan={plan} onNav={navigate} />
+          )}
           {screen === "billing" && (
             <Billing userId={userId} plan={plan} setPlan={setPlanAndSync} />
           )}
@@ -352,6 +359,7 @@ export default function AppShell({ user: initUser, onLogout }) {
               setBiz={setBizAndSync}
               user={user}
               setUser={setUserAndSync}
+              plan={plan}
             />
           )}
           {screen === "team" && <Team plan={plan} userId={userId} />}
@@ -359,13 +367,13 @@ export default function AppShell({ user: initUser, onLogout }) {
           {screen === "privacy" && <AppPrivacyPolicy onBack={goBack} />}
           {screen === "terms" && <AppTerms onBack={goBack} />}
           {screen === "more" && (
-            <More onNav={navigate} onLogout={onLogout} unreadCount={unread} />
+            <More onNav={navigate} onLogout={onLogout} unreadCount={unread} plan={plan} />
           )}
-          {screen === "sentlog" && <SentLog userId={userId} />}
-          {screen === "referral" && <Referral userId={userId} user={user} />}
+          {screen === "sentlog" && <SentLog userId={userId} plan={plan} />}
+          {screen === "referral" && <Referral userId={userId} user={user} plan={plan} />}
           {screen === "changelog" && <Changelog />}
           {screen === "bulk" && (
-            <BulkSend biz={biz} onSent={handleSent} />
+            <BulkSend biz={biz} onSent={handleSent} plan={plan} userId={userId} />
           )}
         </Suspense>
       </main>

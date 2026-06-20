@@ -10,13 +10,14 @@ import EmptyState from "../ui/EmptyState";
 import Spinner from "../ui/Spinner";
 import ReviewCard from "../ui/ReviewCard";
 import { exportCSV, fmtDate, getRating } from "../../utils/formatters";
+import { hasFeature } from "../../data/constants";
 import { generateReviewReply } from "../../api";
 
 function Skeleton({ h = 14, w = "100%" }) {
   return <div style={{ height: h, background: G.border, borderRadius: 6, width: w, animation: "pulse 1.5s ease-in-out infinite", marginBottom: 8 }} />;
 }
 
-export default function ReviewsPage({ userId, onSend }) {
+export default function ReviewsPage({ userId, plan, onSend }) {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -91,6 +92,10 @@ export default function ReviewsPage({ userId, onSend }) {
 
   // Generate AI reply for a negative review (from review_submissions)
   const generateAiReplyForNeg = async (r) => {
+    if (!hasFeature(plan, "aiReplies")) {
+      toast.error("Upgrade to Starter or higher to use AI replies");
+      return;
+    }
     setAiLoading(r.id);
     try {
       const data = await generateReviewReply({
@@ -192,15 +197,15 @@ export default function ReviewsPage({ userId, onSend }) {
               <div style={{ display: "flex", gap: 6 }}>
                 <button
                   onClick={() => generateAiReplyForNeg(r)}
-                  disabled={aiLoading === r.id}
+                  disabled={aiLoading === r.id || !hasFeature(plan, "aiReplies")}
                   style={{
                     background: "#f3e8ff", border: "1.5px solid #d8b4fe", borderRadius: 8,
                     padding: "7px 14px", fontSize: 12, cursor: aiLoading === r.id ? "wait" : "pointer",
-                    color: "#9333ea", fontFamily: "'Manrope',sans-serif", fontWeight: 700,
-                    display: "flex", alignItems: "center", gap: 5, opacity: aiLoading === r.id ? 0.6 : 1,
+                    color: "#9333ea",                     fontFamily: "'Manrope',sans-serif", fontWeight: 700,
+                    display: "flex", alignItems: "center", gap: 5, opacity: aiLoading === r.id || !hasFeature(plan, "aiReplies") ? 0.6 : 1,
                   }}
                 >
-                  {aiLoading === r.id ? <><Spinner size={12} /> Generating…</> : "✨ Generate AI Reply"}
+                  {aiLoading === r.id ? <><Spinner size={12} /> Generating…</> : !hasFeature(plan, "aiReplies") ? "🔒 AI Reply (Starter+)" : "✨ Generate AI Reply"}
                 </button>
                 <button
                   onClick={() => markResolved(r.id)}
