@@ -3,7 +3,7 @@ import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Btn, Card, Field, Sel } from "../ui";
 import { toast } from "sonner";
-import { generateGatewayLink } from "../../api";
+import { generateGatewayLink, createSubscription } from "../../api";
 import { getDailyLimit } from "../../data/constants";
 import { getLanguages } from "../../data/i18n";
 import PricingModal from "../ui/PricingModal";
@@ -403,10 +403,19 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
         open={showPricing}
         plan={plan}
         onClose={() => setShowPricing(false)}
-        onUpgrade={(planId) => {
+        onUpgrade={async (planId, billing) => {
           setShowPricing(false);
-          window.history.pushState({}, "", "/billing");
-          window.dispatchEvent(new PopStateEvent("popstate"));
+          try {
+            const result = await createSubscription({
+              plan: planId,
+              billing: billing || "monthly",
+              return_url: window.location.href,
+            });
+            if (result?.url) window.location.href = result.url;
+            else toast.error("Checkout URL not returned");
+          } catch (err) {
+            toast.error(err.message || "Failed to start checkout");
+          }
         }}
       />
     </div>

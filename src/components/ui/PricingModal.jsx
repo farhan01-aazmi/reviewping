@@ -5,7 +5,7 @@ import Btn from "./Btn";
 
 const displayPlans = PLANS.filter((p) => p.id !== "free");
 
-export default function PricingModal({ open, plan, onClose, onUpgrade }) {
+export default function PricingModal({ open, plan, onClose, onUpgrade, loading }) {
   const [annual, setAnnual] = useState(false);
   if (!open) return null;
 
@@ -92,11 +92,12 @@ export default function PricingModal({ open, plan, onClose, onUpgrade }) {
           >
             <button
               onClick={() => setAnnual(false)}
+              disabled={loading}
               style={{
                 padding: "8px 20px",
                 borderRadius: 10,
                 border: "none",
-                cursor: "pointer",
+                cursor: loading ? "not-allowed" : "pointer",
                 fontFamily: "Manrope, sans-serif",
                 fontSize: 14,
                 fontWeight: 600,
@@ -109,11 +110,12 @@ export default function PricingModal({ open, plan, onClose, onUpgrade }) {
             </button>
             <button
               onClick={() => setAnnual(true)}
+              disabled={loading}
               style={{
                 padding: "8px 20px",
                 borderRadius: 10,
                 border: "none",
-                cursor: "pointer",
+                cursor: loading ? "not-allowed" : "pointer",
                 fontFamily: "Manrope, sans-serif",
                 fontSize: 14,
                 fontWeight: 600,
@@ -264,14 +266,16 @@ export default function PricingModal({ open, plan, onClose, onUpgrade }) {
                 <Btn
                   fullWidth
                   variant={isCurrent ? "secondary" : "primary"}
-                  onClick={() => onUpgrade(p.id)}
+                  onClick={() => onUpgrade(p.id, annual ? "annual" : "monthly")}
+                  disabled={loading || isCurrent}
+                  loading={loading}
                   style={
                     isPopular && !isCurrent
                       ? { background: G.gold, border: "none", color: "#fff" }
                       : undefined
                   }
                 >
-                  {isCurrent ? "Current Plan" : "Upgrade →"}
+                  {isCurrent ? "Current Plan" : loading ? "Redirecting…" : "Upgrade →"}
                 </Btn>
               </div>
             );

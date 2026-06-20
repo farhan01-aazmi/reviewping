@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { G } from "../../data/theme";
 import { hasFeature, planForFeature } from "../../data/constants";
+import { createSubscription } from "../../api";
 import PricingModal from "./PricingModal";
+import { toast } from "sonner";
 
 /**
  * Wraps a premium feature. If the user's plan doesn't include it,
@@ -19,15 +21,29 @@ export default function PremiumFeature({
   style,
 }) {
   const [showPricing, setShowPricing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const hasAccess = hasFeature(plan, feature);
   const requiredPlan = planForFeature(feature);
 
-  const handleUpgrade = (planId) => {
+  const handleUpgrade = async (planId, billing) => {
+    setLoading(true);
     setShowPricing(false);
-    // Navigate to billing page
-    window.history.pushState({}, "", "/billing");
-    window.dispatchEvent(new PopStateEvent("popstate"));
+    try {
+      const result = await createSubscription({
+        plan: planId,
+        billing: billing || "monthly",
+        return_url: window.location.href,
+      });
+      if (result?.url) {
+        window.location.href = result.url;
+      } else {
+        toast.error("Checkout URL not returned");
+      }
+    } catch (err) {
+      toast.error(err.message || "Failed to start checkout");
+    }
+    setLoading(false);
   };
 
   if (hasAccess) {
@@ -95,13 +111,14 @@ export default function PremiumFeature({
             fontFamily: "'Manrope',sans-serif",
           }}
         >
-          Upgrade to {requiredPlan.name} — ${requiredPlan.price}/mo →
+          {loading ? "Redirecting…" : `Upgrade to ${requiredPlan.name} — $${requiredPlan.price}/mo →`}
         </div>
       </div>
 
       <PricingModal
         open={showPricing}
         plan={plan}
+        loading={loading}
         onClose={() => setShowPricing(false)}
         onUpgrade={handleUpgrade}
       />

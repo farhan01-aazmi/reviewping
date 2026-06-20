@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
-import { generateGatewayLink } from "../../api";
+import { generateGatewayLink, createSubscription } from "../../api";
 import { SERVICES, getDailyLimit } from "../../data/constants";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
@@ -654,10 +654,19 @@ export default function BulkSend({ biz, templates, onSent, plan, userId }) {
         open={showPricing}
         plan={plan}
         onClose={() => setShowPricing(false)}
-        onUpgrade={(planId) => {
+        onUpgrade={async (planId, billing) => {
           setShowPricing(false);
-          window.history.pushState({}, "", "/billing");
-          window.dispatchEvent(new PopStateEvent("popstate"));
+          try {
+            const result = await createSubscription({
+              plan: planId,
+              billing: billing || "monthly",
+              return_url: window.location.href,
+            });
+            if (result?.url) window.location.href = result.url;
+            else toast.error("Checkout URL not returned");
+          } catch (err) {
+            toast.error(err.message || "Failed to start checkout");
+          }
         }}
       />
     </PremiumFeature>
