@@ -375,79 +375,85 @@ const styles = {
 
 /* ───────────── main component ───────────── */
 
-export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
+export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
   const rows = [
     {
       feature: "Price",
-      podium: <span style={styles.priceHighlight}><span style={styles.podiumPrice}>$400+</span>/mo</span>,
+      truereview: <span style={styles.priceHighlight}>$49/mo</span>,
       ping: <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>$29/mo</span>,
       highlight: true,
     },
     {
       feature: "Review Requests",
-      podium: <Check />,
-      ping: <Check />,
-    },
-    {
-      feature: "SMS & Email",
-      podium: <Check />,
+      truereview: <Check />,
       ping: <Check />,
     },
     {
       feature: "AI Reply Generator",
-      podium: <Cross />,
+      truereview: <Check />,
       ping: <Check />,
     },
     {
+      feature: "WhatsApp Review Requests",
+      truereview: <Cross />,
+      ping: (
+        <>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span>
+        </>
+      ),
+      highlight: true,
+    },
+    {
       feature: "Analytics Dashboard",
-      podium: <Check />,
+      truereview: <Check />,
+      ping: <Check />,
+    },
+    {
+      feature: "Custom Templates",
+      truereview: <Check />,
       ping: <Check />,
     },
     {
       feature: "Multi-Location",
-      podium: <Check />,
-      ping: (
-        <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
-        </>
-      ),
-    },
-    {
-      feature: "White-Label",
-      podium: <Cross />,
-      ping: (
-        <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
-        </>
-      ),
-    },
-    {
-      feature: "Long-term contract",
-      podium: (
+      truereview: (
         <span style={{ color: G.accent, fontWeight: 600 }}>
-          <Check /> Required
+          <Check /> +$39/location
         </span>
       ),
       ping: (
-        <span style={{ color: G.success, fontWeight: 600 }}>
-          <Cross /> Cancel anytime
-        </span>
+        <>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo Agency</span>
+        </>
       ),
     },
     {
-      feature: "Built for small biz",
-      podium: <Cross />,
+      feature: "Free Plan",
+      truereview: <Cross />,
       ping: <Check />,
       highlight: true,
+    },
+    {
+      feature: "Multiple Plans",
+      truereview: (
+        <span style={{ color: G.accent, fontWeight: 600 }}>
+          <Cross /> Single plan
+        </span>
+      ),
+      ping: <Check />,
+    },
+    {
+      feature: "Cancel Anytime",
+      truereview: <Check />,
+      ping: <Check />,
     },
   ];
 
   return (
     <div style={styles.page}>
       <SEO
-        title="ReviewPing vs Podium: The $29/mo Alternative"
-        description="Compare ReviewPing ($29/mo) vs Podium ($400+/mo). Same core review request functionality at 95% less cost. Built for small businesses."
-        path="/vs/podium"
+        title="ReviewPing vs TrueReview: Best Budget Review Tool?"
+        description="Compare ReviewPing ($29/mo) vs TrueReview ($49/mo). ReviewPing offers more features, free plan, and lower starting price than TrueReview."
+        path="/vs/truereview"
       />
 
       {/* ── header ── */}
@@ -476,15 +482,15 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
 
       {/* ── hero ── */}
       <section style={styles.heroSection}>
-        <div style={styles.heroBadge}>🏆 #1 Podium Alternative</div>
+        <div style={styles.heroBadge}>🏆 Best Budget Review Tool</div>
         <h1 style={styles.heroTitle}>
-          Podium is great.{" "}
-          <span style={styles.heroTitleEm}>But not for $400/mo.</span>
+          TrueReview is great.{" "}
+          <span style={styles.heroTitleEm}>But $49/mo for one plan?</span>
         </h1>
         <p style={styles.heroSub}>
           You get the same core review-requesting power — SMS, email,
-          automation — at <strong>95% less cost</strong>. No bloated
-          contracts. No enterprise upsells. Just what you actually need.
+          AI replies — starting at <strong>$29/mo</strong>. More plans,
+          a free tier, and WhatsApp requests TrueReview doesn't offer.
         </p>
         <div style={styles.heroCtaRow}>
           <button style={styles.primaryCta} onClick={onSignup}>
@@ -495,7 +501,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
           </button>
         </div>
         <p style={styles.heroDisclaimer}>
-          No credit card required • Cancel anytime • Free setup support
+          No credit card required • Cancel anytime • Free plan available
         </p>
       </section>
 
@@ -507,7 +513,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
               <tr>
                 <th style={styles.th}>Feature</th>
                 <th style={{ ...styles.th, ...styles.thPodium, ...styles.tdCenter }}>
-                  Podium
+                  TrueReview
                 </th>
                 <th style={{ ...styles.th, ...styles.thReviewPing, ...styles.tdCenter }}>
                   ReviewPing
@@ -529,11 +535,11 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
                   <td style={{ ...styles.td, ...styles.tdFeature }}>
                     {row.feature}
                     {row.highlight && i === 0 && (
-                      <span style={styles.tableBadge}>Save 95%</span>
+                      <span style={styles.tableBadge}>Save 40%</span>
                     )}
                   </td>
                   <td style={{ ...styles.td, ...styles.tdCenter }}>
-                    {row.podium}
+                    {row.truereview}
                   </td>
                   <td style={{ ...styles.td, ...styles.tdCenter }}>
                     {row.ping}
@@ -548,49 +554,48 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       {/* ── why reviewping section ── */}
       <section style={styles.whySection}>
         <h2 style={styles.whyHeading}>
-          Built for the businesses Podium forgot
+          Why ReviewPing wins against TrueReview
         </h2>
         <p style={styles.whySub}>
-          Podium targets enterprises with six-figure budgets. ReviewPing is
-          for everyone else — the restaurants, clinics, salons, and
-          e-commerce brands that just want more reviews without the
-          overhead.
+          TrueReview is a fine product with a single $49/mo plan. ReviewPing
+          gives you more flexibility — more plans, a free tier, WhatsApp
+          requests, and no per-location surprises.
         </p>
 
         <div style={styles.cardsGrid}>
           <div style={styles.card}>
-            <span style={styles.cardIcon}>🍽️</span>
-            <h3 style={styles.cardTitle}>Restaurants</h3>
+            <span style={styles.cardIcon}>💰</span>
+            <h3 style={styles.cardTitle}>Price Flexibility</h3>
             <p style={styles.cardText}>
-              Seat more guests by turning every satisfied diner into a
-              5-star review — automatically, after every visit.
+              TrueReview locks you into $49/mo. ReviewPing starts at $29/mo
+              with a free plan, so you only pay for what you need.
             </p>
           </div>
 
           <div style={styles.card}>
-            <span style={styles.cardIcon}>🏥</span>
-            <h3 style={styles.cardTitle}>Clinics & Dentists</h3>
+            <span style={styles.cardIcon}>💬</span>
+            <h3 style={styles.cardTitle}>WhatsApp Reviews</h3>
             <p style={styles.cardText}>
-              Follow up with patients after appointments. Build local
-              reputation without adding admin work.
+              Reach customers where they actually chat. TrueReview doesn't
+              offer WhatsApp review requests — ReviewPing does on Growth+.
             </p>
           </div>
 
           <div style={styles.card}>
-            <span style={styles.cardIcon}>✂️</span>
-            <h3 style={styles.cardTitle}>Salons & Spas</h3>
+            <span style={styles.cardIcon}>🆓</span>
+            <h3 style={styles.cardTitle}>Free Plan Available</h3>
             <p style={styles.cardText}>
-              Send review requests after every booking. Keep your Google
-              rating high and your books full.
+              Test the waters with $0 commitment. TrueReview has no free
+              tier — you're paying from day one.
             </p>
           </div>
 
           <div style={styles.card}>
-            <span style={styles.cardIcon}>🛒</span>
-            <h3 style={styles.cardTitle}>E-Commerce</h3>
+            <span style={styles.cardIcon}>📍</span>
+            <h3 style={styles.cardTitle}>No Per-Location Fees</h3>
             <p style={styles.cardText}>
-              Capture post-purchase happiness with SMS & email review
-              flows. Turn buyers into brand advocates.
+              TrueReview charges $39 extra per location. ReviewPing's
+              Agency plan covers unlimited locations at $149/mo flat.
             </p>
           </div>
         </div>
@@ -600,18 +605,18 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       <section style={styles.ctaSection}>
         <div style={styles.ctaWrap}>
           <h2 style={styles.ctaTitle}>
-            Switch from Podium. Start at{" "}
+            Switch from TrueReview. Start at{" "}
             <span style={{ color: G.gold }}>$29/mo</span>.
           </h2>
           <p style={styles.ctaSub}>
-            No setup fees. No onboarding call required. No long-term
-            contract. You'll be up and running in 5 minutes.
+            No setup fees. Free plan available. Cancel anytime. You'll be up
+            and running in 5 minutes.
           </p>
           <button style={styles.ctaBtn} onClick={onSignup}>
             Start Free Trial
           </button>
           <span style={styles.ctaSmall}>
-            Already using Podium? We'll help you migrate your data — free.
+            Using TrueReview? We'll help you migrate — free.
           </span>
         </div>
       </section>

@@ -375,69 +375,83 @@ const styles = {
 
 /* ───────────── main component ───────────── */
 
-export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
+export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
   const rows = [
     {
       feature: "Price",
-      podium: <span style={styles.priceHighlight}><span style={styles.podiumPrice}>$400+</span>/mo</span>,
-      ping: <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>$29/mo</span>,
+      nicejob: (
+        <span style={styles.priceHighlight}>
+          <span style={styles.podiumPrice}>$75–$125</span>/mo
+          <br />
+          <span style={{ fontSize: 12, color: G.mutedLo }}>~$99/mo typical</span>
+        </span>
+      ),
+      ping: (
+        <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>
+          $29/mo
+        </span>
+      ),
       highlight: true,
     },
     {
       feature: "Review Requests",
-      podium: <Check />,
-      ping: <Check />,
-    },
-    {
-      feature: "SMS & Email",
-      podium: <Check />,
+      nicejob: <Check />,
       ping: <Check />,
     },
     {
       feature: "AI Reply Generator",
-      podium: <Cross />,
+      nicejob: <Cross />,
       ping: <Check />,
+    },
+    {
+      feature: "WhatsApp Review Requests",
+      nicejob: <Cross />,
+      ping: (
+        <>
+          <Check />{" "}
+          <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span>
+        </>
+      ),
     },
     {
       feature: "Analytics Dashboard",
-      podium: <Check />,
+      nicejob: (
+        <span style={{ fontSize: 13, color: G.mutedLo }}>Basic</span>
+      ),
       ping: <Check />,
     },
     {
-      feature: "Multi-Location",
-      podium: <Check />,
-      ping: (
-        <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
-        </>
-      ),
+      feature: "Custom Templates",
+      nicejob: <Check />,
+      ping: <Check />,
     },
     {
-      feature: "White-Label",
-      podium: <Cross />,
-      ping: (
-        <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
-        </>
-      ),
+      feature: "Free Plan",
+      nicejob: <Cross />,
+      ping: <Check />,
     },
     {
-      feature: "Long-term contract",
-      podium: (
+      feature: "Cancel Anytime",
+      nicejob: (
         <span style={{ color: G.accent, fontWeight: 600 }}>
-          <Check /> Required
+          <Cross /> Contracts
         </span>
       ),
       ping: (
         <span style={{ color: G.success, fontWeight: 600 }}>
-          <Cross /> Cancel anytime
+          <Check /> Cancel anytime
         </span>
       ),
     },
     {
-      feature: "Built for small biz",
-      podium: <Cross />,
-      ping: <Check />,
+      feature: "Multi-Location",
+      nicejob: <Check />,
+      ping: (
+        <>
+          <Check />{" "}
+          <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
+        </>
+      ),
       highlight: true,
     },
   ];
@@ -445,9 +459,9 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
   return (
     <div style={styles.page}>
       <SEO
-        title="ReviewPing vs Podium: The $29/mo Alternative"
-        description="Compare ReviewPing ($29/mo) vs Podium ($400+/mo). Same core review request functionality at 95% less cost. Built for small businesses."
-        path="/vs/podium"
+        title="ReviewPing vs Nicejob: Honest Comparison (2026)"
+        description="Compare ReviewPing ($29/mo) vs Nicejob ($75-$125/mo). See how ReviewPing's AI features and affordable pricing stack up against Nicejob's review automation."
+        path="/vs/nicejob"
       />
 
       {/* ── header ── */}
@@ -476,15 +490,16 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
 
       {/* ── hero ── */}
       <section style={styles.heroSection}>
-        <div style={styles.heroBadge}>🏆 #1 Podium Alternative</div>
+        <div style={styles.heroBadge}>🏆 Smarter Than Nicejob</div>
         <h1 style={styles.heroTitle}>
-          Podium is great.{" "}
-          <span style={styles.heroTitleEm}>But not for $400/mo.</span>
+          Nicejob is decent.{" "}
+          <span style={styles.heroTitleEm}>But overpriced.</span>
         </h1>
         <p style={styles.heroSub}>
-          You get the same core review-requesting power — SMS, email,
-          automation — at <strong>95% less cost</strong>. No bloated
-          contracts. No enterprise upsells. Just what you actually need.
+          Nicejob asks <strong>$75–$125/mo</strong> for basic review requests
+          and monitoring. ReviewPing gives you <strong>AI replies</strong>,
+          WhatsApp requests, and a free plan — starting at just{" "}
+          <strong>$29/mo</strong>.
         </p>
         <div style={styles.heroCtaRow}>
           <button style={styles.primaryCta} onClick={onSignup}>
@@ -507,7 +522,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
               <tr>
                 <th style={styles.th}>Feature</th>
                 <th style={{ ...styles.th, ...styles.thPodium, ...styles.tdCenter }}>
-                  Podium
+                  Nicejob
                 </th>
                 <th style={{ ...styles.th, ...styles.thReviewPing, ...styles.tdCenter }}>
                   ReviewPing
@@ -529,11 +544,11 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
                   <td style={{ ...styles.td, ...styles.tdFeature }}>
                     {row.feature}
                     {row.highlight && i === 0 && (
-                      <span style={styles.tableBadge}>Save 95%</span>
+                      <span style={styles.tableBadge}>Save 60%+</span>
                     )}
                   </td>
                   <td style={{ ...styles.td, ...styles.tdCenter }}>
-                    {row.podium}
+                    {row.nicejob}
                   </td>
                   <td style={{ ...styles.td, ...styles.tdCenter }}>
                     {row.ping}
@@ -548,49 +563,49 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       {/* ── why reviewping section ── */}
       <section style={styles.whySection}>
         <h2 style={styles.whyHeading}>
-          Built for the businesses Podium forgot
+          What Nicejob doesn't tell you
         </h2>
         <p style={styles.whySub}>
-          Podium targets enterprises with six-figure budgets. ReviewPing is
-          for everyone else — the restaurants, clinics, salons, and
-          e-commerce brands that just want more reviews without the
-          overhead.
+          Nicejob is a solid product — but it's expensive, lacks AI features,
+          and locks you into contracts. Here's what you actually get with
+          ReviewPing.
         </p>
 
         <div style={styles.cardsGrid}>
           <div style={styles.card}>
-            <span style={styles.cardIcon}>🍽️</span>
-            <h3 style={styles.cardTitle}>Restaurants</h3>
+            <span style={styles.cardIcon}>🤖</span>
+            <h3 style={styles.cardTitle}>AI Reply Generator</h3>
             <p style={styles.cardText}>
-              Seat more guests by turning every satisfied diner into a
-              5-star review — automatically, after every visit.
+              Nicejob makes you write replies manually. ReviewPing
+              auto-generates thoughtful responses to every review — saving
+              hours each week.
             </p>
           </div>
 
           <div style={styles.card}>
-            <span style={styles.cardIcon}>🏥</span>
-            <h3 style={styles.cardTitle}>Clinics & Dentists</h3>
+            <span style={styles.cardIcon}>💬</span>
+            <h3 style={styles.cardTitle}>WhatsApp Requests</h3>
             <p style={styles.cardText}>
-              Follow up with patients after appointments. Build local
-              reputation without adding admin work.
+              Nicejob doesn't support WhatsApp. ReviewPing lets you request
+              reviews via WhatsApp on Growth plans and above.
             </p>
           </div>
 
           <div style={styles.card}>
-            <span style={styles.cardIcon}>✂️</span>
-            <h3 style={styles.cardTitle}>Salons & Spas</h3>
+            <span style={styles.cardIcon}>🆓</span>
+            <h3 style={styles.cardTitle}>Free Plan Available</h3>
             <p style={styles.cardText}>
-              Send review requests after every booking. Keep your Google
-              rating high and your books full.
+              Nicejob starts at $75/mo with no free tier. ReviewPing has a
+              generous free plan so you can try before you buy.
             </p>
           </div>
 
           <div style={styles.card}>
-            <span style={styles.cardIcon}>🛒</span>
-            <h3 style={styles.cardTitle}>E-Commerce</h3>
+            <span style={styles.cardIcon}>🔓</span>
+            <h3 style={styles.cardTitle}>No Contracts</h3>
             <p style={styles.cardText}>
-              Capture post-purchase happiness with SMS & email review
-              flows. Turn buyers into brand advocates.
+              Nicejob requires annual commitments. ReviewPing lets you cancel
+              anytime — no questions asked, no fees.
             </p>
           </div>
         </div>
@@ -600,7 +615,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       <section style={styles.ctaSection}>
         <div style={styles.ctaWrap}>
           <h2 style={styles.ctaTitle}>
-            Switch from Podium. Start at{" "}
+            Ditch the expensive contract. Start at{" "}
             <span style={{ color: G.gold }}>$29/mo</span>.
           </h2>
           <p style={styles.ctaSub}>
@@ -611,7 +626,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
             Start Free Trial
           </button>
           <span style={styles.ctaSmall}>
-            Already using Podium? We'll help you migrate your data — free.
+            Already using Nicejob? We'll help you migrate your data — free.
           </span>
         </div>
       </section>

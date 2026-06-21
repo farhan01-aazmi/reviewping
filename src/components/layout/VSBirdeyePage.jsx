@@ -196,7 +196,7 @@ const styles = {
     borderBottom: `2px solid ${G.border}`,
     background: G.bg,
   },
-  thPodium: {
+  thBirdEye: {
     color: G.mutedLo,
   },
   thReviewPing: {
@@ -218,7 +218,7 @@ const styles = {
     fontWeight: 800,
     fontSize: 16,
   },
-  podiumPrice: {
+  birdeyePrice: {
     color: G.accent,
     textDecoration: "line-through",
     textDecorationColor: G.accent,
@@ -375,37 +375,45 @@ const styles = {
 
 /* ───────────── main component ───────────── */
 
-export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
+export default function VSBirdeyePage({ onSignup, onLogin, onBack }) {
   const rows = [
     {
       feature: "Price",
-      podium: <span style={styles.priceHighlight}><span style={styles.podiumPrice}>$400+</span>/mo</span>,
+      birdeye: <span style={styles.priceHighlight}><span style={styles.birdeyePrice}>$299+</span>/mo per location</span>,
       ping: <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>$29/mo</span>,
       highlight: true,
     },
     {
       feature: "Review Requests",
-      podium: <Check />,
-      ping: <Check />,
-    },
-    {
-      feature: "SMS & Email",
-      podium: <Check />,
+      birdeye: <Check />,
       ping: <Check />,
     },
     {
       feature: "AI Reply Generator",
-      podium: <Cross />,
+      birdeye: <Check />,
       ping: <Check />,
     },
     {
+      feature: "WhatsApp Review Requests",
+      birdeye: <Cross />,
+      ping: (
+        <>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span>
+        </>
+      ),
+    },
+    {
       feature: "Analytics Dashboard",
-      podium: <Check />,
+      birdeye: <Check />,
       ping: <Check />,
     },
     {
       feature: "Multi-Location",
-      podium: <Check />,
+      birdeye: (
+        <span style={{ color: G.accent, fontWeight: 600 }}>
+          <Check /> Expensive add-on
+        </span>
+      ),
       ping: (
         <>
           <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
@@ -414,7 +422,11 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
     },
     {
       feature: "White-Label",
-      podium: <Cross />,
+      birdeye: (
+        <span style={{ color: G.accent, fontWeight: 600 }}>
+          <Check /> Custom quote
+        </span>
+      ),
       ping: (
         <>
           <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
@@ -422,21 +434,26 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       ),
     },
     {
-      feature: "Long-term contract",
-      podium: (
+      feature: "Free Plan",
+      birdeye: <Cross />,
+      ping: <Check />,
+    },
+    {
+      feature: "Cancel Anytime",
+      birdeye: (
         <span style={{ color: G.accent, fontWeight: 600 }}>
-          <Check /> Required
+          <Cross /> 1-yr contract
         </span>
       ),
       ping: (
         <span style={{ color: G.success, fontWeight: 600 }}>
-          <Cross /> Cancel anytime
+          <Check /> Cancel anytime
         </span>
       ),
     },
     {
       feature: "Built for small biz",
-      podium: <Cross />,
+      birdeye: <Cross />,
       ping: <Check />,
       highlight: true,
     },
@@ -445,9 +462,9 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
   return (
     <div style={styles.page}>
       <SEO
-        title="ReviewPing vs Podium: The $29/mo Alternative"
-        description="Compare ReviewPing ($29/mo) vs Podium ($400+/mo). Same core review request functionality at 95% less cost. Built for small businesses."
-        path="/vs/podium"
+        title="ReviewPing vs Birdeye: The $29/mo Alternative"
+        description="Compare ReviewPing ($29/mo) vs Birdeye ($299+/mo per location). Save 90% on review management with AI-powered features and no long-term contracts."
+        path="/vs/birdeye"
       />
 
       {/* ── header ── */}
@@ -476,15 +493,15 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
 
       {/* ── hero ── */}
       <section style={styles.heroSection}>
-        <div style={styles.heroBadge}>🏆 #1 Podium Alternative</div>
+        <div style={styles.heroBadge}>🏆 #1 Birdeye Alternative</div>
         <h1 style={styles.heroTitle}>
-          Podium is great.{" "}
-          <span style={styles.heroTitleEm}>But not for $400/mo.</span>
+          Birdeye is great.{" "}
+          <span style={styles.heroTitleEm}>But not for $299/mo.</span>
         </h1>
         <p style={styles.heroSub}>
           You get the same core review-requesting power — SMS, email,
-          automation — at <strong>95% less cost</strong>. No bloated
-          contracts. No enterprise upsells. Just what you actually need.
+          automation — at <strong>90% less cost</strong>. No bloated
+          contracts. No per-location pricing. Just what you actually need.
         </p>
         <div style={styles.heroCtaRow}>
           <button style={styles.primaryCta} onClick={onSignup}>
@@ -506,8 +523,8 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
             <thead style={styles.thead}>
               <tr>
                 <th style={styles.th}>Feature</th>
-                <th style={{ ...styles.th, ...styles.thPodium, ...styles.tdCenter }}>
-                  Podium
+                <th style={{ ...styles.th, ...styles.thBirdEye, ...styles.tdCenter }}>
+                  Birdeye
                 </th>
                 <th style={{ ...styles.th, ...styles.thReviewPing, ...styles.tdCenter }}>
                   ReviewPing
@@ -529,11 +546,11 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
                   <td style={{ ...styles.td, ...styles.tdFeature }}>
                     {row.feature}
                     {row.highlight && i === 0 && (
-                      <span style={styles.tableBadge}>Save 95%</span>
+                      <span style={styles.tableBadge}>Save 90%</span>
                     )}
                   </td>
                   <td style={{ ...styles.td, ...styles.tdCenter }}>
-                    {row.podium}
+                    {row.birdeye}
                   </td>
                   <td style={{ ...styles.td, ...styles.tdCenter }}>
                     {row.ping}
@@ -548,13 +565,13 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       {/* ── why reviewping section ── */}
       <section style={styles.whySection}>
         <h2 style={styles.whyHeading}>
-          Built for the businesses Podium forgot
+          Built for the businesses Birdeye ignores
         </h2>
         <p style={styles.whySub}>
-          Podium targets enterprises with six-figure budgets. ReviewPing is
-          for everyone else — the restaurants, clinics, salons, and
-          e-commerce brands that just want more reviews without the
-          overhead.
+          Birdeye targets enterprises with per-location pricing and
+          six-figure commitments. ReviewPing is for everyone else — the
+          restaurants, clinics, salons, and e-commerce brands that just want
+          more reviews without the overhead.
         </p>
 
         <div style={styles.cardsGrid}>
@@ -600,18 +617,18 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       <section style={styles.ctaSection}>
         <div style={styles.ctaWrap}>
           <h2 style={styles.ctaTitle}>
-            Switch from Podium. Start at{" "}
+            Switch from Birdeye. Start at{" "}
             <span style={{ color: G.gold }}>$29/mo</span>.
           </h2>
           <p style={styles.ctaSub}>
-            No setup fees. No onboarding call required. No long-term
+            No per-location fees. No onboarding call required. No long-term
             contract. You'll be up and running in 5 minutes.
           </p>
           <button style={styles.ctaBtn} onClick={onSignup}>
             Start Free Trial
           </button>
           <span style={styles.ctaSmall}>
-            Already using Podium? We'll help you migrate your data — free.
+            Already using Birdeye? We'll help you migrate your data — free.
           </span>
         </div>
       </section>

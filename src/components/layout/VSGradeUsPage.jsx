@@ -196,7 +196,7 @@ const styles = {
     borderBottom: `2px solid ${G.border}`,
     background: G.bg,
   },
-  thPodium: {
+  thCompetitor: {
     color: G.mutedLo,
   },
   thReviewPing: {
@@ -218,10 +218,8 @@ const styles = {
     fontWeight: 800,
     fontSize: 16,
   },
-  podiumPrice: {
+  competitorPrice: {
     color: G.accent,
-    textDecoration: "line-through",
-    textDecorationColor: G.accent,
   },
   reviewPingPrice: {
     color: G.success,
@@ -375,46 +373,64 @@ const styles = {
 
 /* ───────────── main component ───────────── */
 
-export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
+export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
   const rows = [
     {
       feature: "Price",
-      podium: <span style={styles.priceHighlight}><span style={styles.podiumPrice}>$400+</span>/mo</span>,
-      ping: <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>$29/mo</span>,
+      competitor: (
+        <span style={styles.priceHighlight}>
+          <span style={styles.competitorPrice}>$40–$110</span>
+          /seat/mo
+        </span>
+      ),
+      ping: (
+        <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>
+          $29/mo flat
+        </span>
+      ),
       highlight: true,
     },
     {
-      feature: "Review Requests",
-      podium: <Check />,
-      ping: <Check />,
-    },
-    {
-      feature: "SMS & Email",
-      podium: <Check />,
+      feature: "Review Requests (SMS & Email)",
+      competitor: <Check />,
       ping: <Check />,
     },
     {
       feature: "AI Reply Generator",
-      podium: <Cross />,
+      competitor: <span style={{ color: G.accent, fontSize: 13 }}>Limited</span>,
       ping: <Check />,
+    },
+    {
+      feature: "WhatsApp Review Requests",
+      competitor: <Cross />,
+      ping: (
+        <>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span>
+        </>
+      ),
     },
     {
       feature: "Analytics Dashboard",
-      podium: <Check />,
+      competitor: <Check />,
       ping: <Check />,
     },
     {
-      feature: "Multi-Location",
-      podium: <Check />,
-      ping: (
-        <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
-        </>
+      feature: "Custom Templates",
+      competitor: <Check />,
+      ping: <Check />,
+    },
+    {
+      feature: "Unlimited Users",
+      competitor: (
+        <span style={{ color: G.accent, fontWeight: 600 }}>
+          <Cross /> Per-seat pricing
+        </span>
       ),
+      ping: <Check />,
     },
     {
       feature: "White-Label",
-      podium: <Cross />,
+      competitor: <Check />,
       ping: (
         <>
           <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
@@ -422,32 +438,24 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       ),
     },
     {
-      feature: "Long-term contract",
-      podium: (
-        <span style={{ color: G.accent, fontWeight: 600 }}>
-          <Check /> Required
-        </span>
-      ),
-      ping: (
-        <span style={{ color: G.success, fontWeight: 600 }}>
-          <Cross /> Cancel anytime
-        </span>
-      ),
-    },
-    {
-      feature: "Built for small biz",
-      podium: <Cross />,
+      feature: "Free Plan ($0/mo)",
+      competitor: <Cross />,
       ping: <Check />,
       highlight: true,
+    },
+    {
+      feature: "Cancel Anytime",
+      competitor: <Check />,
+      ping: <Check />,
     },
   ];
 
   return (
     <div style={styles.page}>
       <SEO
-        title="ReviewPing vs Podium: The $29/mo Alternative"
-        description="Compare ReviewPing ($29/mo) vs Podium ($400+/mo). Same core review request functionality at 95% less cost. Built for small businesses."
-        path="/vs/podium"
+        title="ReviewPing vs Grade.us: Which Review Platform Wins?"
+        description="Compare ReviewPing ($29/mo) vs Grade.us ($40-$110/seat/mo). See why ReviewPing offers better value with AI features and unlimited users."
+        path="/vs/grade-us"
       />
 
       {/* ── header ── */}
@@ -476,15 +484,16 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
 
       {/* ── hero ── */}
       <section style={styles.heroSection}>
-        <div style={styles.heroBadge}>🏆 #1 Podium Alternative</div>
+        <div style={styles.heroBadge}>🏆 Better Value Than Grade.us</div>
         <h1 style={styles.heroTitle}>
-          Podium is great.{" "}
-          <span style={styles.heroTitleEm}>But not for $400/mo.</span>
+          Grade.us charges per seat.{"; "}
+          <span style={styles.heroTitleEm}>We charge flat.</span>
         </h1>
         <p style={styles.heroSub}>
-          You get the same core review-requesting power — SMS, email,
-          automation — at <strong>95% less cost</strong>. No bloated
-          contracts. No enterprise upsells. Just what you actually need.
+          Grade.us prices start at <strong>$40/seat/mo</strong> — meaning a
+          team of 3 costs you <strong>$120–$330/mo</strong>. ReviewPing gives
+          you unlimited users, AI features, and WhatsApp requests starting at{" "}
+          <strong>$29/mo flat</strong>.
         </p>
         <div style={styles.heroCtaRow}>
           <button style={styles.primaryCta} onClick={onSignup}>
@@ -506,8 +515,8 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
             <thead style={styles.thead}>
               <tr>
                 <th style={styles.th}>Feature</th>
-                <th style={{ ...styles.th, ...styles.thPodium, ...styles.tdCenter }}>
-                  Podium
+                <th style={{ ...styles.th, ...styles.thCompetitor, ...styles.tdCenter }}>
+                  Grade.us
                 </th>
                 <th style={{ ...styles.th, ...styles.thReviewPing, ...styles.tdCenter }}>
                   ReviewPing
@@ -529,11 +538,11 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
                   <td style={{ ...styles.td, ...styles.tdFeature }}>
                     {row.feature}
                     {row.highlight && i === 0 && (
-                      <span style={styles.tableBadge}>Save 95%</span>
+                      <span style={styles.tableBadge}>Best Value</span>
                     )}
                   </td>
                   <td style={{ ...styles.td, ...styles.tdCenter }}>
-                    {row.podium}
+                    {row.competitor}
                   </td>
                   <td style={{ ...styles.td, ...styles.tdCenter }}>
                     {row.ping}
@@ -548,49 +557,49 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       {/* ── why reviewping section ── */}
       <section style={styles.whySection}>
         <h2 style={styles.whyHeading}>
-          Built for the businesses Podium forgot
+          Why teams are switching from Grade.us
         </h2>
         <p style={styles.whySub}>
-          Podium targets enterprises with six-figure budgets. ReviewPing is
-          for everyone else — the restaurants, clinics, salons, and
-          e-commerce brands that just want more reviews without the
-          overhead.
+          Grade.us works well for agencies, but its per-seat pricing punishes
+          growing teams. Every person you add costs another $40–$110/month.
+          ReviewPing gives you the whole platform for one flat price.
         </p>
 
         <div style={styles.cardsGrid}>
           <div style={styles.card}>
-            <span style={styles.cardIcon}>🍽️</span>
-            <h3 style={styles.cardTitle}>Restaurants</h3>
+            <span style={styles.cardIcon}>👥</span>
+            <h3 style={styles.cardTitle}>Unlimited Team Members</h3>
             <p style={styles.cardText}>
-              Seat more guests by turning every satisfied diner into a
-              5-star review — automatically, after every visit.
+              Add your whole team at no extra cost. No per-seat invoices. No
+              "which users do we really need?" conversations.
             </p>
           </div>
 
           <div style={styles.card}>
-            <span style={styles.cardIcon}>🏥</span>
-            <h3 style={styles.cardTitle}>Clinics & Dentists</h3>
+            <span style={styles.cardIcon}>🤖</span>
+            <h3 style={styles.cardTitle}>AI-Powered Replies</h3>
             <p style={styles.cardText}>
-              Follow up with patients after appointments. Build local
-              reputation without adding admin work.
+              ReviewPing's built-in AI reply generator drafts responses to
+              every review automatically. Grade.us has limited to no AI
+              capabilities.
             </p>
           </div>
 
           <div style={styles.card}>
-            <span style={styles.cardIcon}>✂️</span>
-            <h3 style={styles.cardTitle}>Salons & Spas</h3>
+            <span style={styles.cardIcon}>💬</span>
+            <h3 style={styles.cardTitle}>WhatsApp Review Requests</h3>
             <p style={styles.cardText}>
-              Send review requests after every booking. Keep your Google
-              rating high and your books full.
+              Reach customers where they actually chat. ReviewPing sends review
+              requests over WhatsApp (Growth+). Grade.us doesn't offer this.
             </p>
           </div>
 
           <div style={styles.card}>
-            <span style={styles.cardIcon}>🛒</span>
-            <h3 style={styles.cardTitle}>E-Commerce</h3>
+            <span style={styles.cardIcon}>🆓</span>
+            <h3 style={styles.cardTitle}>Free Plan Available</h3>
             <p style={styles.cardText}>
-              Capture post-purchase happiness with SMS & email review
-              flows. Turn buyers into brand advocates.
+              Start at $0/mo with ReviewPing's free plan. Get real review
+              requests without committing a dime. Grade.us offers no free tier.
             </p>
           </div>
         </div>
@@ -600,18 +609,18 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       <section style={styles.ctaSection}>
         <div style={styles.ctaWrap}>
           <h2 style={styles.ctaTitle}>
-            Switch from Podium. Start at{" "}
+            Ditch per-seat pricing. Start at{" "}
             <span style={{ color: G.gold }}>$29/mo</span>.
           </h2>
           <p style={styles.ctaSub}>
-            No setup fees. No onboarding call required. No long-term
-            contract. You'll be up and running in 5 minutes.
+            No seat limits. No hidden fees. No long-term contracts. Set up your
+            account in 5 minutes and invite your whole team.
           </p>
           <button style={styles.ctaBtn} onClick={onSignup}>
             Start Free Trial
           </button>
           <span style={styles.ctaSmall}>
-            Already using Podium? We'll help you migrate your data — free.
+            Already using Grade.us? We'll help you migrate — free.
           </span>
         </div>
       </section>

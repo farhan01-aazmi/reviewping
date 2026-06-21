@@ -24,6 +24,10 @@ const AboutPage = lazy(() => import("./components/layout/AboutPage"));
 const ContactPage = lazy(() => import("./components/layout/ContactPage"));
 const IndustryPage = lazy(() => import("./components/layout/IndustryPage"));
 const VSPodiumPage = lazy(() => import("./components/layout/VSPodiumPage"));
+const VSGradeUsPage = lazy(() => import("./components/layout/VSGradeUsPage"));
+const VSNicejobPage = lazy(() => import("./components/layout/VSNicejobPage"));
+const VSBirdeyePage = lazy(() => import("./components/layout/VSBirdeyePage"));
+const VSTruereviewPage = lazy(() => import("./components/layout/VSTruereviewPage"));
 const RefundPolicy = lazy(() => import("./components/layout/RefundPolicy"));
 const TermsPage = lazy(() => import("./components/layout/TermsPage"));
 const PrivacyPage = lazy(() => import("./components/layout/PrivacyPage"));
@@ -58,6 +62,10 @@ function pathToView(pathname) {
     "/about": "about",
     "/contact": "contact",
     "/vs/podium": "vspodium",
+    "/vs/grade-us": "vsgradeus",
+    "/vs/nicejob": "vsnicejob",
+    "/vs/birdeye": "vsbirdeye",
+    "/vs/truereview": "vstruereview",
   };
   if (knownPaths[path]) return knownPaths[path];
   if (/^\/blog\//.test(path)) return "blogarticle";
@@ -84,6 +92,10 @@ function navigate(view, param) {
     about: "/about",
     contact: "/contact",
     vspodium: "/vs/podium",
+    vsgradeus: "/vs/grade-us",
+    vsnicejob: "/vs/nicejob",
+    vsbirdeye: "/vs/birdeye",
+    vstruereview: "/vs/truereview",
     reviewgateway: window.location.pathname,
     notfound: window.location.pathname,
   };
@@ -460,6 +472,18 @@ export default function App() {
         )}
         {view === "vspodium" && (
           <VSPodiumPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+        )}
+        {view === "vsgradeus" && (
+          <VSGradeUsPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+        )}
+        {view === "vsnicejob" && (
+          <VSNicejobPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+        )}
+        {view === "vsbirdeye" && (
+          <VSBirdeyePage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+        )}
+        {view === "vstruereview" && (
+          <VSTruereviewPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
         )}
         {view === "freetool" && <FreeTool onSignup={() => changeView("signup")} />}
         {view === "notfound" && (

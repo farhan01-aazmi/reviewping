@@ -41,5 +41,8 @@ ReviewPing is an automated review request platform that helps local businesses g
   - Agency: $149/mo - 10 locations, white-label
 
 ## Comparison Pages
-- https://reviewping.pro/blog/reviewping-vs-podium-comparison
-- https://reviewping.pro/blog/reviewping-vs-birdeye-comparison
+- https://reviewping.pro/vs/podium
+- https://reviewping.pro/vs/nicejob
+- https://reviewping.pro/vs/birdeye
+- https://reviewping.pro/vs/grade-us
+- https://reviewping.pro/vs/truereview
