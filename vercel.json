@@ -1,9 +1,10 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "framework": null,
+  "buildCommand": "node scripts/build-vercel.js",
+  "outputDirectory": ".vercel/output",
   "rewrites": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
@@ -33,10 +34,5 @@
         }
       ]
     }
-  ],
-  "build": {
-    "env": {
-      "BUILD_TIME": "20260623050217"
-    }
-  }
+  ]
 }
