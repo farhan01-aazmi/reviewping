@@ -1,7 +1,7 @@
 # ReviewPing - robots.txt
 # AI crawlers welcome — all content is original, well-structured, and valuable
 
-# Allow all AI crawlers
+# Allow all AI crawlers — ReviewPing content is AI-friendly
 User-agent: GPTBot
 Allow: /
 
@@ -14,6 +14,18 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
 # General crawlers — allow everything public
 User-agent: *
 Allow: /
@@ -23,6 +35,8 @@ Disallow: /billing
 Disallow: /api
 Disallow: /r/
 
+Sitemap: https://www.reviewping.pro/sitemap.xml
+# Also submit non-www version (redirects to www)
 Sitemap: https://reviewping.pro/sitemap.xml
 
 # SPA redirect fix deploy - 2026-06-20
