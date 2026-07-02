@@ -1,0 +1,674 @@
+[
+  {
+    "domain": "contrary.com",
+    "addedAt": "2026-07-02T14:06:26.797Z",
+    "status": "scraped",
+    "title": "Home | Contrary",
+    "description": "We combine technology and research to identify and invest in a small number of exceptional people and the companies they build.",
+    "category": "other",
+    "emails": [],
+    "phones": [],
+    "social": [
+      "https://www.linkedin.com/company/contrarycapital",
+      "https://twitter.com/contrary"
+    ],
+    "contactPage": null,
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:07:03.894Z"
+  },
+  {
+    "domain": "nurturely.io",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "scraped",
+    "title": "Nurturely+ | The All-in-One CRM, Sales, & Marketing Platform",
+    "description": "Grow your business with Nurturely+—an all-in-one CRM, marketing, and sales platform built to capture leads, close sales, and automate growth.",
+    "category": "other",
+    "emails": [],
+    "phones": [],
+    "social": [],
+    "contactPage": null,
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:07:06.326Z"
+  },
+  {
+    "domain": "rickcasehonda.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "scraped",
+    "title": "Rick Case Honda Davie | New & Pre-owned Honda Dealer in in Davie, FL",
+    "description": "Shop new and used Honda vehicles at Rick Case Honda Davie. Only Rick Case doubles the nationwide factory warranty. Finance, lease, or trade in today!",
+    "category": "other",
+    "emails": [],
+    "phones": [
+      "954-371-0232",
+      "954-840-3872",
+      "954-840-3875"
+    ],
+    "social": [
+      "https://www.facebook.com/RickCaseHondaDavie",
+      "https://twitter.com/RCDavieHonda"
+    ],
+    "contactPage": "https://rickcasehonda.com/contact.htm",
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:07:08.126Z"
+  },
+  {
+    "domain": "manawellnessandaestheticsgroup.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "scraped",
+    "title": "Mana Wellness and Aesthetics Group | Best Skincare Treatments",
+    "description": "Experience premium wellness, skincare, and aesthetic treatments at Mana Wellness and Aesthetics Group. Revitalize your body, and beauty today.",
+    "category": "other",
+    "emails": [
+      "info@manawellnessandaestheticsgroup.com"
+    ],
+    "phones": [
+      "824\n(201) 824-2200",
+      "(201) 824-2300",
+      "824\n(201) 824-2300",
+      "(201) 824-2200"
+    ],
+    "social": [],
+    "contactPage": "https://manawellnessandaestheticsgroup.com/contact",
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:09:26.270Z"
+  },
+  {
+    "domain": "rydellchevy.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "scraped",
+    "title": "Waterloo Chevrolet Dealer in Waterloo IA | Cedar Falls Evansdale Jesup Chevrolet Dealership Iowa",
+    "description": "Rydell Chevrolet of Waterloo IA serving Cedar Falls, Evansdale, Jesup, is one of the finest Waterloo Chevrolet dealers.",
+    "category": "other",
+    "emails": [],
+    "phones": [
+      "877-256-4950",
+      "877-279-9269",
+      "319-235-6653",
+      "319-433-3643"
+    ],
+    "social": [
+      "https://www.facebook.com/RydellChevy"
+    ],
+    "contactPage": "https://rydellchevy.com/contact-us",
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:09:23.583Z"
+  },
+  {
+    "domain": "soberpartners.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "scraped",
+    "title": "Drug and Alcohol Rehab - Huntington Beach, CA - Sober Partners",
+    "description": "Sober Partners is a premier drug and alcohol rehab center in Huntington Beach CA. Our rehab facilities offer the best professional care for substance abuse issues.",
+    "category": "other",
+    "emails": [
+      "info@soberpartners.com"
+    ],
+    "phones": [
+      "(855) 997-2786"
+    ],
+    "social": [
+      "https://www.facebook.com/soberpartners"
+    ],
+    "contactPage": "https://soberpartners.com/contact-us",
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:08:48.061Z"
+  },
+  {
+    "domain": "securityvisionmb.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "error",
+    "title": "",
+    "description": "",
+    "category": "unknown",
+    "emails": [],
+    "phones": [],
+    "social": [],
+    "scrapeError": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://securityvisionmb.com/\", waiting until \"domcontentloaded\"\u001b[22m\n",
+    "updatedAt": "2026-07-02T14:09:43.643Z"
+  },
+  {
+    "domain": "ryanventairductsolutions.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending",
+    "title": "Ryan Vent Air Duct Solutions",
+    "category": "local_business",
+    "emails": [],
+    "phones": [
+      "(888) 926-9730"
+    ],
+    "contactPage": null,
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:12:14.350Z"
+  },
+  {
+    "domain": "australiaspeed.com.au",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "error",
+    "title": "",
+    "description": "",
+    "category": "unknown",
+    "emails": [],
+    "phones": [],
+    "social": [],
+    "scrapeError": "page.goto: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://australiaspeed.com.au/\", waiting until \"domcontentloaded\"\u001b[22m\n",
+    "updatedAt": "2026-07-02T14:09:43.734Z"
+  },
+  {
+    "domain": "solarskylights.com.au",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "scraped",
+    "title": "Solar Light Whiz – Hybrid Solar Lighting Devices & Skylight Alternatives",
+    "category": "other",
+    "emails": [
+      "ges@ges.com.au",
+      "operations@ges.com.au"
+    ],
+    "phones": [],
+    "contactPage": "https://solarskylights.com.au/contact",
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:11:38.452Z"
+  },
+  {
+    "domain": "ferrisjewelry.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "scraped",
+    "title": "Handmade Southwest Artisanal Jewelry – FerrisJewelry.com",
+    "category": "jewelry",
+    "emails": [
+      "ferris@ferrisjewelry.com"
+    ],
+    "phones": [
+      "(307) 899-5771",
+      "307-899-5771"
+    ],
+    "contactPage": null,
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:11:50.073Z"
+  },
+  {
+    "domain": "cuinsight.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending",
+    "title": "Just a moment...",
+    "category": "other",
+    "emails": [],
+    "phones": [],
+    "contactPage": null,
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:12:14.360Z"
+  },
+  {
+    "domain": "web-design-london-uk.co.uk",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending",
+    "title": "Web Design London | Professional Solutions for Your Business",
+    "category": "other",
+    "emails": [],
+    "phones": [],
+    "contactPage": null,
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:12:28.856Z"
+  },
+  {
+    "domain": "ivandryerventandchimneycleaning.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending",
+    "title": "Ivan Dryer Vent & Chimney Cleaning",
+    "category": "local_business",
+    "emails": [],
+    "phones": [
+      "(866) 846-1048"
+    ],
+    "contactPage": null,
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:12:28.859Z"
+  },
+  {
+    "domain": "progressmedical.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending",
+    "title": "HOME - Progress Medical | Wilmington, NC",
+    "category": "other",
+    "emails": [],
+    "phones": [
+      "(910) 239-9347"
+    ],
+    "contactPage": null,
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:12:39.830Z"
+  },
+  {
+    "domain": "subger.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "scraped",
+    "title": "Master Your Money — No Bank Access Required | Subger",
+    "category": "other",
+    "emails": [
+      "info@subger.com"
+    ],
+    "phones": [],
+    "contactPage": null,
+    "scrapeError": null,
+    "updatedAt": "2026-07-02T14:12:39.833Z"
+  },
+  {
+    "domain": "album.vc",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "stevengaragedoormaintenance.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "cyazer.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "hubspot.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "podium.engineering",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "upullandsave.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "repuvibe.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "moraninsurance.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "partnerbase.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "goprimelectric.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "getbox2u.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "servicebusinessmastery.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "jackgaragedoorreplacement.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "theturtleeffect.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "grace-medspa.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "llflooringdesign.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "toiletrepairplumber.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "zipdo.co",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "glarity.app",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "classifiedsubmissions.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "branchenbuch.ch",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "smoothmedspa.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "nerdisa.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "rydellford.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "workingnomads.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "alghuraf-press.blogspot.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "itsthewell.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "removedigital.com.au",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "pnwrejuvenation.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "twit.tv",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "mypodcastdata.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "mahlerjewelers.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "lawfirm500.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "josegaragedoorsensorissues.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "totalbodyunlimited.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "the-tutorials.web.app",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "josephmuciraexclusives.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "sapphireventures.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "mara-solutions.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "webcatalog.io",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "reelproof.io",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "anewscafe.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "parkerlockchangeservice.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "welcome2mydesk.blogspot.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "gallivantertravel.com.au",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "peakconciergemedicine.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "aspencreekaesthetics.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "lordstreetgarage.com.au",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "tmscomfort.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "4emailmarketers.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "venusrisingmedspa.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "eloasalary.blogspot.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "lockoutsservice.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "ppcmate.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "fanajewelry.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "everydayoffroad.au",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "ramonschimneysweepcleaning.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "jewelrytogo.net",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "austinlocalgaragedoorcompany.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "astricknation.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "rinsecleaning.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "phoenixlaserrc.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "phdeck.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "whatarethebest.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "rooferscoffeeshop.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "moyens.net",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "advids.co",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "vandendooljewellers.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "removedigital.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "pawnmaster.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "airmccoy.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "triswimschool.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "skindalemedspa.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "player.fm",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "neilpatel.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "enlightenmd.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "mybusinessflow.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "masonanthony.edu",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "podium.co",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "beststartup.us",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "drouintyreandbatteryservice.com.au",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "hectorroofreplacementservice.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "williamgatemaintenanceservice.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  },
+  {
+    "domain": "elkgroveplumbinganddrain.com",
+    "addedAt": "2026-07-02T14:06:26.813Z",
+    "status": "pending"
+  }
+]
