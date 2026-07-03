@@ -1,0 +1,72 @@
+name: 📨 Send Backlink Outreach
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Emails to send this batch'
+        required: true
+        default: '5'
+        type: choice
+        options:
+          - '1'
+          - '5'
+          - '10'
+          - '20'
+      dry_run:
+        description: 'Dry run (preview only, no actual send)'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  send:
+    name: Send outreach emails
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: ⚡ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm install resend nodemailer
+
+      - name: 🔧 Setup Resend config
+        run: |
+          echo '{
+            "provider": "resend",
+            "apiKey": "${{ secrets.RESEND_API_KEY }}",
+            "fromEmail": "outreach@reviewping.pro",
+            "fromName": "Team ReviewPing"
+          }' > backlink-data/sender-config.json
+
+      - name: 📨 Dry run
+        if: ${{ inputs.dry_run == 'true' }}
+        run: node scripts/backlink-machine/send.cjs --dry-run --limit ${{ inputs.limit }}
+        timeout-minutes: 5
+
+      - name: 📨 Actually send
+        if: ${{ inputs.dry_run == 'false' }}
+        run: node scripts/backlink-machine/send.cjs --send --limit ${{ inputs.limit }}
+        timeout-minutes: 5
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+
+      - name: 💾 Commit sent log
+        if: ${{ inputs.dry_run == 'false' }}
+        run: |
+          git config user.name "Backlink Machine"
+          git config user.email "bot@reviewping.pro"
+          git add backlink-data/ -A
+          git diff --staged --quiet || git commit -m "chore: outreach sent $(date +'%Y-%m-%d')"
+          git push
