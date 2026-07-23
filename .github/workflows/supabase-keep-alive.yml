@@ -1,0 +1,21 @@
+name: 💤 Supabase Keep-Alive
+
+on:
+  schedule:
+    # Every 3 days at 12:00 PM IST (6:30 AM UTC)
+    - cron: '30 6 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping Supabase to prevent auto-pause
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Ping auth health endpoint
+        run: |
+          echo "Pinging Supabase..."
+          curl -s -o /dev/null -w "HTTP %{http_code}\n" \
+            --max-time 10 \
+            https://fvugrcqjrtwabaobuigb.supabase.co/auth/v1/health
+          echo "Keep-alive complete"
