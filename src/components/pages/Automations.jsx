@@ -8,6 +8,7 @@ import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
 import { toast } from "sonner";
 import PremiumFeature from "../ui/PremiumFeature";
+import posthog, { isPostHogEnabled } from "../../posthog.js";
 
 export default function Automations({ userId, plan }) {
   const [rules, setRules] = useState([]);
@@ -51,6 +52,9 @@ export default function Automations({ userId, plan }) {
       setRules((p) =>
         p.map((r) => (r.id === id ? { ...r, active: !r.active } : r))
       );
+      if (isPostHogEnabled) {
+        posthog.capture("automation_status_updated", { active: !r.active });
+      }
       toast.success("Automation updated");
     } catch (err) {
       console.error("Failed to toggle automation:", err);
@@ -78,6 +82,9 @@ export default function Automations({ userId, plan }) {
         return;
       }
       if (data) setRules((p) => [...p, data[0]]);
+      if (isPostHogEnabled) {
+        posthog.capture("automation_created", { channel: nCh, delay: nDelay });
+      }
       setShowNew(false);
       setNName("");
       toast.success("Automation created");

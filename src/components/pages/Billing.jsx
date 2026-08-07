@@ -8,6 +8,7 @@ import Pill from "../ui/Pill";
 import ConfirmModal from "../ui/ConfirmModal";
 import { toast } from "sonner";
 import { supabase } from "../../config/supabase";
+import posthog, { isPostHogEnabled } from "../../posthog.js";
 
 export default function Billing({ userId, plan, setPlan }) {
   const cur = PLANS.find((p) => p.id === plan) || PLANS[1];
@@ -77,6 +78,12 @@ export default function Billing({ userId, plan, setPlan }) {
         return_url: window.location.href,
       });
       if (result?.url) {
+        if (isPostHogEnabled) {
+          posthog.capture("checkout_started", {
+            billing_interval: billing,
+            target_plan: p.id,
+          });
+        }
         window.location.href = result.url;
         return; // page will navigate away
       }

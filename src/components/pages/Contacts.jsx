@@ -5,6 +5,7 @@ import { ConfirmModal } from "../ui";
 import { supabase } from "../../config/supabase";
 import { toast } from "sonner";
 import { fmtDate } from "../../utils/formatters";
+import posthog, { isPostHogEnabled } from "../../posthog.js";
 
 export default function Contacts({ userId }) {
   const [contacts, setContacts] = useState([]);
@@ -88,6 +89,12 @@ export default function Contacts({ userId }) {
       setNName("");
       setNEmail("");
       setNPhone("");
+      if (isPostHogEnabled) {
+        posthog.capture("contact_created", {
+          has_email: Boolean(data.email),
+          has_phone: Boolean(data.phone),
+        });
+      }
       toast.success(`${data.name} added to contacts`);
     }
     setAdding(false);
@@ -109,6 +116,9 @@ export default function Contacts({ userId }) {
       toast.error(error.message);
     } else {
       setContacts((p) => p.filter((c) => c.id !== contact.id));
+      if (isPostHogEnabled) {
+        posthog.capture("contact_deleted");
+      }
       toast.success(`${contact.name} removed from contacts`);
     }
     setDeleting(false);
@@ -130,6 +140,9 @@ export default function Contacts({ userId }) {
           c.id === contact.id ? { ...c, optedOut: newVal } : c
         )
       );
+      if (isPostHogEnabled) {
+        posthog.capture("contact_opt_out_updated", { opted_out: newVal });
+      }
       toast.success(
         newVal
           ? `${contact.name} opted out`
@@ -188,9 +201,13 @@ export default function Contacts({ userId }) {
       if (error) {
         toast.error(error.message);
       } else {
+        const importedCount = data?.length || rows.length;
         setContacts((p) => [...(data || []), ...p]);
+        if (isPostHogEnabled) {
+          posthog.capture("contacts_imported", { contact_count: importedCount });
+        }
         toast.success(
-          `${data?.length || rows.length} contact${(data?.length || rows.length) !== 1 ? "s" : ""} imported`
+          `${importedCount} contact${importedCount !== 1 ? "s" : ""} imported`
         );
       }
     } catch {

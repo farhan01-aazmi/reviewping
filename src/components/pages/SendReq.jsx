@@ -7,6 +7,7 @@ import { generateGatewayLink, createSubscription } from "../../api";
 import { getDailyLimit } from "../../data/constants";
 import { getLanguages } from "../../data/i18n";
 import PricingModal from "../ui/PricingModal";
+import posthog, { isPostHogEnabled } from "../../posthog.js";
 
 const DIRECT_API = import.meta.env.VITE_API_URL || "";
 const PROXY_API = window.location.origin + "/api/edge";
@@ -91,6 +92,9 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
       const data = await res.json();
       if (data.subject) setSubject(data.subject);
       if (data.body) setMessageBody(data.body);
+      if (isPostHogEnabled) {
+        posthog.capture("ai_message_generated", { channel });
+      }
       toast.success("AI email generated!");
     } catch (err) {
       toast.error(err.message || "Failed to generate. Try again.");
@@ -185,6 +189,9 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
         return;
       }
 
+      if (isPostHogEnabled) {
+        posthog.capture("review_request_sent", { channel, language: lang });
+      }
       setDone(true);
       onSent({ name: name.trim(), service: "", channel, sentAt: Date.now() });
     } catch (e) {
@@ -411,8 +418,15 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
               billing: billing || "monthly",
               return_url: window.location.href,
             });
-            if (result?.url) window.location.href = result.url;
-            else toast.error("Checkout URL not returned");
+            if (result?.url) {
+              if (isPostHogEnabled) {
+                posthog.capture("checkout_started", {
+                  billing_interval: billing || "monthly",
+                  target_plan: planId,
+                });
+              }
+              window.location.href = result.url;
+            } else toast.error("Checkout URL not returned");
           } catch (err) {
             toast.error(err.message || "Failed to start checkout");
           }

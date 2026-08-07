@@ -8,6 +8,7 @@ import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
 import { toast } from "sonner";
 import { supabase } from "../../config/supabase";
+import posthog, { isPostHogEnabled } from "../../posthog.js";
 
 const DEFAULT_TEMPLATES = [
   {
@@ -101,6 +102,9 @@ export default function Templates({ userId }) {
           .select();
         if (error) throw error;
         setTemplates((p) => [...p, data[0]]);
+        if (isPostHogEnabled) {
+          posthog.capture("template_created", { service: eSvc });
+        }
         toast.success("Template saved");
       } else if (editing <= 5) {
         // Editing a default template — create a custom copy
@@ -110,6 +114,9 @@ export default function Templates({ userId }) {
           .select();
         if (error) throw error;
         setTemplates((p) => [...p, data[0]]);
+        if (isPostHogEnabled) {
+          posthog.capture("template_created", { service: eSvc, source: "default_template" });
+        }
         toast.success("Template saved as custom");
       } else {
         // Editing a custom template — update in DB
@@ -122,6 +129,9 @@ export default function Templates({ userId }) {
         setTemplates((p) =>
           p.map((t) => (t.id === editing ? data[0] : t))
         );
+        if (isPostHogEnabled) {
+          posthog.capture("template_updated", { service: eSvc });
+        }
         toast.success("Template updated");
       }
       setEditing(null);
@@ -135,6 +145,9 @@ export default function Templates({ userId }) {
       const { error } = await supabase.from("templates").delete().eq("id", id);
       if (error) throw error;
       setTemplates((p) => p.filter((t) => t.id !== id));
+      if (isPostHogEnabled) {
+        posthog.capture("template_deleted");
+      }
       toast.success("Template deleted");
     } catch (err) {
       toast.error(err.message || "Failed to delete template");
