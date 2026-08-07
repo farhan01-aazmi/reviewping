@@ -6,6 +6,7 @@ import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Pill from "../ui/Pill";
 import { toast } from "sonner";
+import posthog, { isPostHogEnabled } from "../../posthog.js";
 
 export default function Integrations({ plan }) {
   const [gbp, setGbp] = useState(null);
@@ -59,6 +60,9 @@ export default function Integrations({ plan }) {
 
     try {
       const { url } = await getGbpAuthUrl();
+      if (isPostHogEnabled) {
+        posthog.capture("gbp_connection_started");
+      }
       if (popup && !popup.closed) {
         popup.location.href = url;
       } else {
@@ -75,6 +79,9 @@ export default function Integrations({ plan }) {
   const doGbpDisconnect = async () => {
     try {
       await disconnectGbp();
+      if (isPostHogEnabled) {
+        posthog.capture("gbp_disconnected");
+      }
       setGbp(null);
       toast("GBP disconnected");
     } catch (err) {
@@ -86,6 +93,9 @@ export default function Integrations({ plan }) {
     setSyncing(true);
     try {
       const result = await syncGbpReviews();
+      if (isPostHogEnabled) {
+        posthog.capture("gbp_reviews_synced", { review_count: result.stored ?? 0 });
+      }
       toast(`${result.stored} new reviews synced from GBP`);
     } catch (err) {
       toast.error(err.message || "Sync failed");

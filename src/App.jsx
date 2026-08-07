@@ -1,4 +1,5 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
+import posthog, { isPostHogEnabled } from "./posthog.js";
 import { supabase } from "./config/supabase";
 import { G } from "./data/theme";
 import { Spinner } from "./components/ui";
@@ -128,6 +129,35 @@ export default function App() {
   const [authError, setAuthError] = useState("");
   const [loadError, setLoadError] = useState("");
   const [diagnosis, setDiagnosis] = useState(null);
+  const identifiedUserId = useRef(null);
+
+  const identifyUser = (authenticatedUser) => {
+    if (!isPostHogEnabled || !authenticatedUser?.id || identifiedUserId.current === authenticatedUser.id) {
+      return;
+    }
+
+    if (identifiedUserId.current) {
+      posthog.reset();
+    }
+
+    const personProperties = Object.fromEntries(
+      Object.entries({
+        email: authenticatedUser.email,
+        name: authenticatedUser.name,
+        business_name: authenticatedUser.biz,
+      }).filter(([, value]) => Boolean(value)),
+    );
+
+    posthog.identify(authenticatedUser.id, personProperties);
+    identifiedUserId.current = authenticatedUser.id;
+  };
+
+  const resetPostHogIdentity = () => {
+    if (isPostHogEnabled && identifiedUserId.current) {
+      posthog.reset();
+    }
+    identifiedUserId.current = null;
+  };
 
   useEffect(() => {
     const onPop = () => setView(pathToView(window.location.pathname));
@@ -148,6 +178,7 @@ export default function App() {
       biz: data.business_name,
       onboarding_completed: data.onboarding_completed === true,
     };
+    identifyUser(profileUser);
     setUser(profileUser);
     if (profileUser.onboarding_completed) {
       changeView("app");
@@ -223,6 +254,7 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (cancelled) return;
       if (event === "SIGNED_OUT") {
+        resetPostHogIdentity();
         setUser(null);
         changeView("landing");
       } else if (session?.user && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
@@ -241,11 +273,14 @@ export default function App() {
   }, []);
 
   const handleAuth = (u) => {
-    setUser({ ...u, onboarding_completed: false });
+    const authenticatedUser = { ...u, onboarding_completed: false };
+    identifyUser(authenticatedUser);
+    setUser(authenticatedUser);
     changeView("onboarding");
   };
 
   const handleLoginComplete = (u) => {
+    identifyUser(u);
     setUser(u);
     if (u?.onboarding_completed) {
       changeView("app");
@@ -279,6 +314,7 @@ export default function App() {
   };
 
   const handleAuthCallback = (u) => {
+    identifyUser(u);
     if (u?.onboarding_completed) {
       setUser(u);
       changeView("app");
@@ -295,6 +331,7 @@ export default function App() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    resetPostHogIdentity();
     setUser(null);
     changeView("landing");
   };
