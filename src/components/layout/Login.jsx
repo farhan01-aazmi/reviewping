@@ -4,6 +4,7 @@ import { G } from "../../data/theme";
 import { Card, Field, Btn, LogoMark } from "../ui";
 import SEO from "../SEO";
 import { toast } from "sonner";
+import { trackUserLoggedIn } from "../../tracking";
 
 export default function Login({ onDone, onLoginComplete, onSignup, onBack, onForgot, authError = "", onAuthErrorClear }) {
   const [email, setEmail] = useState("");
@@ -47,6 +48,7 @@ export default function Login({ onDone, onLoginComplete, onSignup, onBack, onFor
       .single();
 
     setLoading(false);
+    trackUserLoggedIn({ method: "email" });
 
     // Returning user with complete profile → skip onboarding
     if (profile?.name && profile?.business_name && onLoginComplete) {

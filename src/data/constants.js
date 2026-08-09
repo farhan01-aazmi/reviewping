@@ -16,20 +16,85 @@ export const SERVICES = [
   "Other Service",
 ];
 
+export const CATEGORY_GROUPS = [
+  {
+    label: "Food & Dining",
+    items: ["Restaurant", "Cafe", "Bar & Lounge", "Bakery", "Food Truck", "Catering", "Other Food & Dining"],
+  },
+  {
+    label: "Health & Medical",
+    items: ["Dentist", "Doctor / Clinic", "Physiotherapy", "Chiropractor", "Optometrist", "Pharmacy", "Mental Health", "Other Health & Medical"],
+  },
+  {
+    label: "Beauty & Personal Care",
+    items: ["Salon", "Barbershop", "Spa", "Nail Salon", "Tattoo Studio", "Med Spa", "Other Beauty & Personal Care"],
+  },
+  {
+    label: "Automotive",
+    items: ["Auto Repair", "Car Wash", "Auto Body Shop", "Tire Shop", "Car Dealership", "Oil Change", "Other Automotive"],
+  },
+  {
+    label: "Home Services",
+    items: ["Plumber", "Electrician", "HVAC", "House Cleaning", "Landscaping", "Painter", "Roofer", "Pest Control", "Other Home Services"],
+  },
+  {
+    label: "Professional Services",
+    items: ["Legal Consultation", "Accounting", "Real Estate", "Insurance Agent", "Financial Advisor", "Marketing Agency", "Other Professional Services"],
+  },
+  {
+    label: "Fitness & Recreation",
+    items: ["Gym / Fitness Center", "Yoga Studio", "Personal Trainer", "Sports Club", "Dance Studio", "Martial Arts", "Other Fitness & Recreation"],
+  },
+  {
+    label: "Retail & Shopping",
+    items: ["Retail Store", "Boutique", "Supermarket", "Convenience Store", "Electronics", "Furniture Store", "Other Retail & Shopping"],
+  },
+  {
+    label: "Hospitality & Travel",
+    items: ["Hotel", "Bed & Breakfast", "Vacation Rental", "Travel Agency", "Airport Service", "Other Hospitality & Travel"],
+  },
+  {
+    label: "Other",
+    items: ["Other"],
+  },
+];
+
 export const NAV_ITEMS = [
-  { id: "dashboard", label: "Home" },
-  { id: "reviews", label: "Reviews" },
-  { id: "analytics", label: "Analytics" },
-  { id: "templates", label: "Templates" },
-  { id: "more", label: "More" },
+  { id: "dashboard", label: "Dashboard", icon: "📊" },
+  { id: "reviews", label: "Reviews", icon: "⭐" },
+  { id: "requests", label: "Requests", icon: "📨" },
+  { id: "qr-gateway", label: "QR Gateway", icon: "📱" },
+  { id: "settings", label: "Settings", icon: "⚙️" },
+  { id: "billing", label: "Billing", icon: "💳" },
 ];
 
 export const MAIN_SCREENS = [
   "dashboard",
   "reviews",
+  "requests",
+  "qr-gateway",
+  "templates",
+  "settings",
+  "billing",
+  "send",
+  "more",
   "analytics",
   "templates",
-  "more",
+  "automations",
+  "contacts",
+  "qrcode",
+  "widget",
+  "integrations",
+  "notifications",
+  "pricing",
+  "team",
+  "help",
+  "privacy",
+  "terms",
+  "sentlog",
+  "referral",
+  "changelog",
+  "bulk",
 ];
 
 export const D = 86400000;
@@ -38,15 +103,15 @@ export const D = 86400000;
  * ═══════════════════════════════════════════════════════════════
  * PLAN DEFINITIONS
  *
- * The frontend sends `plan` (starter/growth/agency) + `billing`
+ * The frontend sends `plan` (starter/premium/agency) + `billing`
  * (monthly/annual) to the create-checkout edge function.
  * The edge function resolves actual Dodo Payments product IDs
  * from environment variables:
  *
  *   DODO_PRODUCT_STARTER_MONTHLY
  *   DODO_PRODUCT_STARTER_ANNUAL
- *   DODO_PRODUCT_GROWTH_MONTHLY
- *   DODO_PRODUCT_GROWTH_ANNUAL
+ *   DODO_PRODUCT_PREMIUM_MONTHLY
+ *   DODO_PRODUCT_PREMIUM_ANNUAL
  *   DODO_PRODUCT_AGENCY_MONTHLY
  *   DODO_PRODUCT_AGENCY_ANNUAL
  *
@@ -57,39 +122,23 @@ export const D = 86400000;
  */
 export const PLANS = [
   {
-    id: "free",
-    name: "Free",
-    price: 0,
-    annual: 0,
-    sub: "Get started",
-    f: ["5 review requests/day", "Email requests only", "Dashboard & analytics", "Google review link"],
-    features: {
-      aiReplies: false,
-      bulkSend: false,
-      automations: false,
-      competitorRadar: false,
-      analytics: false,
-      customTemplates: false,
-      qrCode: false,
-      widgetEmbed: false,
-      teamMembers: false,
-      gbpSync: false,
-      reputationScore: false,
-      whatsappChannel: false,
-    },
-  },
-  {
     id: "starter",
     name: "Starter",
-    price: 29,
-    annual: 278,
+    price: 599,
+    annual: 5990,
     sub: "Solo owners",
-    f: ["100 review requests/mo", "Email only (SMS extra)", "Dashboard & analytics", "Google review link", "Email support"],
+    f: [
+      "100 review requests/mo",
+      "Email review requests",
+      "Dashboard & analytics",
+      "Custom review templates",
+      "QR Code gateway",
+      "Widget embed",
+    ],
     features: {
       aiReplies: true,
-      bulkSend: true,
+      bulkSend: false,
       automations: false,
-      competitorRadar: false,
       analytics: true,
       customTemplates: true,
       qrCode: true,
@@ -99,21 +148,26 @@ export const PLANS = [
       reputationScore: false,
       whatsappChannel: false,
     },
+    limits: {
+      templatesPerRating: 1,
+      aiGenerations: 25,
+      locations: 1,
+      teamMembers: 1,
+      reviewRequests: 100,
+    },
   },
   {
-    id: "growth",
-    name: "Pro",
-    price: 79,
-    annual: 758,
+    id: "premium",
+    name: "Premium",
+    price: 999,
+    annual: 9990,
     sub: "Most popular",
     f: [
       "Unlimited review requests",
-      "AI-personalized messages (SMS + Email)",
+      "AI-personalized messages (Email + WhatsApp)",
       "AI reply generator",
       "Reputation Score & insights",
       "Full analytics & charts",
-      "Competitor Radar",
-      "Contacts management",
       "Custom templates",
       "Priority support",
     ],
@@ -121,7 +175,6 @@ export const PLANS = [
       aiReplies: true,
       bulkSend: true,
       automations: true,
-      competitorRadar: true,
       analytics: true,
       customTemplates: true,
       qrCode: true,
@@ -131,26 +184,32 @@ export const PLANS = [
       reputationScore: true,
       whatsappChannel: true,
     },
+    limits: {
+      templatesPerRating: 999,
+      aiGenerations: 100,
+      locations: 1,
+      teamMembers: 3,
+      reviewRequests: 99999,
+    },
   },
   {
     id: "agency",
     name: "Agency",
-    price: 149,
-    annual: 1430,
+    price: 1499,
+    annual: 14990,
     sub: "Multi-location",
     f: [
-      "Everything in Pro",
-      "Up to 10 locations",
+      "Everything in Premium",
+      "Up to 5 locations",
       "White-label (no branding)",
       "API access",
-      "Team members (up to 10)",
+      "Team members (up to 5)",
       "Dedicated onboarding",
     ],
     features: {
       aiReplies: true,
       bulkSend: true,
       automations: true,
-      competitorRadar: true,
       analytics: true,
       customTemplates: true,
       qrCode: true,
@@ -160,12 +219,19 @@ export const PLANS = [
       reputationScore: true,
       whatsappChannel: true,
     },
+    limits: {
+      templatesPerRating: 999,
+      aiGenerations: 500,
+      locations: 5,
+      teamMembers: 10,
+      reviewRequests: 99999,
+    },
   },
 ];
 
 /**
  * Check if a given plan has access to a specific feature.
- * Usage: hasFeature(userPlan, "competitorRadar") → true/false
+ * Usage: hasFeature(userPlan, "reputationScore") → true/false
  */
 export function hasFeature(plan, feature) {
   const p = PLANS.find((x) => x.id === plan);
@@ -175,9 +241,15 @@ export function hasFeature(plan, feature) {
 
 /** Get the daily request limit for a plan. */
 export function getDailyLimit(plan) {
-  if (plan === "free") return 5;
   if (plan === "starter") return 100;
-  return 99999; // effectively unlimited for growth/agency
+  return 99999; // effectively unlimited for premium/agency
+}
+
+/** Get a numeric limit for a plan by key (e.g. "aiGenerations"). */
+export function getLimit(plan, key) {
+  const p = PLANS.find((x) => x.id === plan);
+  if (!p) return 0;
+  return p.limits?.[key] ?? 99999;
 }
 
 /** Get the plan that unlocks a given feature (lowest plan with access). */
@@ -185,5 +257,5 @@ export function planForFeature(feature) {
   for (const p of PLANS) {
     if (p.features?.[feature]) return p;
   }
-  return PLANS[1]; // fallback to starter
+  return PLANS[0]; // fallback to starter
 }

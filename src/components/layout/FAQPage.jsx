@@ -26,7 +26,7 @@ export default function FAQPage({ onSignup, onLogin, onBack }) {
     <>
       <SEO
         title="Frequently Asked Questions"
-        description="Find answers to common questions about ReviewPing — review request automation, pricing, GDPR compliance, SMS vs email, and more."
+        description="Find answers to common questions about ReviewPing — review request automation, pricing, GDPR compliance, WhatsApp vs email, and more."
         path="/faq"
       />
       <div

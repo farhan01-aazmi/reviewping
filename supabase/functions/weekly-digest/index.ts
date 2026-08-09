@@ -59,12 +59,20 @@ serve(async (req) => {
         continue
       }
 
-      // Get reviews from the period
-      const { data: periodReviews } = await supabase
-        .from("reviews")
+      // Get review requests from the period
+      const { data: periodRequests } = await supabase
+        .from("review_requests")
         .select("*")
         .eq("user_id", user.id)
-        .gte("sentAt", since)
+        .gte("sent_at", since)
+
+      const periodReviews = (periodRequests || []).map((r) => ({
+        name: r.customer_name || "Customer",
+        text: r.gateway_feedback || "",
+        rating: r.gateway_rating || 0,
+        status: r.status || "pending",
+        reply: r.reply || "",
+      }))
 
       if (!periodReviews || periodReviews.length === 0) {
         results.push({ email: user.email, status: "skipped", reason: "no reviews in period" })

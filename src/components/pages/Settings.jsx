@@ -1,27 +1,28 @@
 import { useState, useEffect } from "react";
 import { G } from "../../data/theme";
 import { useTheme } from "../../data/ThemeProvider";
-import { SERVICES } from "../../data/constants";
+import { CATEGORY_GROUPS } from "../../data/constants";
 import { supabase } from "../../config/supabase";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Field from "../ui/Field";
 import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
+import LocationManager from "../ui/LocationManager";
 import EditProfileModal from "../ui/EditProfileModal";
 import { toast } from "sonner";
 
-export default function Settings({ biz, setBiz, user, setUser }) {
+export default function Settings({ biz, setBiz, user, setUser, plan, onLogout, trialDaysLeft }) {
   const { isDark, toggleDark } = useTheme();
   const [bn, setBn] = useState(biz.bizName || "");
   const [gl, setGl] = useState(biz.googleLink || "");
-  const [bt, setBt] = useState(biz.bizType || SERVICES[0]);
+  const [bt, setBt] = useState(biz.bizType || "");
+  const [otherCat, setOtherCat] = useState(biz.otherBusinessType || "");
   const [avgVal, setAvgVal] = useState(biz.avg_order_value ?? 500);
   const [notifs, setNotifs] = useState({
     newReview: true,
     daily: true,
     weekly: false,
-    sms: false,
   });
   const [showEdit, setShowEdit] = useState(false);
 
@@ -44,17 +45,40 @@ export default function Settings({ biz, setBiz, user, setUser }) {
   }, [user?.id]);
 
   const save = () => {
-    setBiz((b) => ({ ...b, bizName: bn, googleLink: gl, bizType: bt, avg_order_value: Number(avgVal) || 500 }));
+    const finalType = bt === "Other" ? otherCat : bt;
+    setBiz((b) => ({ ...b, bizName: bn, googleLink: gl, bizType: finalType, otherBusinessType: otherCat, avg_order_value: Number(avgVal) || 500 }));
 
-    // Persist notification preferences
+    // Persist to business_settings
     if (user?.id) {
+      const updates = {
+        business_name: bn,
+        biz_type: finalType,
+        google_link: gl,
+        other_business_type: bt === "Other" ? otherCat : null,
+        avg_order_value: Number(avgVal) || 500,
+      };
+      supabase
+        .from("business_settings")
+        .upsert(updates, { onConflict: "user_id" })
+        .eq("user_id", user.id)
+        .then(({ error }) => { if (error) console.error("Failed to save settings:", error); })
+        .catch(console.error);
+
+      // Log custom category if Other
+      if (bt === "Other" && otherCat.trim()) {
+        supabase
+          .from("other_categories")
+          .insert({ user_id: user.id, category_name: otherCat.trim() })
+          .then()
+          .catch(() => {});
+      }
+
+      // Save notification preferences
       supabase
         .from("profiles")
         .update({ notif_prefs: notifs })
         .eq("id", user.id)
-        .then(({ error }) => {
-          if (error) console.error("Failed to save notif prefs:", error);
-        })
+        .then(({ error }) => { if (error) console.error("Failed to save notif prefs:", error); })
         .catch(console.error);
     }
 
@@ -183,11 +207,20 @@ export default function Settings({ biz, setBiz, user, setUser }) {
           placeholder="Your Business"
         />
         <Sel
-          label="Primary service"
+          label="Business category"
           value={bt}
           onChange={(e) => setBt(e.target.value)}
-          options={SERVICES}
+          options={CATEGORY_GROUPS}
+          placeholder="Select a category"
         />
+        {bt === "Other" && (
+          <Field
+            label="Describe your business type"
+            value={otherCat}
+            onChange={(e) => setOtherCat(e.target.value)}
+            placeholder="e.g. Photography Studio, Pet Grooming, etc."
+          />
+        )}
         <Field
           label="Google review link"
           value={gl}
@@ -214,13 +247,25 @@ export default function Settings({ biz, setBiz, user, setUser }) {
             color: G.inkSoft,
           }}
         >
+          Locations
+        </div>
+        <LocationManager userId={user?.id} plan={plan} />
+      </Card>
+      <Card sx={{ marginBottom: 12 }}>
+        <div
+          style={{
+            fontWeight: 700,
+            fontSize: 14,
+            marginBottom: 14,
+            color: G.inkSoft,
+          }}
+        >
           Notifications
         </div>
         {[
           { k: "newReview", l: "Email on new review" },
           { k: "daily", l: "Daily summary" },
           { k: "weekly", l: "Weekly analytics" },
-          { k: "sms", l: "SMS alerts" },
         ].map((n) => (
           <div
             key={n.k}
@@ -315,9 +360,37 @@ export default function Settings({ biz, setBiz, user, setUser }) {
         </div>
       </Card>
 
+      {trialDaysLeft > 0 && (
+        <Card
+          sx={{
+            marginBottom: 12,
+            background: G.goldBg,
+            border: `1.5px solid ${G.goldBd}`,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 24 }}>{"\uD83C\uDF89"}</span>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: "#8B6914" }}>
+                Free trial — {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} left
+              </div>
+              <div style={{ fontSize: 12.5, color: "#8B6914", opacity: 0.8 }}>
+                Upgrade to keep your features and reviews.
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <Btn onClick={save} fullWidth size="lg">
         Save changes
       </Btn>
+
+      <div style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${G.border}` }}>
+        <Btn variant="danger" fullWidth onClick={onLogout} size="sm">
+          Sign out
+        </Btn>
+      </div>
     </div>
   );
 }

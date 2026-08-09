@@ -8,6 +8,7 @@ import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
 import { toast } from "sonner";
 import PremiumFeature from "../ui/PremiumFeature";
+import { trackAutomationCreated, trackAutomationToggled } from "../../tracking";
 
 export default function Automations({ userId, plan }) {
   const [rules, setRules] = useState([]);
@@ -15,7 +16,7 @@ export default function Automations({ userId, plan }) {
   const [showNew, setShowNew] = useState(false);
   const [nName, setNName] = useState("");
   const [nDelay, setNDelay] = useState("1 hour");
-  const [nCh, setNCh] = useState("SMS");
+  const [nCh, setNCh] = useState("Email");
 
   useEffect(() => {
     if (!userId) return;
@@ -51,6 +52,7 @@ export default function Automations({ userId, plan }) {
       setRules((p) =>
         p.map((r) => (r.id === id ? { ...r, active: !r.active } : r))
       );
+      trackAutomationToggled({ enabled: !r.active });
       toast.success("Automation updated");
     } catch (err) {
       console.error("Failed to toggle automation:", err);
@@ -80,6 +82,7 @@ export default function Automations({ userId, plan }) {
       if (data) setRules((p) => [...p, data[0]]);
       setShowNew(false);
       setNName("");
+      trackAutomationCreated({ delay_hours: nDelay ? Number(nDelay) : undefined });
       toast.success("Automation created");
     } catch (err) {
       console.error("Failed to create automation:", err);
@@ -153,7 +156,7 @@ export default function Automations({ userId, plan }) {
             label="Rule name"
             value={nName}
             onChange={(e) => setNName(e.target.value)}
-            placeholder="e.g. Post-appointment SMS"
+            placeholder="e.g. Post-appointment WhatsApp"
           />
           <Sel
             label="Send after"
@@ -172,7 +175,7 @@ export default function Automations({ userId, plan }) {
             label="Channel"
             value={nCh}
             onChange={(e) => setNCh(e.target.value)}
-            options={["SMS", "Email", "Both"]}
+            options={["Email", "WhatsApp", "Both"]}
           />
           <div style={{ display: "flex", gap: 8 }}>
             <Btn variant="secondary" onClick={() => setShowNew(false)}>

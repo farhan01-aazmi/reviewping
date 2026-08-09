@@ -32,13 +32,6 @@ export function aiWriteMessage({ name, service, business }) {
   });
 }
 
-export function sendSMS({ to, message }) {
-  return api("/send-sms", {
-    method: "POST",
-    body: JSON.stringify({ to, message }),
-  });
-}
-
 export function sendEmail({ to, subject, message }) {
   return api("/send-email", {
     method: "POST",
@@ -98,40 +91,17 @@ export function generateGatewayLink({ request_id, customer_name, customer_email,
   });
 }
 
-export async function listCompetitors() {
-  const { data: { session } } = await supabase.auth.getSession();
-  const res = await fetch(`${API_BASE}/competitor-sync?action=list`, {
-    headers: { Authorization: `Bearer ${session?.access_token}` },
-  });
-  return res.json();
-}
-
-export async function addCompetitor(payload) {
-  const { data: { session } } = await supabase.auth.getSession();
-  const res = await fetch(`${API_BASE}/competitor-sync?action=add`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session?.access_token}`,
-    },
-    body: JSON.stringify(payload),
-  });
-  return res.json();
-}
-
-export async function syncCompetitors() {
-  const { data: { session } } = await supabase.auth.getSession();
-  const res = await fetch(`${API_BASE}/competitor-sync?action=sync`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${session?.access_token}` },
-  });
-  return res.json();
-}
-
 export function generateReviewReply({ review_text, rating, author_name, tone = "Professional" }) {
   return api("/ai-reply-generator", {
     method: "POST",
     body: JSON.stringify({ review_text, rating, author_name, tone }),
+  });
+}
+
+export function analyzeGbpReviews() {
+  return api("/analyze-gbp-reviews", {
+    method: "POST",
+    body: JSON.stringify({}),
   });
 }
 
@@ -140,29 +110,4 @@ export function sendTestDigest(frequency = "daily") {
     method: "POST",
     body: JSON.stringify({ frequency }),
   });
-}
-
-export async function analyzePatterns() {
-  const { data: { session } } = await supabase.auth.getSession();
-  const res = await fetch(`${API_BASE}/competitor-sync?action=analyze-patterns`, {
-    headers: { Authorization: `Bearer ${session?.access_token}` },
-  });
-  if (!res.ok) {
-    const err = await res.text().catch(() => "");
-    throw new Error(err || "Failed to analyze patterns");
-  }
-  return res.json();
-}
-
-export async function deleteCompetitor(competitor_id) {
-  const { data: { session } } = await supabase.auth.getSession();
-  const res = await fetch(`${API_BASE}/competitor-sync?action=delete`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session?.access_token}`,
-    },
-    body: JSON.stringify({ competitor_id }),
-  });
-  return res.json();
 }

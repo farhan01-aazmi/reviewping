@@ -43,8 +43,8 @@ serve(async (req) => {
       throw new Error("NVIDIA_API_KEY not configured — set it in Supabase secrets");
     }
 
-    const systemPrompt = "You generate short SMS review request messages for businesses. Keep responses under 115 characters. Include [LINK] where the review link goes. No emojis. Sound human and warm. Return ONLY the message text, nothing else.";
-    const userPrompt = `Write a review request SMS for ${name} who just had a ${service} at ${business || "our business"}.`;
+    const systemPrompt = "You generate short review request messages for businesses. Keep responses under 115 characters. Include [LINK] where the review link goes. No emojis. Sound human and warm. Return ONLY the message text, nothing else.";
+    const userPrompt = `Write a review request message for ${name} who just had a ${service} at ${business || "our business"}.`;
 
     const res = await fetch(
       "https://integrate.api.nvidia.com/v1/chat/completions",

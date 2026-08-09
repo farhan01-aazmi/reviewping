@@ -157,17 +157,18 @@ export default function Analytics({ userId }) {
         Date.now() - 30 * 24 * 60 * 60 * 1000,
       ).toISOString();
 
-      const [reviewsResult, requestsResult, submissionsResult] =
+      const [requestsResult, gbpResult, submissionsResult] =
         await Promise.all([
           supabase
-            .from("reviews")
-            .select("sentAt, rating")
-            .eq("user_id", userId)
-            .gte("sentAt", thirtyDaysAgo),
-          supabase
             .from("review_requests")
-            .select("status")
-            .eq("user_id", userId),
+            .select("sent_at, gateway_rating, status")
+            .eq("user_id", userId)
+            .gte("sent_at", thirtyDaysAgo),
+          supabase
+            .from("gbp_reviews")
+            .select("create_time, rating")
+            .eq("user_id", userId)
+            .gte("create_time", thirtyDaysAgo),
           supabase
             .from("review_submissions")
             .select("source")
@@ -175,11 +176,21 @@ export default function Analytics({ userId }) {
             .gte("created_at", thirtyDaysAgo),
         ]);
 
-      if (reviewsResult.error) throw reviewsResult.error;
       if (requestsResult.error) throw requestsResult.error;
+      if (gbpResult.error) throw gbpResult.error;
       if (submissionsResult.error) throw submissionsResult.error;
 
-      setReviews(reviewsResult.data || []);
+      // Normalize reviews from both sources: gateway feedback + Google reviews
+      const gatewayReviews = (requestsResult.data || [])
+        .filter((r) => r.gateway_rating != null)
+        .map((r) => ({ date: r.sent_at, rating: r.gateway_rating }));
+      const googleReviews = (gbpResult.data || []).map((r) => ({
+        date: r.create_time,
+        rating: r.rating,
+      }));
+      const allReviews = [...gatewayReviews, ...googleReviews];
+
+      setReviews(allReviews);
       setReviewRequests(requestsResult.data || []);
       setReviewSubmissions(submissionsResult.data || []);
     } catch (err) {
@@ -214,7 +225,7 @@ export default function Analytics({ userId }) {
   const reviewsPerDay = useMemo(() => {
     const map = {};
     reviews.forEach((r) => {
-      const day = r.sentAt?.slice(0, 10);
+      const day = r.date?.slice(0, 10);
       if (day) map[day] = (map[day] || 0) + 1;
     });
     return buildDayLabels().map((day) => ({

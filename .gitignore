@@ -22,3 +22,17 @@ Thumbs.db
 supabase/.temp
 
 .vercel
+
+# Vercel CLI generated
+.env.prod
+.env.vercel
+posthog.diff
+
+adk-python/
+reticle/
+
+backlink-data/sender-config.json
+backlink-data/*.json
+
+backlink-data/sender-config.json
+backlink-data/

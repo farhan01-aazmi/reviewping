@@ -1,0 +1,449 @@
+meta:
+  product: "ReviewPing"
+  version: 1
+  created: 2026-08-06
+  updated: 2026-08-06
+  owner: "Mohd (solo)"
+  destinations: [posthog]
+  naming_convention: "snake_case, object.action"
+  pii_policy: traits_only
+  internal_user_policy: "flag Ã¢â‚¬â€ profiles.is_internal = true excludes all events/identify calls for that user"
+
+entities:
+  user:
+    id_property: user_id
+    id_format: "UUID (Supabase auth.users.id)"
+    traits:
+      - name: email
+        type: string
+        pii: true
+        update_pattern: one-time
+        required: true
+      - name: name
+        type: string
+        pii: true
+        update_pattern: on-change
+        required: false
+      - name: signup_method
+        type: string
+        enum: [email, google]
+        update_pattern: one-time
+        required: true
+      - name: plan
+        type: string
+        enum: [free, starter, growth, agency]
+        update_pattern: on-change
+        required: true
+      - name: role
+        type: string
+        enum: [owner, team_member]
+        update_pattern: one-time
+        required: true
+      - name: created_at
+        type: datetime
+        update_pattern: one-time
+        required: true
+      - name: is_internal
+        type: boolean
+        update_pattern: on-change
+        required: false
+
+groups:
+  - type: business
+    id_property: business_id
+    id_format: "UUID (profiles.id)"
+    is_top_level: true
+    traits:
+      - name: name
+        type: string
+        update_pattern: on-change
+        required: true
+      - name: plan
+        type: string
+        enum: [free, starter, growth, agency]
+        update_pattern: on-change
+        required: true
+      - name: mrr
+        type: number
+        update_pattern: on-change
+        required: false
+      - name: gbp_connected
+        type: boolean
+        update_pattern: on-change
+        required: true
+      - name: team_size
+        type: integer
+        update_pattern: scheduled
+        required: false
+      - name: requests_sent_count
+        type: integer
+        update_pattern: scheduled
+        required: false
+      - name: created_at
+        type: datetime
+        update_pattern: one-time
+        required: true
+    group_call_triggers:
+      - trigger: creation
+        when: "profile row created on signup"
+      - trigger: trait_change
+        when: "plan changes, GBP connected/disconnected, business renamed"
+      - trigger: scheduled_sync
+        when: "daily Ã¢â‚¬â€ team_size, requests_sent_count"
+
+  - type: location
+    id_property: location_id
+    id_format: "UUID"
+    parent_type: business
+    note: "Agency plan only (up to 10 per business). Not yet a distinct DB table in the scanned codebase Ã¢â‚¬â€ confirm during implementation whether locations are modeled as separate profiles rows or a new table; if not yet built, this group can be added when the multi-location schema lands."
+    traits:
+      - name: name
+        type: string
+        update_pattern: on-change
+        required: true
+    group_call_triggers:
+      - trigger: creation
+        when: "location added to an Agency account"
+
+snapshot_sync:
+  cadence: daily
+  traits:
+    - entity: business
+      trait: team_size
+      source: "COUNT of active rows in team_members per business"
+    - entity: business
+      trait: requests_sent_count
+      source: "COUNT of review_requests per business, lifetime"
+
+events:
+  # -- Lifecycle --
+  - name: user.signed_up
+    category: lifecycle
+    group_level: business
+    description: A new business owner creates an account
+    properties:
+      - name: signup_method
+        type: string
+        enum: [email, google]
+        required: true
+    expected_frequency: low
+
+  - name: user.logged_in
+    category: lifecycle
+    group_level: business
+    description: User logs in (any method)
+    properties:
+      - name: method
+        type: string
+        enum: [email, google]
+        required: true
+    expected_frequency: medium
+
+  - name: onboarding.completed
+    category: lifecycle
+    group_level: business
+    description: User finishes the post-signup onboarding flow
+    properties: []
+    expected_frequency: low
+
+  - name: milestone.reached
+    category: lifecycle
+    group_level: business
+    description: >
+      A product-defined milestone is hit (backed by the existing milestones_reached
+      table Ã¢â‚¬â€ e.g. first_request_sent, first_review_received, tenth_request_sent).
+      Consolidates what would otherwise be many separate "first X" events into one
+      event with a distinguishing property.
+    properties:
+      - name: milestone_name
+        type: string
+        enum: [first_review, reviews_10, reviews_25, reviews_50, reviews_100, first_five_star, rating_4_0, rating_4_5]
+        required: true
+        note: "Corrected during implementation to match the actual milestones_reached.milestone_key values in Dashboard.jsx (originally guessed before the codebase's milestone logic was read in detail)."
+    expected_frequency: low
+
+  # -- Core Value --
+  - name: review_request.sent
+    category: core_value
+    group_level: business
+    description: >
+      The primary value action Ã¢â‚¬â€ an AI-personalized review request is successfully
+      delivered to a customer via SMS, email, or WhatsApp.
+    properties:
+      - name: channel
+        type: string
+        enum: [sms, email, whatsapp]
+        required: true
+      - name: source
+        type: string
+        enum: [manual, bulk_send, automation, qr_gateway]
+        required: true
+      - name: ai_generated
+        type: boolean
+        required: true
+      - name: template_used
+        type: boolean
+        required: true
+      - name: contact_id
+        type: string
+        required: true
+    expected_frequency: high
+
+  - name: review_request.failed
+    category: core_value
+    group_level: business
+    description: A review request failed to send (delivery failure, not a user cancellation)
+    properties:
+      - name: channel
+        type: string
+        enum: [sms, email, whatsapp]
+        required: true
+      - name: reason
+        type: string
+        required: false
+    expected_frequency: low
+
+  - name: review.received
+    category: core_value
+    group_level: business
+    description: A new review appears via GBP sync (the downstream outcome of requests sent)
+    properties:
+      - name: rating
+        type: integer
+        required: true
+      - name: source
+        type: string
+        enum: [gbp_sync, gateway]
+        required: true
+    expected_frequency: medium
+
+  - name: review_gateway.link_generated
+    category: core_value
+    group_level: business
+    description: A QR/link-based review gateway is generated for a business
+    properties: []
+    expected_frequency: low
+
+  - name: review_gateway.rating_selected
+    category: core_value
+    group_level: business
+    description: A customer scans the QR/gateway link and selects a star rating
+    properties:
+      - name: rating
+        type: integer
+        required: true
+    expected_frequency: high
+
+  - name: review_gateway.completed
+    category: core_value
+    group_level: business
+    description: Customer clicks through from the gateway to actually leave a Google review
+    properties:
+      - name: rating
+        type: integer
+        required: true
+      - name: used_suggested_template
+        type: boolean
+        required: true
+    expected_frequency: medium
+
+  - name: gbp.connected
+    category: core_value
+    group_level: business
+    description: Business connects their Google Business Profile
+    properties: []
+    expected_frequency: low
+
+  - name: gbp.disconnected
+    category: core_value
+    group_level: business
+    description: Business disconnects their Google Business Profile
+    properties:
+      - name: reason
+        type: string
+        required: false
+    expected_frequency: low
+
+  - name: ai_reply.generated
+    category: core_value
+    group_level: business
+    description: AI generates a suggested reply to a review
+    properties:
+      - name: rating
+        type: integer
+        required: false
+      - name: sent
+        type: boolean
+        required: true
+    expected_frequency: medium
+
+  # -- Collaboration --
+  - name: team_member.invited
+    category: collaboration
+    group_level: business
+    description: Owner invites a team member (Growth/Agency plans)
+    properties:
+      - name: role
+        type: string
+        required: false
+    expected_frequency: low
+
+  - name: team_member.joined
+    category: collaboration
+    group_level: business
+    description: Invited team member accepts and joins
+    properties: []
+    expected_frequency: low
+
+  - name: location.added
+    category: collaboration
+    group_level: business
+    description: Business adds an additional location (Agency plan)
+    properties: []
+    expected_frequency: low
+
+  # -- Configuration --
+  - name: template.created
+    category: configuration
+    group_level: business
+    description: Custom message template created
+    properties:
+      - name: channel
+        type: string
+        enum: [sms, email, whatsapp]
+        required: true
+    expected_frequency: low
+
+  - name: automation.created
+    category: configuration
+    group_level: business
+    description: An auto-send rule is configured
+    properties:
+      - name: delay_hours
+        type: integer
+        required: false
+    expected_frequency: low
+
+  - name: automation.toggled
+    category: configuration
+    group_level: business
+    description: An automation rule is enabled or disabled
+    properties:
+      - name: enabled
+        type: boolean
+        required: true
+    expected_frequency: low
+
+  - name: contact.imported
+    category: configuration
+    group_level: business
+    description: Contacts imported (single add or bulk import)
+    properties:
+      - name: method
+        type: string
+        enum: [manual, csv_bulk]
+        required: true
+      - name: contact_count
+        type: integer
+        required: true
+    expected_frequency: medium
+
+  - name: widget.embedded
+    category: configuration
+    group_level: business
+    description: The review widget embed code is generated/copied for the business's site
+    properties: []
+    expected_frequency: low
+
+  # -- Billing (critical commercial signals) --
+  - name: checkout.started
+    category: billing
+    group_level: business
+    description: User initiates checkout for a paid plan via Dodo Payments
+    properties:
+      - name: target_plan
+        type: string
+        enum: [starter, growth, agency]
+        required: true
+      - name: billing_cycle
+        type: string
+        enum: [monthly, annual]
+        required: true
+    expected_frequency: low
+
+  - name: plan.upgraded
+    category: billing
+    group_level: business
+    description: A paid plan change increases tier (confirmed via Dodo webhook)
+    properties:
+      - name: from_plan
+        type: string
+        enum: [free, starter, growth, agency]
+        required: true
+      - name: to_plan
+        type: string
+        enum: [starter, growth, agency]
+        required: true
+      - name: price
+        type: number
+        required: true
+      - name: currency
+        type: string
+        enum: [INR, USD]
+        required: true
+      - name: billing_cycle
+        type: string
+        enum: [monthly, annual]
+        required: true
+    expected_frequency: low
+
+  - name: plan.downgraded
+    category: billing
+    group_level: business
+    description: A plan change decreases tier
+    properties:
+      - name: from_plan
+        type: string
+        required: true
+      - name: to_plan
+        type: string
+        required: true
+    expected_frequency: low
+
+  - name: plan.cancelled
+    category: billing
+    group_level: business
+    description: Subscription cancelled
+    properties:
+      - name: plan
+        type: string
+        required: true
+    expected_frequency: low
+
+  - name: limit.reached
+    category: billing
+    group_level: business
+    description: Business hits their daily/monthly review request limit
+    properties:
+      - name: plan
+        type: string
+        required: true
+      - name: limit_type
+        type: string
+        enum: [daily_requests, monthly_requests]
+        required: true
+    expected_frequency: medium
+
+  # -- Navigation (sparse, high-signal only) --
+  - name: feature.gated_view
+    category: navigation
+    group_level: business
+    description: >
+      User views a premium feature they don't have access to (PremiumFeature.jsx
+      upgrade CTA). High-value upgrade-intent signal, kept sparse Ã¢â‚¬â€ not a page view.
+    properties:
+      - name: feature_name
+        type: string
+        enum: [competitor_radar, reputation_score, whatsapp_channel, automations, bulk_send, ai_reply, integrations, team]
+        required: true
+    expected_frequency: medium

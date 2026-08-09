@@ -369,6 +369,129 @@ const styles = {
     textDecoration: "underline",
     textUnderlineOffset: 2,
   },
+
+  /* ───────────── detailed comparison ───────────── */
+  detailedSection: {
+    padding: "8px 32px 56px",
+    maxWidth: 900,
+    margin: "0 auto",
+  },
+  detailedHeading: {
+    fontSize: 32,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 8px",
+    color: G.ink,
+    textAlign: "center",
+  },
+  detailedSub: {
+    fontSize: 16,
+    color: G.mutedLo,
+    marginBottom: 32,
+    textAlign: "center",
+    maxWidth: 640,
+    margin: "0 auto 32px",
+    lineHeight: 1.6,
+  },
+  detailGrid: {
+    overflowX: "auto",
+    borderRadius: 16,
+    border: `1px solid ${G.border}`,
+    background: G.surface,
+    boxShadow: "0 4px 24px rgba(26,23,20,0.06)",
+  },
+  detailTable: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: 15,
+  },
+  detailTh: {
+    textAlign: "left",
+    padding: "14px 20px",
+    fontWeight: 700,
+    fontSize: 14,
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    borderBottom: `2px solid ${G.border}`,
+    background: G.bg,
+  },
+  detailThCenter: {
+    textAlign: "center",
+    width: "30%",
+  },
+  detailThCompetitor: {
+    color: G.mutedLo,
+  },
+  detailThPing: {
+    color: G.accent,
+  },
+  detailTd: {
+    padding: "12px 20px",
+    borderBottom: `1px solid ${G.border}`,
+    verticalAlign: "middle",
+  },
+  detailTdCenter: {
+    textAlign: "center",
+  },
+  detailTdFeature: {
+    fontWeight: 600,
+    color: G.ink,
+  },
+  detailRowAlt: {
+    background: G.bg,
+  },
+
+  /* ───────────── who section ───────────── */
+  whoSection: {
+    padding: "8px 32px 48px",
+    maxWidth: 900,
+    margin: "0 auto",
+  },
+  whoHeading: {
+    fontSize: 28,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 16px",
+    color: G.ink,
+  },
+  whoText: {
+    fontSize: 16,
+    color: G.mutedLo,
+    lineHeight: 1.7,
+    margin: 0,
+  },
+
+  /* ───────────── faq section ───────────── */
+  faqSection: {
+    padding: "40px 32px 56px",
+    maxWidth: 720,
+    margin: "0 auto",
+  },
+  faqHeading: {
+    fontSize: 28,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 32px",
+    color: G.ink,
+    textAlign: "center",
+  },
+  faqItem: {
+    borderBottom: `1px solid ${G.border}`,
+    padding: "20px 0",
+  },
+  faqQuestion: {
+    fontSize: 17,
+    fontWeight: 700,
+    color: G.ink,
+    margin: "0 0 8px",
+    lineHeight: 1.4,
+  },
+  faqAnswer: {
+    fontSize: 15,
+    color: G.mutedLo,
+    lineHeight: 1.7,
+    margin: 0,
+  },
 };
 
 /* ───────────── main component ───────────── */
@@ -385,13 +508,13 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
       ),
       ping: (
         <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>
-          $29/mo flat
+          ₹599/mo flat
         </span>
       ),
       highlight: true,
     },
     {
-      feature: "Review Requests (SMS & Email)",
+      feature: "Review Requests (Email & WhatsApp)",
       competitor: <Check />,
       ping: <Check />,
     },
@@ -433,7 +556,7 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
       competitor: <Check />,
       ping: (
         <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>₹1,499/mo</span>
         </>
       ),
     },
@@ -454,7 +577,7 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
     <div style={styles.page}>
       <SEO
         title="ReviewPing vs Grade.us: Which Review Platform Wins?"
-        description="Compare ReviewPing ($29/mo) vs Grade.us ($40-$110/seat/mo). See why ReviewPing offers better value with AI features and unlimited users."
+        description="Compare ReviewPing (₹599/mo) vs Grade.us ($40-$110/seat/mo). See why ReviewPing offers better value with AI features and unlimited users."
         path="/vs/grade-us"
       />
 
@@ -491,13 +614,15 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
         </h1>
         <p style={styles.heroSub}>
           Grade.us prices start at <strong>$40/seat/mo</strong> — meaning a
-          team of 3 costs you <strong>$120–$330/mo</strong>. ReviewPing gives
-          you unlimited users, AI features, and WhatsApp requests starting at{" "}
-          <strong>$29/mo flat</strong>.
+          team of just 3 people already costs you <strong>$120–$330/mo</strong>
+          before you even send a single review request. ReviewPing gives you
+          unlimited users, AI-powered reply generation, WhatsApp review
+          requests, and a comprehensive analytics dashboard — all starting at
+          just <strong>₹599/mo flat</strong> with no per-seat fees whatsoever.
         </p>
         <div style={styles.heroCtaRow}>
           <button style={styles.primaryCta} onClick={onSignup}>
-            Start Free Trial — $29/mo
+            Start Free Trial — ₹599/mo
           </button>
           <button style={styles.secondaryCta} onClick={onLogin}>
             See My Dashboard
@@ -560,9 +685,13 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
           Why teams are switching from Grade.us
         </h2>
         <p style={styles.whySub}>
-          Grade.us works well for agencies, but its per-seat pricing punishes
-          growing teams. Every person you add costs another $40–$110/month.
-          ReviewPing gives you the whole platform for one flat price.
+          Grade.us works reasonably well for agencies with small, fixed teams,
+          but its per-seat pricing model actively punishes growing businesses.
+          Every new team member you add costs another <strong>$40–$110/month</strong>,
+          turning what looks like an affordable platform into an expensive
+          line item. ReviewPing gives your entire team access to the full
+          platform for one flat monthly price — no seat counts, no upgrade
+          anxiety, no awkward "do we really need this person?" conversations.
         </p>
 
         <div style={styles.cardsGrid}>
@@ -605,16 +734,149 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
         </div>
       </section>
 
+      {/* ── detailed feature comparison ── */}
+      <section style={styles.detailedSection}>
+        <h2 style={styles.detailedHeading}>
+          Detailed Feature Comparison
+        </h2>
+        <p style={styles.detailedSub}>
+          Here is how Grade.us and ReviewPing really compare across the
+          features that determine your team's daily workflow and monthly
+          budget. The biggest difference? Grade.us charges per person
+          while ReviewPing charges a flat rate for the whole team.
+        </p>
+
+        <div style={styles.detailGrid}>
+          <table style={styles.detailTable}>
+            <thead>
+              <tr>
+                <th style={styles.detailTh}>Feature</th>
+                <th style={{...styles.detailTh, ...styles.detailThCenter, ...styles.detailThCompetitor}}>Grade.us</th>
+                <th style={{...styles.detailTh, ...styles.detailThCenter, ...styles.detailThPing}}>ReviewPing</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Core review requests (Email + WhatsApp)</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>AI reply generation</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.accent, fontSize: 13 }}>Limited</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Free plan available</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Per-seat pricing</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.accent, fontWeight: 600 }}>$40–$110/seat/mo</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.success, fontWeight: 600 }}>₹599/mo unlimited users</span></td>
+              </tr>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>WhatsApp integration</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Month-to-month contracts</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> Cancel anytime</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ── who should choose ── */}
+      <section style={styles.whoSection}>
+        <h2 style={styles.whoHeading}>
+          Who should choose ReviewPing instead of Grade.us?
+        </h2>
+        <p style={styles.whoText}>
+          ReviewPing is the ideal choice for growing teams that need to add
+          staff without watching their software bill climb. Marketing agencies
+          managing multiple client locations save significantly on our Agency
+          plan at <strong>₹1,499/month</strong> with white-label branding
+          included. Small business owners who want a free plan to test the
+          waters before committing will appreciate our <strong>$0/mo</strong>
+          tier. And any team that relies on AI-generated review replies or
+          WhatsApp-based customer outreach will find those features baked
+          into ReviewPing at no extra cost — whereas Grade.us charges a
+          premium or omits them entirely.
+        </p>
+      </section>
+
+      {/* ── faq ── */}
+      <section style={styles.faqSection}>
+        <h2 style={styles.faqHeading}>
+          Frequently asked questions about Grade.us alternatives
+        </h2>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            How does ReviewPing compare to Grade.us for agencies?
+          </h3>
+          <p style={styles.faqAnswer}>
+            Grade.us is popular among agencies, but its per-seat pricing
+            becomes expensive as soon as you scale your team or client base.
+            ReviewPing's Agency plan at <strong>₹1,499/month</strong> includes
+            unlimited users, white-label branding, and multi-location support
+            — everything an agency needs to manage reviews across multiple
+            clients without per-person surcharges. You can add account
+            managers, strategists, and support staff without ever seeing
+            a price increase.
+          </p>
+        </div>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            Does ReviewPing have all the same features as Grade.us?
+          </h3>
+          <p style={styles.faqAnswer}>
+            ReviewPing covers the essential features — email and WhatsApp review
+            requests, analytics dashboards, custom templates, and
+            multi-location support — and adds several that Grade.us lacks,
+            including AI-powered reply generation, WhatsApp review requests,
+            and a free plan. The main difference is that ReviewPing is
+            simpler to set up and more affordable, while Grade.us offers
+            deeper enterprise integrations that most small businesses
+            never actually use.
+          </p>
+        </div>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            Can I migrate from Grade.us to ReviewPing easily?
+          </h3>
+          <p style={styles.faqAnswer}>
+            Absolutely. ReviewPing offers free migration support for
+            Grade.us users. Our team will help you transfer your review
+            request templates, automation workflows, and connected
+            locations so you can switch without downtime. Most migrations
+            are completed within a few days, and because ReviewPing is
+            designed for simplicity, your team will be comfortable with
+            the new interface after just one training session.
+          </p>
+        </div>
+      </section>
+
       {/* ── cta ── */}
       <section style={styles.ctaSection}>
         <div style={styles.ctaWrap}>
           <h2 style={styles.ctaTitle}>
             Ditch per-seat pricing. Start at{" "}
-            <span style={{ color: G.gold }}>$29/mo</span>.
+            <span style={{ color: G.gold }}>₹599/mo</span>.
           </h2>
           <p style={styles.ctaSub}>
-            No seat limits. No hidden fees. No long-term contracts. Set up your
-            account in 5 minutes and invite your whole team.
+            No seat limits, no hidden per-user fees, and no long-term
+            contracts — just one flat price for your entire team. Set up
+            your account in 5 minutes, invite everyone, and start sending
+            review requests immediately. Already using Grade.us? We offer
+            free migration assistance so you can switch without the headache.
           </p>
           <button style={styles.ctaBtn} onClick={onSignup}>
             Start Free Trial

@@ -58,7 +58,7 @@ serve(async (req) => {
     }
 
     const RESEND_KEY = Deno.env.get("RESEND_API_KEY");
-    const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "noreply@reviewping.io";
+    const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "noreply@reviewping.pro";
 
     if (!RESEND_KEY) {
       throw new Error("RESEND_API_KEY environment variable not configured");
@@ -80,6 +80,7 @@ serve(async (req) => {
 
     if (!res.ok) {
       const errText = await res.text();
+      console.error("Resend API raw error:", res.status, errText);
       throw new Error(`Resend API error: ${res.status} - ${errText}`);
     }
 

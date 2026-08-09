@@ -10,10 +10,10 @@ export default function SEO({
 }) {
   const fullTitle = title
     ? `${title} · ReviewPing`
-    : "ReviewPing — Automate Your Google Reviews";
+    : "ReviewPing — Get 30+ Google Reviews/Month Automatically";
   const fullDesc =
     description ||
-    "Send AI-personalised review requests via SMS or email. No chasing. No copy-pasting. Built for small businesses.";
+    "Get 30+ new Google reviews every month automatically. AI-personalised Email & WhatsApp review requests. Free plan available. No contracts. Set up in 2 minutes.";
   const url = `${BASE_URL}${path}`;
   const image = ogImage.startsWith("http") ? ogImage : `${BASE_URL}${ogImage}`;
 
@@ -32,6 +32,9 @@ export default function SEO({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={fullDesc} />
       <meta name="twitter:image" content={image} />
+
+      {/* Keep Google tags in head (not removed by Helmet) */}
+      <meta name="google-adsense-account" content="ca-pub-3228204713225337" />
     </Helmet>
   );
 }

@@ -47,7 +47,7 @@ export default function ReviewCard({ review, userId, onUpdate }) {
     setSaving(true);
     try {
       const { error } = await supabase
-        .from("reviews")
+        .from("review_requests")
         .update({ reply: replyText.trim() })
         .eq("id", r.id);
       if (error) throw error;

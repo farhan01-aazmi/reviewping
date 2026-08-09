@@ -69,12 +69,10 @@ function escapeXml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function urlEntry(loc, priority, changefreq, lastmod) {
+function urlEntry(loc, lastmod) {
   return `  <url>
     <loc>${escapeXml(SITE + loc)}</loc>
     <lastmod>${lastmod}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
   </url>`;
 }
 
@@ -103,7 +101,7 @@ allPages.sort((a, b) => {
 });
 
 for (const page of allPages) {
-  lines.push(urlEntry(page.loc, page.priority, page.changefreq, page.date));
+  lines.push(urlEntry(page.loc, page.date));
 }
 
 lines.push('</urlset>');

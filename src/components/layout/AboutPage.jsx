@@ -55,7 +55,7 @@ export default function AboutPage({ onSignup, onLogin, onBack }) {
               url: "https://reviewping.io",
               logo: "https://reviewping.io/og-image.png",
               description:
-                "Send AI-personalised review requests via SMS or email. No chasing. No copy-pasting.",
+                "Send AI-personalised review requests via email or WhatsApp. No chasing. No copy-pasting.",
               foundingDate: "2025",
               founder: { "@id": "https://reviewping.io/#founder" },
               address: {
@@ -230,6 +230,102 @@ export default function AboutPage({ onSignup, onLogin, onBack }) {
             The alternative was a shared spreadsheet and copy-pasted texts that
             felt robotic. That moment sparked ReviewPing: review management that's
             simple, affordable, and actually built for small businesses.
+          </p>
+          <p
+            style={{
+              fontSize: 15,
+              lineHeight: 1.8,
+              color: G.inkSoft,
+              margin: "16px 0 0",
+            }}
+          >
+            Alex had spent a decade running a digital agency, watching clients 
+            sign $500/month contracts with review platforms that locked them into 
+            annual terms and charged extra for the simplest features. The software 
+            was designed for enterprise marketing teams, not for the solo plumber 
+            or the coffee shop owner who just wanted more Google reviews.
+          </p>
+          <p
+            style={{
+              fontSize: 15,
+              lineHeight: 1.8,
+              color: G.inkSoft,
+              margin: "16px 0 0",
+            }}
+          >
+            Sarah saw the same problem from the product side. After building 
+            customer platforms for global brands, she knew the technology existed 
+            to make review management simple and affordable — the big vendors just 
+            had no incentive to do it. So they built ReviewPing themselves: review 
+            request automation that actually works for the 99%.
+          </p>
+        </section>
+
+        {/* Our Journey */}
+        <section
+          style={{ maxWidth: 660, margin: "0 auto 64px", padding: "0 22px" }}
+        >
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: G.accent,
+              letterSpacing: "1.5px",
+              textTransform: "uppercase",
+              margin: "0 0 10px",
+            }}
+          >
+            Our Journey
+          </p>
+          <h2
+            style={{
+              fontFamily: "'Instrument Serif',serif",
+              fontSize: 32,
+              fontWeight: 400,
+              margin: "0 0 20px",
+              letterSpacing: "-0.8px",
+            }}
+          >
+            From whiteboard to launch in 90 days.
+          </h2>
+          <p
+            style={{
+              fontSize: 15,
+              lineHeight: 1.8,
+              color: G.inkSoft,
+              margin: 0,
+            }}
+          >
+            ReviewPing was founded in early 2025 with a simple belief: a review 
+            management platform shouldn't cost a fortune. The team shipped the 
+            first version in just three months — proving that a lean, focused 
+            team could build what enterprise vendors had over-engineered for years.
+          </p>
+          <p
+            style={{
+              fontSize: 15,
+              lineHeight: 1.8,
+              color: G.inkSoft,
+              margin: "16px 0 0",
+            }}
+          >
+            By mid-2025, the first 100 businesses had signed up. Coffee shops, 
+            dentists, plumbers, yoga studios — real small businesses with real 
+            budgets. That was the moment we knew we were onto something. Word 
+            spread fast, and by early 2026 we had expanded into the USA and UK, 
+            bringing affordable small business software to owners who had been 
+            ignored by the big review platforms.
+          </p>
+          <p
+            style={{
+              fontSize: 15,
+              lineHeight: 1.8,
+              color: G.inkSoft,
+              margin: "16px 0 0",
+            }}
+          >
+            Today ReviewPing is the review request automation tool thousands of 
+            business owners rely on — and we're just getting started.
           </p>
         </section>
 
@@ -418,6 +514,142 @@ export default function AboutPage({ onSignup, onLogin, onBack }) {
           </div>
         </section>
 
+        {/* Why businesses choose us */}
+        <section
+          style={{
+            maxWidth: 660,
+            margin: "0 auto 64px",
+            padding: "0 22px",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              color: G.accent,
+              letterSpacing: "1.5px",
+              textTransform: "uppercase",
+              margin: "0 0 10px",
+            }}
+          >
+            Why businesses choose us
+          </p>
+          <h2
+            style={{
+              fontFamily: "'Instrument Serif',serif",
+              fontSize: 32,
+              fontWeight: 400,
+              margin: "0 0 24px",
+              letterSpacing: "-0.8px",
+            }}
+          >
+            Three reasons businesses trust ReviewPing.
+          </h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div
+              style={{
+                background: G.surface,
+                border: `1.5px solid ${G.border}`,
+                borderRadius: 12,
+                padding: "22px 20px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "'Instrument Serif',serif",
+                  fontSize: 20,
+                  fontWeight: 400,
+                  marginBottom: 6,
+                  color: G.accent,
+                }}
+              >
+                1. Price transparency — no hidden fees
+              </div>
+              <p
+                style={{
+                  fontSize: 13.5,
+                  lineHeight: 1.7,
+                  color: G.inkSoft,
+                  margin: 0,
+                }}
+              >
+                Enterprise review platforms love surprising you with per-message 
+                fees, setup charges, and tier upgrades. We charge a flat rate. No 
+                hidden costs, no surprise invoices, no "sales calls" to unlock 
+                basic features. That's affordable review management at its simplest.
+              </p>
+            </div>
+            <div
+              style={{
+                background: G.surface,
+                border: `1.5px solid ${G.border}`,
+                borderRadius: 12,
+                padding: "22px 20px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "'Instrument Serif',serif",
+                  fontSize: 20,
+                  fontWeight: 400,
+                  marginBottom: 6,
+                  color: G.accent,
+                }}
+              >
+                2. Ease of use — 2-minute setup
+              </div>
+              <p
+                style={{
+                  fontSize: 13.5,
+                  lineHeight: 1.7,
+                  color: G.inkSoft,
+                  margin: 0,
+                }}
+              >
+                If you can send a text, you can use ReviewPing. Import your 
+                customers, pick a template, and hit send. No training calls, no 
+                learning curve. Our Google review software works directly with 
+                your Google Business Profile, so every request goes exactly where 
+                it needs to.
+              </p>
+            </div>
+            <div
+              style={{
+                background: G.surface,
+                border: `1.5px solid ${G.border}`,
+                borderRadius: 12,
+                padding: "22px 20px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "'Instrument Serif',serif",
+                  fontSize: 20,
+                  fontWeight: 400,
+                  marginBottom: 6,
+                  color: G.accent,
+                }}
+              >
+                3. Real human support — not chatbots
+              </div>
+              <p
+                style={{
+                  fontSize: 13.5,
+                  lineHeight: 1.7,
+                  color: G.inkSoft,
+                  margin: 0,
+                }}
+              >
+                When something goes wrong — and sometimes it will — you get a 
+                real person. Not a knowledge base article. Not a chatbot trained 
+                on your frustration. A human who answers within hours and actually 
+                fixes things. It's the kind of support every customer review 
+                platform should offer.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Stats */}
         <section
           style={{
@@ -463,6 +695,32 @@ export default function AboutPage({ onSignup, onLogin, onBack }) {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* Milestones */}
+        <section
+          style={{
+            maxWidth: 660,
+            margin: "0 auto 64px",
+            padding: "0 22px",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 14.5,
+              lineHeight: 1.8,
+              color: G.inkSoft,
+              margin: 0,
+              textAlign: "center",
+            }}
+          >
+            These numbers represent real businesses choosing a better way. <strong>500+ 
+            businesses</strong> across the USA and UK now use ReviewPing to automate 
+            their review requests. <strong>10,000+ reviews</strong> have been requested 
+            through our platform, helping small businesses build their online reputation 
+            with zero manual effort. And with an <strong>average rating of 4.9</strong>, 
+            our customers consistently deliver experiences worth sharing.
+          </p>
         </section>
 
         {/* CTA */}

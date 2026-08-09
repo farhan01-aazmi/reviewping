@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { G } from "../../data/theme";
 import { hasFeature, planForFeature } from "../../data/constants";
 import { createSubscription } from "../../api";
 import PricingModal from "./PricingModal";
 import { toast } from "sonner";
+import { trackFeatureGatedView, trackCheckoutStarted } from "../../tracking";
 
 /**
  * Wraps a premium feature. If the user's plan doesn't include it,
  * renders a clean upgrade CTA card instead of the children.
  *
  * Usage:
- *   <PremiumFeature feature="competitorRadar" plan={userPlan}>
- *     <CompetitorRadar />
+ *   <PremiumFeature feature="qrReviewGateway" plan={userPlan}>
+ *     <QRGatewaySettings />
  *   </PremiumFeature>
  */
 export default function PremiumFeature({
@@ -26,9 +27,18 @@ export default function PremiumFeature({
   const hasAccess = hasFeature(plan, feature);
   const requiredPlan = planForFeature(feature);
 
+  useEffect(() => {
+    if (!hasAccess) {
+      trackFeatureGatedView({ feature_name: feature });
+    }
+    // Only fire when the gate is actually shown for this feature, not on every re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasAccess, feature]);
+
   const handleUpgrade = async (planId, billing) => {
     setLoading(true);
     setShowPricing(false);
+    trackCheckoutStarted({ target_plan: planId, billing_cycle: billing || "monthly" });
     try {
       const result = await createSubscription({
         plan: planId,
@@ -111,7 +121,7 @@ export default function PremiumFeature({
             fontFamily: "'Manrope',sans-serif",
           }}
         >
-          {loading ? "Redirecting…" : `Upgrade to ${requiredPlan.name} — $${requiredPlan.price}/mo →`}
+          {loading ? "Redirecting…" : `Upgrade to ${requiredPlan.name} — ₹${requiredPlan.price}/mo →`}
         </div>
       </div>
 

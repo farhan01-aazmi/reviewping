@@ -5,6 +5,7 @@ import { ConfirmModal } from "../ui";
 import { supabase } from "../../config/supabase";
 import { toast } from "sonner";
 import { fmtDate } from "../../utils/formatters";
+import { trackContactImported } from "../../tracking";
 
 export default function Contacts({ userId }) {
   const [contacts, setContacts] = useState([]);
@@ -84,6 +85,7 @@ export default function Contacts({ userId }) {
       toast.error(error.message);
     } else {
       setContacts((p) => [data, ...p]);
+      trackContactImported({ method: "manual", contact_count: 1 });
       setShowAdd(false);
       setNName("");
       setNEmail("");
@@ -189,6 +191,7 @@ export default function Contacts({ userId }) {
         toast.error(error.message);
       } else {
         setContacts((p) => [...(data || []), ...p]);
+        trackContactImported({ method: "csv_bulk", contact_count: data?.length || rows.length });
         toast.success(
           `${data?.length || rows.length} contact${(data?.length || rows.length) !== 1 ? "s" : ""} imported`
         );

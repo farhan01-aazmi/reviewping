@@ -48,8 +48,8 @@ export default function Integrations({ plan }) {
   }, []);
 
   const doGbpConnect = async () => {
-    if (plan === "free" || plan === "starter") {
-      toast.error("Upgrade to Growth to connect integrations");
+    if (plan === "starter") {
+      toast.error("Upgrade to Premium to connect integrations");
       return;
     }
     setGbpLoading(true);

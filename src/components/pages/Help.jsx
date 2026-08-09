@@ -17,8 +17,8 @@ export default function Help() {
       a: "When you tap '✦ AI Write', ReviewPing uses Claude (Anthropic's AI) to write a personalised, human-sounding message based on the customer's name and service. Every message is unique.",
     },
     {
-      q: "SMS vs Email — which is better?",
-      a: "SMS has a 98% open rate and gets read within 3 minutes on average. Email is better if you only have an email address. 'Both' covers all bases.",
+      q: "WhatsApp vs Email — which is better?",
+      a: "WhatsApp has a 98% open rate within 5 minutes and the highest review completion rate of any channel. Email is better for professional services and when you only have an email address.",
     },
     {
       q: "Can I customise templates?",
@@ -26,7 +26,7 @@ export default function Help() {
     },
     {
       q: "Is my data safe?",
-      a: "All data is encrypted in transit and at rest. We are fully GDPR compliant. We never sell customer data. Every SMS includes an opt-out link as required by law.",
+      a: "All data is encrypted in transit and at rest. We are fully GDPR compliant. We never sell customer data. Every message includes an opt-out link as required by law.",
     },
     {
       q: "How do I cancel?",

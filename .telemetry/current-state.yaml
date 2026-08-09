@@ -1,0 +1,12 @@
+# Current State: greenfield (no tracking detected)
+# Scanned: 2026-08-06
+# SDK: none (react-ga4 is a declared dependency in package.json but has zero
+# import/usage occurrences anywhere in src/ Ã¢â‚¬â€ not wired up)
+
+events: []
+identity:
+  identify_calls: []
+  group_calls: []
+patterns:
+  naming_style: n/a
+  centralized: n/a

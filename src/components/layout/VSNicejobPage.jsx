@@ -371,6 +371,129 @@ const styles = {
     textDecoration: "underline",
     textUnderlineOffset: 2,
   },
+
+  /* ───────────── detailed comparison ───────────── */
+  detailedSection: {
+    padding: "8px 32px 56px",
+    maxWidth: 900,
+    margin: "0 auto",
+  },
+  detailedHeading: {
+    fontSize: 32,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 8px",
+    color: G.ink,
+    textAlign: "center",
+  },
+  detailedSub: {
+    fontSize: 16,
+    color: G.mutedLo,
+    marginBottom: 32,
+    textAlign: "center",
+    maxWidth: 640,
+    margin: "0 auto 32px",
+    lineHeight: 1.6,
+  },
+  detailGrid: {
+    overflowX: "auto",
+    borderRadius: 16,
+    border: `1px solid ${G.border}`,
+    background: G.surface,
+    boxShadow: "0 4px 24px rgba(26,23,20,0.06)",
+  },
+  detailTable: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: 15,
+  },
+  detailTh: {
+    textAlign: "left",
+    padding: "14px 20px",
+    fontWeight: 700,
+    fontSize: 14,
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    borderBottom: `2px solid ${G.border}`,
+    background: G.bg,
+  },
+  detailThCenter: {
+    textAlign: "center",
+    width: "30%",
+  },
+  detailThCompetitor: {
+    color: G.mutedLo,
+  },
+  detailThPing: {
+    color: G.accent,
+  },
+  detailTd: {
+    padding: "12px 20px",
+    borderBottom: `1px solid ${G.border}`,
+    verticalAlign: "middle",
+  },
+  detailTdCenter: {
+    textAlign: "center",
+  },
+  detailTdFeature: {
+    fontWeight: 600,
+    color: G.ink,
+  },
+  detailRowAlt: {
+    background: G.bg,
+  },
+
+  /* ───────────── who section ───────────── */
+  whoSection: {
+    padding: "8px 32px 48px",
+    maxWidth: 900,
+    margin: "0 auto",
+  },
+  whoHeading: {
+    fontSize: 28,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 16px",
+    color: G.ink,
+  },
+  whoText: {
+    fontSize: 16,
+    color: G.mutedLo,
+    lineHeight: 1.7,
+    margin: 0,
+  },
+
+  /* ───────────── faq section ───────────── */
+  faqSection: {
+    padding: "40px 32px 56px",
+    maxWidth: 720,
+    margin: "0 auto",
+  },
+  faqHeading: {
+    fontSize: 28,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 32px",
+    color: G.ink,
+    textAlign: "center",
+  },
+  faqItem: {
+    borderBottom: `1px solid ${G.border}`,
+    padding: "20px 0",
+  },
+  faqQuestion: {
+    fontSize: 17,
+    fontWeight: 700,
+    color: G.ink,
+    margin: "0 0 8px",
+    lineHeight: 1.4,
+  },
+  faqAnswer: {
+    fontSize: 15,
+    color: G.mutedLo,
+    lineHeight: 1.7,
+    margin: 0,
+  },
 };
 
 /* ───────────── main component ───────────── */
@@ -388,7 +511,7 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
       ),
       ping: (
         <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>
-          $29/mo
+          ₹599/mo
         </span>
       ),
       highlight: true,
@@ -449,7 +572,7 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
       ping: (
         <>
           <Check />{" "}
-          <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
+          <span style={{ fontSize: 13, color: G.mutedLo }}>₹1,499/mo</span>
         </>
       ),
       highlight: true,
@@ -460,7 +583,7 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
     <div style={styles.page}>
       <SEO
         title="ReviewPing vs Nicejob: Honest Comparison (2026)"
-        description="Compare ReviewPing ($29/mo) vs Nicejob ($75-$125/mo). See how ReviewPing's AI features and affordable pricing stack up against Nicejob's review automation."
+        description="Compare ReviewPing (₹599/mo) vs Nicejob ($75-$125/mo). See how ReviewPing's AI features and affordable pricing stack up against Nicejob's review automation."
         path="/vs/nicejob"
       />
 
@@ -497,13 +620,16 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
         </h1>
         <p style={styles.heroSub}>
           Nicejob asks <strong>$75–$125/mo</strong> for basic review requests
-          and monitoring. ReviewPing gives you <strong>AI replies</strong>,
-          WhatsApp requests, and a free plan — starting at just{" "}
-          <strong>$29/mo</strong>.
+          and monitoring — with no AI capabilities, no WhatsApp integration,
+          and no free plan to try before you buy. ReviewPing gives you
+          <strong> AI-powered reply generation</strong>, WhatsApp review
+          requests, a full analytics dashboard, and a generous free plan —
+          all starting at just <strong>₹599/mo</strong> with no contracts
+          required.
         </p>
         <div style={styles.heroCtaRow}>
           <button style={styles.primaryCta} onClick={onSignup}>
-            Start Free Trial — $29/mo
+            Start Free Trial — ₹599/mo
           </button>
           <button style={styles.secondaryCta} onClick={onLogin}>
             See My Dashboard
@@ -566,9 +692,13 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
           What Nicejob doesn't tell you
         </h2>
         <p style={styles.whySub}>
-          Nicejob is a solid product — but it's expensive, lacks AI features,
-          and locks you into contracts. Here's what you actually get with
-          ReviewPing.
+          Nicejob is a perfectly capable review platform — but it is
+          expensive for what it delivers, lacks AI-powered features that
+          save you hours each week, and often locks customers into annual
+          contracts with hefty cancellation fees. Here is what you actually
+          get with ReviewPing: smarter automation, more communication
+          channels, and transparent month-to-month pricing that grows with
+          you rather than trapping you.
         </p>
 
         <div style={styles.cardsGrid}>
@@ -611,16 +741,149 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
         </div>
       </section>
 
+      {/* ── detailed feature comparison ── */}
+      <section style={styles.detailedSection}>
+        <h2 style={styles.detailedHeading}>
+          Detailed Feature Comparison
+        </h2>
+        <p style={styles.detailedSub}>
+          When you look past the marketing, Nicejob and ReviewPing differ
+          in some important ways. Here is a transparent feature-by-feature
+          comparison so you can see exactly what each platform delivers
+          and where your money actually goes.
+        </p>
+
+        <div style={styles.detailGrid}>
+          <table style={styles.detailTable}>
+            <thead>
+              <tr>
+                <th style={styles.detailTh}>Feature</th>
+                <th style={{...styles.detailTh, ...styles.detailThCenter, ...styles.detailThCompetitor}}>Nicejob</th>
+                <th style={{...styles.detailTh, ...styles.detailThCenter, ...styles.detailThPing}}>ReviewPing</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Core review requests (Email + WhatsApp)</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>AI reply generation</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Free plan available</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Monthly pricing range</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.accent, fontWeight: 600 }}>$75–$125/mo</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.success, fontWeight: 600 }}>₹599/mo flat</span></td>
+              </tr>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>WhatsApp integration</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Month-to-month contracts</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.accent, fontWeight: 600 }}><Cross /> Annual required</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.success, fontWeight: 600 }}><Check /> Cancel anytime</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ── who should choose ── */}
+      <section style={styles.whoSection}>
+        <h2 style={styles.whoHeading}>
+          Who should choose ReviewPing instead of Nicejob?
+        </h2>
+        <p style={styles.whoText}>
+          ReviewPing is the better fit for budget-conscious business owners
+          who want modern features like AI reply generation and WhatsApp
+          outreach without paying for features they will never use.
+          Independent restaurants, dental practices, and local service
+          providers will appreciate the <strong>$0/mo free plan</strong>
+          that lets them validate the platform before upgrading. Anyone
+          frustrated by Nicejob's annual contract requirements will love
+          ReviewPing's month-to-month flexibility. And e-commerce operators
+          who need multi-channel review requests will find ReviewPing's
+          email and WhatsApp coverage unmatched at this price point.
+        </p>
+      </section>
+
+      {/* ── faq ── */}
+      <section style={styles.faqSection}>
+        <h2 style={styles.faqHeading}>
+          Frequently asked questions about Nicejob alternatives
+        </h2>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            Is ReviewPing as feature-rich as Nicejob?
+          </h3>
+          <p style={styles.faqAnswer}>
+            In many ways, ReviewPing is actually more feature-rich. While
+            Nicejob covers the basics of review requests and monitoring,
+            ReviewPing adds AI-powered reply generation, WhatsApp review
+            requests, and a free plan — three features Nicejob simply does
+            not offer. ReviewPing also provides a more modern analytics
+            dashboard with actionable insights rather than just raw data.
+            The only area where Nicejob may have an edge is in advanced
+            enterprise reporting, which most small businesses never need.
+          </p>
+        </div>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            Can ReviewPing handle multi-location review management?
+          </h3>
+          <p style={styles.faqAnswer}>
+            Absolutely. ReviewPing's Agency plan at <strong>₹1,499/month</strong>
+            supports unlimited locations with white-label branding, making
+            it ideal for multi-location businesses and marketing agencies.
+            Nicejob also supports multiple locations, but at a significantly
+            higher price point. ReviewPing gives you predictable flat-rate
+            pricing that does not increase as you add more locations or
+            team members — a critical advantage for growing operations.
+          </p>
+        </div>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            Does ReviewPing require a long-term contract like Nicejob?
+          </h3>
+          <p style={styles.faqAnswer}>
+            Not at all. ReviewPing is proudly month-to-month with no
+            annual commitments and no cancellation fees. You can upgrade,
+            downgrade, or cancel at any time with a single click. Nicejob
+            often requires annual contracts that lock you in even if your
+            needs change. If flexibility matters to your business,
+            ReviewPing's transparent no-contract approach is a breath of
+            fresh air compared to Nicejob's rigid commitment requirements.
+          </p>
+        </div>
+      </section>
+
       {/* ── cta ── */}
       <section style={styles.ctaSection}>
         <div style={styles.ctaWrap}>
           <h2 style={styles.ctaTitle}>
             Ditch the expensive contract. Start at{" "}
-            <span style={{ color: G.gold }}>$29/mo</span>.
+            <span style={{ color: G.gold }}>₹599/mo</span>.
           </h2>
           <p style={styles.ctaSub}>
-            No setup fees. No onboarding call required. No long-term
-            contract. You'll be up and running in 5 minutes.
+            No setup fees, no onboarding calls, and definitely no long-term
+            contracts — just honest pricing and a platform that works out of
+            the box. You will be up and running in 5 minutes with your first
+            review request sent in under an hour. Already using Nicejob? Our
+            team offers free migration support to help you transfer your
+            settings and get comfortable with ReviewPing quickly.
           </p>
           <button style={styles.ctaBtn} onClick={onSignup}>
             Start Free Trial

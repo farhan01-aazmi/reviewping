@@ -1,7 +1,8 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense, useRef } from "react";
 import { supabase } from "./config/supabase";
 import { G } from "./data/theme";
 import { Spinner } from "./components/ui";
+import ReactGA from "react-ga4";
 import Landing from "./components/layout/Landing";
 import Signup from "./components/layout/Signup";
 import Login from "./components/layout/Login";
@@ -10,10 +11,9 @@ import Onboarding from "./components/layout/Onboarding";
 import AppShell from "./components/layout/AppShell";
 
 import AuthCallback from "./components/layout/AuthCallback";
+import { identifyUser, trackOnboardingCompleted, resetIdentity } from "./tracking";
 
 // Lazy-loaded pages (not critical path)
-const PrivacyPolicy = lazy(() => import("./components/layout/PrivacyPolicy"));
-const Terms = lazy(() => import("./components/layout/Terms"));
 const FreeTool = lazy(() => import("./components/layout/FreeTool"));
 const NotFound = lazy(() => import("./components/layout/NotFoundPage"));
 const FeaturesPage = lazy(() => import("./components/layout/FeaturesPage"));
@@ -28,11 +28,21 @@ const VSGradeUsPage = lazy(() => import("./components/layout/VSGradeUsPage"));
 const VSNicejobPage = lazy(() => import("./components/layout/VSNicejobPage"));
 const VSBirdeyePage = lazy(() => import("./components/layout/VSBirdeyePage"));
 const VSTruereviewPage = lazy(() => import("./components/layout/VSTruereviewPage"));
+const PodiumAlternativePage = lazy(() => import("./components/layout/PodiumAlternativePage"));
+const PricingPage = lazy(() => import("./components/pages/PricingPage"));
 const RefundPolicy = lazy(() => import("./components/layout/RefundPolicy"));
 const TermsPage = lazy(() => import("./components/layout/TermsPage"));
 const PrivacyPage = lazy(() => import("./components/layout/PrivacyPage"));
 const RefundPage = lazy(() => import("./components/layout/RefundPage"));
 const ReviewGatewayPage = lazy(() => import("./components/layout/ReviewGatewayPage"));
+
+function getHashPath() {
+  const h = window.location.hash;
+  if (!h || h === "#") return null;
+  const p = h.replace(/^#/, "");
+  if (p === "/dashboard" || p.startsWith("/dashboard/")) return p;
+  return null;
+}
 
 function pathToView(pathname) {
   if (
@@ -41,6 +51,8 @@ function pathToView(pathname) {
   ) {
     return "authcallback";
   }
+  const hashPath = getHashPath();
+  if (hashPath) return "app";
   const path = pathname.replace(/\/+$/, "") || "/";
   const knownPaths = {
     "/": "landing",
@@ -53,7 +65,7 @@ function pathToView(pathname) {
     "/auth/callback": "authcallback",
     "/tools/review-link-generator": "freetool",
     "/tools/review-response-generator": "freetool",
-    "/pricing": "landing",
+    "/pricing": "pricing",
     "/dashboard": "app",
     "/onboarding": "onboarding",
     "/features": "features",
@@ -66,15 +78,28 @@ function pathToView(pathname) {
     "/vs/nicejob": "vsnicejob",
     "/vs/birdeye": "vsbirdeye",
     "/vs/truereview": "vstruereview",
+    "/podium-alternative": "podiumalternative",
   };
   if (knownPaths[path]) return knownPaths[path];
   if (/^\/blog\//.test(path)) return "blogarticle";
   if (/^\/industry\//.test(path)) return "industry";
   if (/^\/r\//.test(path)) return "reviewgateway";
+  if (/^\/biz\//.test(path)) return "reviewgateway";
+  if (/^\/dashboard\//.test(path)) return "app";
   return "notfound";
 }
 
 function navigate(view, param) {
+  if (view === "app") {
+    const cur = window.location.hash;
+    if (param) {
+      const hash = `#/dashboard/${param}`;
+      if (cur !== hash) window.location.hash = hash;
+    } else if (!cur || cur === "#" || !cur.startsWith("#/dashboard")) {
+      window.location.hash = "#/dashboard";
+    }
+    return;
+  }
   const viewToPath = {
     landing: "/",
     login: "/login",
@@ -84,8 +109,8 @@ function navigate(view, param) {
     terms: "/terms",
     refund: "/refund",
     freetool: "/tools/review-link-generator",
-    app: "/dashboard",
     onboarding: "/onboarding",
+    pricing: "/pricing",
     features: "/features",
     faq: "/faq",
     blog: "/blog",
@@ -96,6 +121,7 @@ function navigate(view, param) {
     vsnicejob: "/vs/nicejob",
     vsbirdeye: "/vs/birdeye",
     vstruereview: "/vs/truereview",
+    podiumalternative: "/podium-alternative",
     reviewgateway: window.location.pathname,
     notfound: window.location.pathname,
   };
@@ -122,7 +148,31 @@ async function fetchProfile(userId) {
 }
 
 export default function App() {
-  const [view, setView] = useState(() => pathToView(window.location.pathname));
+  const [view, setView] = useState(() => getHashPath() ? "app" : pathToView(window.location.pathname));
+  const prevView = useRef(view);
+
+  // Google AdSense — add meta tag directly to head (Helmet keeps removing it)
+  useEffect(() => {
+    if (!document.querySelector('meta[name="google-adsense-account"]')) {
+      const meta = document.createElement("meta");
+      meta.name = "google-adsense-account";
+      meta.content = "ca-pub-3228204713225337";
+      document.head.appendChild(meta);
+    }
+  }, []);
+
+  // Google Analytics — init once + track page views
+  useEffect(() => {
+    ReactGA.initialize("G-MD1B5GNZD2");
+    ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+  }, []);
+
+  useEffect(() => {
+    if (view !== prevView.current) {
+      prevView.current = view;
+      ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+    }
+  }, [view]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState("");
@@ -131,8 +181,16 @@ export default function App() {
 
   useEffect(() => {
     const onPop = () => setView(pathToView(window.location.pathname));
+    const onHash = () => {
+      if (getHashPath()) setView("app");
+      else setView(pathToView(window.location.pathname));
+    };
     window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener("hashchange", onHash);
+    };
   }, []);
 
   const changeView = (newView) => {
@@ -140,7 +198,8 @@ export default function App() {
     setView(newView);
   };
 
-  async function onProfileLoaded(data) {
+  async function onProfileLoaded(data, authUser) {
+    if (pathToView(window.location.pathname) === "reviewgateway") return;
     const profileUser = {
       id: data.id,
       name: data.full_name || data.name,
@@ -148,6 +207,17 @@ export default function App() {
       biz: data.business_name,
       onboarding_completed: data.onboarding_completed === true,
     };
+    if (authUser) {
+      identifyUser(authUser, {
+        id: data.id,
+        name: profileUser.name,
+        business_name: data.business_name,
+        plan: data.plan,
+        gbp_connected: !!data.gbp_connected,
+        is_internal: data.is_internal,
+        created_at: data.created_at,
+      });
+    }
     setUser(profileUser);
     if (profileUser.onboarding_completed) {
       changeView("app");
@@ -200,11 +270,11 @@ export default function App() {
             setLoading(false);
             return;
           }
-          if (session?.user) {
+          if (session?.user && pathToView(window.location.pathname) !== "reviewgateway") {
             fetchProfile(session.user.id)
               .then((data) => {
                 if (cancelled) return;
-                if (data) onProfileLoaded(data);
+                if (data) onProfileLoaded(data, session.user);
                 setLoading(false);
               })
               .catch(() => {
@@ -223,12 +293,14 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (cancelled) return;
       if (event === "SIGNED_OUT") {
+        resetIdentity();
         setUser(null);
         changeView("landing");
       } else if (session?.user && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
         if (window.location.search.includes("code=") || window.location.hash.includes("access_token=")) return;
+        if (pathToView(window.location.pathname) === "reviewgateway") return;
         fetchProfile(session.user.id)
-          .then((data) => { if (data) onProfileLoaded(data); })
+          .then((data) => { if (data) onProfileLoaded(data, session.user); })
           .catch(() => {});
       }
     });
@@ -275,6 +347,7 @@ export default function App() {
       }
       return updated;
     });
+    trackOnboardingCompleted();
     changeView("app");
   };
 
@@ -295,6 +368,7 @@ export default function App() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    resetIdentity();
     setUser(null);
     changeView("landing");
   };
@@ -484,6 +558,12 @@ export default function App() {
         )}
         {view === "vstruereview" && (
           <VSTruereviewPage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
+        )}
+        {view === "pricing" && (
+          <PricingPage plan={{ id: "free" }} onNav={(v) => changeView(v === "pricing" ? "signup" : v)} />
+        )}
+        {view === "podiumalternative" && (
+          <PodiumAlternativePage onSignup={() => changeView("signup")} onLogin={() => changeView("login")} onBack={() => changeView("landing")} />
         )}
         {view === "freetool" && <FreeTool onSignup={() => changeView("signup")} />}
         {view === "notfound" && (

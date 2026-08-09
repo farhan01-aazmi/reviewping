@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Card, Field, Btn, Wordmark, Pill } from "../ui";
@@ -21,6 +21,22 @@ export default function Onboarding({ user, onComplete }) {
   const [ph, setPh] = useState(user.phone || "");
   const [web, setWeb] = useState("");
   const [saving, setSaving] = useState(false);
+  const [gbpConnected, setGbpConnected] = useState(false);
+  const [gbpChecking, setGbpChecking] = useState(true);
+
+  // Check if Google Business Profile is already connected
+  useEffect(() => {
+    (async () => {
+      if (!user?.id) { setGbpChecking(false); return; }
+      const { data } = await supabase
+        .from("gbp_connections")
+        .select("is_connected")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      setGbpConnected(data?.is_connected === true);
+      setGbpChecking(false);
+    })();
+  }, [user?.id]);
 
   const steps = [
     { n: 1, l: "Business info" },
@@ -262,7 +278,7 @@ export default function Onboarding({ user, onComplete }) {
 
           {/* Step 2: Review link */}
           {step === 2 && (
-            <div onKeyDown={(e) => e.key === "Enter" && setStep(3)}>
+            <div onKeyDown={(e) => e.key === "Enter" && gbpConnected && setStep(3)}>
               <h2
                 style={{
                   fontFamily: "'Instrument Serif',serif",
@@ -272,7 +288,7 @@ export default function Onboarding({ user, onComplete }) {
                   letterSpacing: "-0.5px",
                 }}
               >
-                Add your Google review link
+                Connect your Google Business Profile
               </h2>
               <p
                 style={{
@@ -282,21 +298,14 @@ export default function Onboarding({ user, onComplete }) {
                   lineHeight: 1.7,
                 }}
               >
-                Customers click this to leave your review.
+                Required — this powers auto-fetch of reviews, AI replies, and your QR review gateway.
               </p>
-              <Field
-                label="Google review link"
-                value={gl}
-                onChange={(e) => setGl(e.target.value)}
-                placeholder="https://g.page/r/..."
-                hint="Google Maps → Your Business → Share → Copy review link"
-              />
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: G.inkSoft, marginBottom: 6 }}>
-                  Connect Google Business Profile (Recommended)
+                  Google Business Profile <span style={{ color: G.accent }}>*</span>
                 </label>
                 <Btn
-                  variant="secondary"
+                  variant={gbpConnected ? "secondary" : "primary"}
                   fullWidth
                   onClick={async () => {
                     try {
@@ -308,41 +317,30 @@ export default function Onboarding({ user, onComplete }) {
                   }}
                   style={{ marginBottom: 8 }}
                 >
-                  Connect Google Business Profile →
+                  {gbpChecking ? "Checking…" : gbpConnected ? "✓ Connected — reconnect" : "Connect Google Business Profile →"}
                 </Btn>
+                {gbpConnected && (
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+                    <span style={{ color: G.success, fontWeight: 700, fontSize: 13 }}>✓</span>
+                    <span style={{ fontSize: 13, color: G.success, fontWeight: 600 }}>
+                      Connected! Your reviews and replies are now powered automatically.
+                    </span>
+                  </div>
+                )}
                 <p style={{ fontSize: 11, color: G.muted, margin: 0 }}>
-                  Connect GBP to auto-fetch reviews, auto-generate review links, and enable review replies.
-                </p>
-              </div>
-              <div
-                style={{
-                  padding: "14px 16px",
-                  background: G.accentBg,
-                  border: `1.5px solid ${G.accentBd}`,
-                  borderRadius: 10,
-                  marginBottom: 20,
-                }}
-              >
-                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4 }}>
-                  Don't have review link yet?
-                </div>
-                <p
-                  style={{
-                    color: G.muted,
-                    margin: 0,
-                    fontSize: 13,
-                    lineHeight: 1.65,
-                  }}
-                >
-                  Skip for now. Add it later from Settings.
+                  You'll be redirected to Google to authorize access. Then we'll auto-fetch reviews and AI-reply to new ones.
                 </p>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <Btn variant="secondary" onClick={() => setStep(1)}>
                   ← Back
                 </Btn>
-                <Btn fullWidth onClick={() => setStep(3)}>
-                  Continue →
+                <Btn
+                  fullWidth
+                  onClick={() => gbpConnected && setStep(3)}
+                  disabled={!gbpConnected}
+                >
+                  {gbpConnected ? "Continue →" : gbpChecking ? "Checking…" : "Connect GBP first →"}
                 </Btn>
               </div>
             </div>
@@ -400,7 +398,7 @@ export default function Onboarding({ user, onComplete }) {
                     marginBottom: 10,
                   }}
                 >
-                  SMS Preview
+                  Message Preview
                 </div>
                 <p
                   style={{
@@ -414,12 +412,12 @@ export default function Onboarding({ user, onComplete }) {
                 >
                   "Hi [Customer Name]! Thanks for visiting {bn || "us"} today.
                   A quick Google review would mean the world — 30 seconds:{" "}
-                  {gl || "your-link"}
+                  {gl || user.googleLink || "your-link"}
                 </p>
               </Card>
               {[
                 { t: "AI personalises every message" },
-                { t: "Sent instantly via SMS or email" },
+                { t: "Sent instantly via email or WhatsApp" },
                 { t: "You're notified when reviews arrive" },
               ].map((i, x) => (
                 <div

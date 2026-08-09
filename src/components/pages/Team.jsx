@@ -8,6 +8,7 @@ import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
 import { fmtDate } from "../../utils/formatters";
 import { toast } from "sonner";
+import { trackTeamMemberInvited } from "../../tracking";
 
 export default function Team({ plan, userId }) {
   const [team, setTeam] = useState([]);
@@ -61,6 +62,7 @@ export default function Team({ plan, userId }) {
         return;
       }
       if (data) setTeam((p) => [...p, data[0]]);
+      trackTeamMemberInvited({ role: inviteRole });
       setInviteEmail("");
       toast.success(`Invitation sent to ${inviteEmail}`);
     } catch (err) {

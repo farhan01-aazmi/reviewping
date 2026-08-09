@@ -22,7 +22,7 @@ export default function BulkSend({ biz, templates, onSent, plan, userId }) {
   const [sending, setSending] = useState(false);
   const [done2, setDone2] = useState(false);
   const [service, setService] = useState(SERVICES[0]);
-  const [method, setMethod] = useState("SMS");
+  const [method, setMethod] = useState("Email");
   const [rowErrors, setRowErrors] = useState({});
   const [results, setResults] = useState([]);
   const [showPricing, setShowPricing] = useState(false);
@@ -138,11 +138,10 @@ export default function BulkSend({ biz, templates, onSent, plan, userId }) {
     for (const r of rows) {
       try {
         const isEmail = r.contact.includes("@");
-        const shouldSendSms = method === "SMS" || method === "Both";
         const shouldSendEmail = method === "Email" || method === "Both";
-        const shouldSendWhatsApp = method === "WhatsApp";
+        const shouldSendWhatsApp = method === "WhatsApp" || method === "Both";
         const isPhone = !isEmail;
-        const channel = isEmail ? "email" : shouldSendWhatsApp ? "whatsapp" : "sms";
+        const channel = isEmail ? "email" : "whatsapp";
         const bizName = biz?.business_name || biz?.biz || "our business";
 
         // 1. Create review_request
@@ -181,22 +180,6 @@ export default function BulkSend({ biz, templates, onSent, plan, userId }) {
         }
 
         const link = gatewayUrl || `[LINK]`;
-
-        if (shouldSendSms && !isEmail) {
-          // Send SMS
-          const smsRes = await fetch(`${FUNCTION_URL}/send-sms`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ to: r.contact, message: `Hi ${r.name}, thanks for choosing ${bizName}! We'd love your feedback: ${link}` }),
-          });
-          if (!smsRes.ok) {
-            const err = await smsRes.json();
-            throw new Error(err.error || `SMS failed (${smsRes.status})`);
-          }
-        }
 
         if (shouldSendWhatsApp && isPhone) {
           // Send WhatsApp
@@ -370,7 +353,7 @@ export default function BulkSend({ biz, templates, onSent, plan, userId }) {
           label="Send via"
           value={method}
           onChange={(e) => setMethod(e.target.value)}
-          options={["SMS", "Email", "WhatsApp", "Both"]}
+          options={["Email", "WhatsApp", "Both"]}
         />
       </Card>
       <Card sx={{ marginBottom: 14 }}>

@@ -6,7 +6,7 @@ import { CORS, verifyAuth } from "../_shared/auth.ts";
  * Dodo Payments Checkout Session Creator
  *
  * Creates a hosted checkout session for subscription payments.
- * Accepts `plan` (starter/growth/agency) and `billing` (monthly/annual).
+ * Accepts `plan` (starter/premium/agency) and `billing` (monthly/annual).
  * Resolves Dodo Payments product IDs from environment variables.
  *
  * Products must be created in Dodo Payments dashboard first.
@@ -15,8 +15,8 @@ import { CORS, verifyAuth } from "../_shared/auth.ts";
  *   DODO_PAYMENTS_API_KEY
  *   DODO_PRODUCT_STARTER_MONTHLY
  *   DODO_PRODUCT_STARTER_ANNUAL
- *   DODO_PRODUCT_GROWTH_MONTHLY
- *   DODO_PRODUCT_GROWTH_ANNUAL
+ *   DODO_PRODUCT_PREMIUM_MONTHLY
+ *   DODO_PRODUCT_PREMIUM_ANNUAL
  *   DODO_PRODUCT_AGENCY_MONTHLY
  *   DODO_PRODUCT_AGENCY_ANNUAL
  *   DODO_MODE (optional: "test" or "live", defaults to "test")
@@ -53,8 +53,8 @@ serve(async (req) => {
 
     const { plan, billing, return_url } = body || {};
 
-    if (!plan || !["starter", "growth", "agency"].includes(plan)) {
-      return new Response(JSON.stringify({ error: "Invalid plan. Must be starter, growth, or agency" }), {
+    if (!plan || !["starter", "premium", "agency"].includes(plan)) {
+      return new Response(JSON.stringify({ error: "Invalid plan. Must be starter, premium, or agency" }), {
         status: 400, headers: CORS,
       });
     }

@@ -7,122 +7,64 @@ import Pill from "../ui/Pill";
 import Stars from "../ui/Stars";
 import { fmtDate } from "../../utils/formatters";
 
+const ICONS = { email: "✉️", whatsapp: "📱" };
+const CHANNEL_NAMES = { email: "Email", whatsapp: "WhatsApp" };
+
+function DeliveryBadge({ delivery_status }) {
+  const map = {
+    sent: { label: "Sent", color: G.info },
+    delivered: { label: "Delivered", color: G.success },
+    opened: { label: "Opened", color: G.success },
+    clicked: { label: "Clicked", color: G.success },
+    reviewed: { label: "Reviewed", color: G.purple },
+    failed: { label: "Failed", color: G.accent },
+    pending: { label: "Pending", color: G.gold },
+  };
+  const m = map[delivery_status] || map.pending;
+  return <Pill color={m.color}>{m.label}</Pill>;
+}
+
 export default function SentLog({ userId }) {
-  const [reviews, setReviews] = useState([]);
+  const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("All");
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
     supabase
-      .from("reviews")
-      .select("*")
+      .from("review_requests")
+      .select("id, customer_name, customer_email, customer_phone, channel, status, delivery_status, failed_reason, sent_at, review_link")
       .eq("user_id", userId)
-      .order("sentAt", { ascending: false })
+      .order("sent_at", { ascending: false })
+      .limit(100)
       .then(({ data, error }) => {
         if (cancelled) return;
         if (error) console.error(error);
-        setReviews(data || []);
+        setRequests(data || []);
         setLoading(false);
       });
     return () => { cancelled = true; };
   }, [userId]);
 
-  let list = loading ? [] : [...reviews].sort((a, b) => b.sentAt - a.sentAt);
-  if (filter === "Reviewed")
-    list = list.filter((r) => r.status === "reviewed");
-  if (filter === "Pending")
-    list = list.filter((r) => r.status === "pending");
-  if (search)
-    list = list.filter(
-      (r) =>
-        r.name.toLowerCase().includes(search.toLowerCase()) ||
-        r.service.toLowerCase().includes(search.toLowerCase())
-    );
+  if (loading) {
+    return <div style={{ textAlign: "center", padding: 40, color: G.muted }}>Loading messages...</div>;
+  }
 
   return (
     <div>
-      <h2
-        style={{
-          fontFamily: "'Instrument Serif',serif",
-          fontSize: 26,
-          fontWeight: 400,
-          margin: "0 0 4px",
-          letterSpacing: "-0.5px",
-        }}
-      >
-        Message history
+      <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 26, fontWeight: 400, margin: "0 0 4px", letterSpacing: "-0.5px" }}>
+        Sent Log
       </h2>
       <p style={{ margin: "0 0 20px", color: G.muted, fontSize: 13.5 }}>
-        Complete log of every review request sent from your account.
+        Delivery status for every review request sent.
       </p>
-      <div style={{ position: "relative", marginBottom: 10 }}>
-        <span
-          style={{
-            position: "absolute",
-            left: 12,
-            top: "50%",
-            transform: "translateY(-50%)",
-            color: G.muted,
-            fontSize: 14,
-          }}
-        >
-          🔍
-        </span>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search name or service…"
-          aria-label="Search message history"
-          style={{
-            width: "100%",
-            background: G.surface,
-            border: `1.5px solid ${G.border}`,
-            borderRadius: 8,
-            padding: "10px 14px 10px 36px",
-            fontSize: 13.5,
-            color: G.ink,
-            outline: "2px solid transparent",
-            outlineOffset: "2px",
-            boxSizing: "border-box",
-            fontFamily: "'Manrope',sans-serif",
-          }}
-        />
+      <div style={{ fontSize: 12, color: G.muted, fontWeight: 600, marginBottom: 10 }}>
+        {requests.length} {requests.length === 1 ? "message" : "messages"}
       </div>
-      <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-        {["All", "Reviewed", "Pending"].map((f) => (
-          <Btn
-            key={f}
-            variant={filter === f ? "primary" : "secondary"}
-            size="sm"
-            onClick={() => setFilter(f)}
-          >
-            {f}
-          </Btn>
-        ))}
-      </div>
-      <div
-        style={{
-          fontSize: 12,
-          color: G.muted,
-          fontWeight: 600,
-          marginBottom: 10,
-        }}
-      >
-        {loading ? "Loading..." : `${list.length} messages`}
-      </div>
-      {loading ? (
-        <div style={{ textAlign: "center", padding: 40, color: G.muted }}>
-          Loading messages…
-        </div>
-      ) : list.length === 0 ? (
-        <div style={{ textAlign: "center", padding: 40, color: G.muted }}>
-          No messages found.
-        </div>
+      {requests.length === 0 ? (
+        <div style={{ textAlign: "center", padding: 40, color: G.muted }}>No messages sent yet.</div>
       ) : (
-        list.map((r) => (
+        requests.map((r) => (
           <div
             key={r.id}
             style={{
@@ -137,40 +79,22 @@ export default function SentLog({ userId }) {
             }}
           >
             <span style={{ fontSize: 16, flexShrink: 0 }}>
-              {r.channel === "SMS"
-                ? "📱"
-                : r.channel === "Email"
-                ? "✉️"
-                : "📤"}
+              {ICONS[r.channel] || "📤"}
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontWeight: 600,
-                  fontSize: 13.5,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {r.name}
+              <div style={{ fontWeight: 600, fontSize: 13.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {r.customer_name || r.customer_email || r.customer_phone || "Unknown"}
               </div>
               <div style={{ fontSize: 12, color: G.muted }}>
-                {r.service} · {fmtDate(r.sentAt)}
+                {CHANNEL_NAMES[r.channel] || r.channel} · {fmtDate(r.sent_at)}
               </div>
             </div>
             <div style={{ textAlign: "right", flexShrink: 0 }}>
-              {r.status === "reviewed" ? (
-                <>
-                  <Pill color={G.success}>Reviewed</Pill>
-                  {r.rating && (
-                    <div style={{ marginTop: 3 }}>
-                      <Stars rating={r.rating} size={11} />
-                    </div>
-                  )}
-                </>
-              ) : (
-                <Pill color={G.gold}>Pending</Pill>
+              <DeliveryBadge delivery_status={r.delivery_status || r.status} />
+              {r.failed_reason && (
+                <div style={{ fontSize: 10, color: G.accent, marginTop: 2, maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {r.failed_reason}
+                </div>
               )}
             </div>
           </div>

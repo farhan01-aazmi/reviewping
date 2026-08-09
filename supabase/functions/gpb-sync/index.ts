@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { captureServerEvent } from "../_shared/posthog.ts"
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || ""
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
@@ -122,6 +123,12 @@ serve(async (req) => {
       })
 
       if (!insertErr) stored++
+      if (!insertErr) {
+        await captureServerEvent(user.id, "review.received", {
+          rating: r.starRating,
+          source: "gbp_sync",
+        }, user.id)
+      }
     }
 
     // Update last sync timestamp
@@ -129,10 +136,49 @@ serve(async (req) => {
       last_sync_at: new Date().toISOString(),
     }).eq("user_id", user.id)
 
+    // Auto-reply to new reviews (non-fatal if it fails)
+    let autoReply = { replied: 0, failed: [] as string[] }
+    try {
+      const replyRes = await fetch(`${SUPABASE_URL}/functions/v1/auto-reply-gbp`, {
+        method: "POST",
+        headers: {
+          "Authorization": authHeader,
+          "Content-Type": "application/json",
+        },
+        body: "{}",
+      })
+      if (replyRes.ok) {
+        autoReply = await replyRes.json()
+      }
+    } catch {
+      // ignore — auto-reply failure should not fail the sync
+    }
+
+    // Email the business owner about new reviews (non-fatal if it fails)
+    let notified = 0
+    try {
+      const notifyRes = await fetch(`${SUPABASE_URL}/functions/v1/notify-new-reviews`, {
+        method: "POST",
+        headers: {
+          "Authorization": authHeader,
+          "Content-Type": "application/json",
+        },
+        body: "{}",
+      })
+      if (notifyRes.ok) {
+        const notifyData = await notifyRes.json()
+        notified = notifyData.notified?.length || 0
+      }
+    } catch {
+      // ignore — notification failure should not fail the sync
+    }
+
     return new Response(JSON.stringify({
       success: true,
       stored,
       total: gbpReviews.length,
+      autoReply,
+      notified,
     }), {
       headers: { "Content-Type": "application/json" },
     })

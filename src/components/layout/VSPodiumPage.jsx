@@ -371,6 +371,129 @@ const styles = {
     textDecoration: "underline",
     textUnderlineOffset: 2,
   },
+
+  /* ───────────── detailed comparison ───────────── */
+  detailedSection: {
+    padding: "8px 32px 56px",
+    maxWidth: 900,
+    margin: "0 auto",
+  },
+  detailedHeading: {
+    fontSize: 32,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 8px",
+    color: G.ink,
+    textAlign: "center",
+  },
+  detailedSub: {
+    fontSize: 16,
+    color: G.mutedLo,
+    marginBottom: 32,
+    textAlign: "center",
+    maxWidth: 640,
+    margin: "0 auto 32px",
+    lineHeight: 1.6,
+  },
+  detailGrid: {
+    overflowX: "auto",
+    borderRadius: 16,
+    border: `1px solid ${G.border}`,
+    background: G.surface,
+    boxShadow: "0 4px 24px rgba(26,23,20,0.06)",
+  },
+  detailTable: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: 15,
+  },
+  detailTh: {
+    textAlign: "left",
+    padding: "14px 20px",
+    fontWeight: 700,
+    fontSize: 14,
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    borderBottom: `2px solid ${G.border}`,
+    background: G.bg,
+  },
+  detailThCenter: {
+    textAlign: "center",
+    width: "30%",
+  },
+  detailThCompetitor: {
+    color: G.mutedLo,
+  },
+  detailThPing: {
+    color: G.accent,
+  },
+  detailTd: {
+    padding: "12px 20px",
+    borderBottom: `1px solid ${G.border}`,
+    verticalAlign: "middle",
+  },
+  detailTdCenter: {
+    textAlign: "center",
+  },
+  detailTdFeature: {
+    fontWeight: 600,
+    color: G.ink,
+  },
+  detailRowAlt: {
+    background: G.bg,
+  },
+
+  /* ───────────── who section ───────────── */
+  whoSection: {
+    padding: "8px 32px 48px",
+    maxWidth: 900,
+    margin: "0 auto",
+  },
+  whoHeading: {
+    fontSize: 28,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 16px",
+    color: G.ink,
+  },
+  whoText: {
+    fontSize: 16,
+    color: G.mutedLo,
+    lineHeight: 1.7,
+    margin: 0,
+  },
+
+  /* ───────────── faq section ───────────── */
+  faqSection: {
+    padding: "40px 32px 56px",
+    maxWidth: 720,
+    margin: "0 auto",
+  },
+  faqHeading: {
+    fontSize: 28,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 32px",
+    color: G.ink,
+    textAlign: "center",
+  },
+  faqItem: {
+    borderBottom: `1px solid ${G.border}`,
+    padding: "20px 0",
+  },
+  faqQuestion: {
+    fontSize: 17,
+    fontWeight: 700,
+    color: G.ink,
+    margin: "0 0 8px",
+    lineHeight: 1.4,
+  },
+  faqAnswer: {
+    fontSize: 15,
+    color: G.mutedLo,
+    lineHeight: 1.7,
+    margin: 0,
+  },
 };
 
 /* ───────────── main component ───────────── */
@@ -380,7 +503,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
     {
       feature: "Price",
       podium: <span style={styles.priceHighlight}><span style={styles.podiumPrice}>$400+</span>/mo</span>,
-      ping: <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>$29/mo</span>,
+      ping: <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>₹599/mo</span>,
       highlight: true,
     },
     {
@@ -389,7 +512,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       ping: <Check />,
     },
     {
-      feature: "SMS & Email",
+      feature: "Email & WhatsApp",
       podium: <Check />,
       ping: <Check />,
     },
@@ -408,7 +531,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       podium: <Check />,
       ping: (
         <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>₹1,499/mo</span>
         </>
       ),
     },
@@ -417,7 +540,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
       podium: <Cross />,
       ping: (
         <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo</span>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>₹1,499/mo</span>
         </>
       ),
     },
@@ -445,8 +568,8 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
   return (
     <div style={styles.page}>
       <SEO
-        title="ReviewPing vs Podium: The $29/mo Alternative"
-        description="Compare ReviewPing ($29/mo) vs Podium ($400+/mo). Same core review request functionality at 95% less cost. Built for small businesses."
+        title="ReviewPing vs Podium: The ₹599/mo Alternative"
+        description="Compare ReviewPing (₹599/mo) vs Podium ($400+/mo). Same core review request functionality at 95% less cost. Built for small businesses."
         path="/vs/podium"
       />
 
@@ -482,13 +605,16 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
           <span style={styles.heroTitleEm}>But not for $400/mo.</span>
         </h1>
         <p style={styles.heroSub}>
-          You get the same core review-requesting power — SMS, email,
-          automation — at <strong>95% less cost</strong>. No bloated
-          contracts. No enterprise upsells. Just what you actually need.
+          You get the same core review-requesting power — email, WhatsApp
+          automation, and multi-channel campaigns — at <strong>95% less
+          cost</strong> than Podium. No bloated enterprise contracts, no
+          hidden upsells for basic features, and no mandatory onboarding
+          calls. ReviewPing delivers everything you need to collect more
+          5-star reviews without the five-digit annual commitment.
         </p>
         <div style={styles.heroCtaRow}>
           <button style={styles.primaryCta} onClick={onSignup}>
-            Start Free Trial — $29/mo
+            Start Free Trial — ₹599/mo
           </button>
           <button style={styles.secondaryCta} onClick={onLogin}>
             See My Dashboard
@@ -551,10 +677,13 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
           Built for the businesses Podium forgot
         </h2>
         <p style={styles.whySub}>
-          Podium targets enterprises with six-figure budgets. ReviewPing is
-          for everyone else — the restaurants, clinics, salons, and
-          e-commerce brands that just want more reviews without the
-          overhead.
+          Podium built its platform for large enterprises with six-figure
+          budgets, dedicated account managers, and compliance teams you
+          should never need. ReviewPing is purpose-built for everyone else
+          — independent restaurants, dental clinics, hair salons, e-commerce
+          stores, and local service providers who simply want more authentic
+          reviews without the corporate overhead and bloated pricing tiers
+          that come with enterprise-focused platforms.
         </p>
 
         <div style={styles.cardsGrid}>
@@ -589,10 +718,140 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
             <span style={styles.cardIcon}>🛒</span>
             <h3 style={styles.cardTitle}>E-Commerce</h3>
             <p style={styles.cardText}>
-              Capture post-purchase happiness with SMS & email review
+              Capture post-purchase happiness with Email & WhatsApp review
               flows. Turn buyers into brand advocates.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* ── detailed feature comparison ── */}
+      <section style={styles.detailedSection}>
+        <h2 style={styles.detailedHeading}>
+          Detailed Feature Comparison
+        </h2>
+        <p style={styles.detailedSub}>
+          Beyond the headline numbers, here is how Podium and ReviewPing
+          truly stack up across the features that matter most to growing
+          businesses. You will notice a pattern: Podium charges a premium
+          for basics, while ReviewPing includes them at a fraction of the
+          price.
+        </p>
+
+        <div style={styles.detailGrid}>
+          <table style={styles.detailTable}>
+            <thead>
+              <tr>
+                <th style={styles.detailTh}>Feature</th>
+                <th style={{...styles.detailTh, ...styles.detailThCenter, ...styles.detailThCompetitor}}>Podium</th>
+                <th style={{...styles.detailTh, ...styles.detailThCenter, ...styles.detailThPing}}>ReviewPing</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Core review requests (Email + WhatsApp)</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>AI reply generation</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Free plan available</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Per-location / enterprise pricing</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.accent, fontWeight: 600 }}>$400+/mo</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.success, fontWeight: 600 }}>₹599/mo flat</span></td>
+              </tr>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>WhatsApp integration</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Month-to-month contracts</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.accent, fontWeight: 600 }}><Check /> Required</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.success, fontWeight: 600 }}><Check /> Cancel anytime</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ── who should choose ── */}
+      <section style={styles.whoSection}>
+        <h2 style={styles.whoHeading}>
+          Who should choose ReviewPing instead of Podium?
+        </h2>
+        <p style={styles.whoText}>
+          If you run a restaurant, dental clinic, hair salon, or e-commerce
+          store and need reliable review requests without enterprise
+          complexity, ReviewPing is the smarter choice. Independent
+          business owners love that they can start at <strong>$0/mo</strong>
+          on our free plan and upgrade only when their review volume grows.
+          Multi-location operators save thousands annually compared to
+          Podium's per-location pricing model. And any team that values
+          AI-assisted review replies, WhatsApp outreach, and transparent
+          month-to-month billing will find ReviewPing a natural fit.
+        </p>
+      </section>
+
+      {/* ── faq ── */}
+      <section style={styles.faqSection}>
+        <h2 style={styles.faqHeading}>
+          Frequently asked questions about Podium alternatives
+        </h2>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            Can ReviewPing really replace Podium for my business?
+          </h3>
+          <p style={styles.faqAnswer}>
+            Absolutely. ReviewPing covers the same core review request
+            functionality — automated email and WhatsApp campaigns, multi-location
+            support, analytics, and Google review linking — at a fraction of
+            Podium's price. The main difference is that ReviewPing is built
+            for small and mid-sized businesses rather than enterprise clients,
+            which means a simpler setup and no forced onboarding calls. If
+            Podium's advanced features like team inbox or website chat feel
+            like overkill for your needs, ReviewPing is the perfect fit.
+          </p>
+        </div>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            How much does Podium cost compared to ReviewPing?
+          </h3>
+          <p style={styles.faqAnswer}>
+            Podium starts at approximately <strong>$400+/month</strong> and
+            often requires annual contracts with enterprise add-ons that push
+            the real cost much higher. ReviewPing starts at just
+            <strong> ₹599/month</strong> with a free plan available. That is
+            a savings of over 90% for equivalent review request functionality.
+            Even our multi-location Agency plan at ₹1,499/month costs less than
+            what most Podium users pay for a single location.
+          </p>
+        </div>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            Is ReviewPing suitable for multi-location businesses?
+          </h3>
+          <p style={styles.faqAnswer}>
+            Yes. Our Agency plan at <strong>₹1,499/month</strong> supports
+            unlimited locations with white-label branding, making it an
+            excellent choice for multi-location operators, marketing
+            agencies, and franchise groups. Podium charges per location
+            with enterprise pricing, which quickly adds up. ReviewPing
+            gives you predictable flat-rate pricing regardless of how many
+            locations you manage, so you can scale your review collection
+            without surprise cost increases each month.
+          </p>
         </div>
       </section>
 
@@ -601,11 +860,15 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
         <div style={styles.ctaWrap}>
           <h2 style={styles.ctaTitle}>
             Switch from Podium. Start at{" "}
-            <span style={{ color: G.gold }}>$29/mo</span>.
+            <span style={{ color: G.gold }}>₹599/mo</span>.
           </h2>
           <p style={styles.ctaSub}>
-            No setup fees. No onboarding call required. No long-term
-            contract. You'll be up and running in 5 minutes.
+            No setup fees, no mandatory onboarding calls, and absolutely no
+            long-term contracts — just a simple, powerful review platform
+            that works. You will be up and running in under 5 minutes, and
+            our team offers free migration support for Podium users so you
+            can switch without losing a single piece of data or missing a
+            beat in your review collection workflow.
           </p>
           <button style={styles.ctaBtn} onClick={onSignup}>
             Start Free Trial

@@ -3,6 +3,7 @@ import { G } from "../../data/theme";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
 import Sel from "../ui/Sel";
+import { trackWidgetEmbedded } from "../../tracking";
 
 export default function WidgetEmbed({ biz }) {
   const [style2, setStyle2] = useState("carousel");
@@ -15,6 +16,7 @@ export default function WidgetEmbed({ biz }) {
 
   const copy = () => {
     navigator.clipboard?.writeText(code);
+    trackWidgetEmbedded();
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

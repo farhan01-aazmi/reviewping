@@ -1,5 +1,19 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { captureServerEvent, updateBusinessGroup } from "../_shared/posthog.ts";
+
+// Plan rank (for detecting upgrade vs downgrade) and current INR pricing —
+// keep in sync with src/data/constants.js PLANS.
+const PLAN_RANK: Record<string, number> = { free: 0, starter: 1, growth: 2, agency: 3 };
+const PLAN_PRICE_INR: Record<string, number> = { starter: 599, growth: 999, agency: 1499 };
+
+function planEvent(fromPlan: string, toPlan: string) {
+  const fromRank = PLAN_RANK[fromPlan] ?? 0;
+  const toRank = PLAN_RANK[toPlan] ?? 0;
+  if (toRank > fromRank) return "plan.upgraded";
+  if (toRank < fromRank) return "plan.downgraded";
+  return null; // same rank — not a plan change worth an event (e.g. re-sync)
+}
 
 /**
  * Dodo Payments Webhook Handler
@@ -76,6 +90,14 @@ serve(async (req) => {
         const sessionId = session.session_id || body.session_id || "";
 
         if (userId && plan) {
+          // Fetch previous plan first so we can tell upgrade from downgrade
+          const { data: prevProfile } = await supabase
+            .from("profiles")
+            .select("plan")
+            .eq("id", userId)
+            .single();
+          const previousPlan = prevProfile?.plan || "free";
+
           // Update user's plan in profiles
           await supabase.from("profiles").update({
             plan: plan,
@@ -92,6 +114,18 @@ serve(async (req) => {
               customer_id: customerId,
             }).eq("session_id", sessionId);
           }
+
+          const eventName = planEvent(previousPlan, plan);
+          if (eventName) {
+            await captureServerEvent(userId, eventName, {
+              from_plan: previousPlan,
+              to_plan: plan,
+              price: PLAN_PRICE_INR[plan] ?? 0,
+              currency: "INR",
+              billing_cycle: billing === "annual" ? "annual" : "monthly",
+            }, userId);
+          }
+          await updateBusinessGroup(userId, { plan });
 
           console.log("Dodo webhook: updated plan to", plan, "for user", userId);
         }
@@ -110,6 +144,13 @@ serve(async (req) => {
         const subId = subscription.id || data.subscription_id || "";
 
         if (subUserId && subPlan) {
+          const { data: prevProfile } = await supabase
+            .from("profiles")
+            .select("plan")
+            .eq("id", subUserId)
+            .single();
+          const previousPlan = prevProfile?.plan || "free";
+
           const updateData: Record<string, unknown> = {
             dodo_subscription_id: subId,
             dodo_customer_id: subCustomerId,
@@ -122,6 +163,21 @@ serve(async (req) => {
           }
 
           await supabase.from("profiles").update(updateData).eq("id", subUserId);
+
+          if (updateData.plan && previousPlan !== subPlan) {
+            const eventName = planEvent(previousPlan, subPlan);
+            if (eventName) {
+              await captureServerEvent(subUserId, eventName, {
+                from_plan: previousPlan,
+                to_plan: subPlan,
+                price: PLAN_PRICE_INR[subPlan] ?? 0,
+                currency: "INR",
+                billing_cycle: "monthly",
+              }, subUserId);
+            }
+            await updateBusinessGroup(subUserId, { plan: subPlan });
+          }
+
           console.log("Dodo webhook: subscription", subStatus, "for user", subUserId, "plan:", subPlan);
         }
         break;
@@ -134,10 +190,17 @@ serve(async (req) => {
         const cancelSubId = cancelData.id || data.subscription_id || "";
 
         if (cancelUserId) {
+          const { data: prevProfile } = await supabase
+            .from("profiles")
+            .select("plan")
+            .eq("id", cancelUserId)
+            .single();
+          const cancelledPlan = prevProfile?.plan || "growth";
+
           await supabase.from("profiles").update({
             dodo_subscription_id: "",
             subscription_status: "cancelled",
-            plan: "growth", // Revert to default free plan
+            plan: "starter", // Revert to default plan
             updated_at: new Date().toISOString(),
           }).eq("id", cancelUserId);
 
@@ -147,6 +210,11 @@ serve(async (req) => {
               status: "cancelled",
             }).eq("subscription_id", cancelSubId);
           }
+
+          await captureServerEvent(cancelUserId, "plan.cancelled", {
+            plan: cancelledPlan,
+          }, cancelUserId);
+          await updateBusinessGroup(cancelUserId, { plan: "growth" });
 
           console.log("Dodo webhook: subscription cancelled for user", cancelUserId);
         }

@@ -9,6 +9,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { corsHeaders } from "../_shared/cors.ts";
+import { captureServerEvent } from "../_shared/posthog.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -45,6 +46,8 @@ serve(async (req) => {
       .eq("user_id", user.id);
 
     if (updateError) throw updateError;
+
+    await captureServerEvent(user.id, "review_gateway.link_generated", {}, user.id);
 
     const siteUrl = Deno.env.get("SITE_URL") || "https://reviewping.pro";
     const gatewayUrl = `${siteUrl}/r/${token}`;

@@ -13,7 +13,6 @@ const SUPABASE_FN_URL = 'https://fvugrcqjrtwabaobuigb.supabase.co/functions/v1';
 const FUNCTION_MAP = {
   'gbp-connect': 'gpb-connect',  // URL uses gbp-connect, function is gpb-connect
   'gpb-sync': 'gpb-sync',        // URL uses gpb-sync, function is gpb-sync
-  'competitor-sync': 'competitor-sync',
   'weekly-digest': 'weekly-digest',
 };
 
@@ -25,7 +24,14 @@ const KNOWN_ROUTES = new Set([
   "/forgot-password",
   "/privacy",
   "/terms",
+  "/refund",
   "/pricing",
+  "/features",
+  "/faq",
+  "/blog",
+  "/about",
+  "/contact",
+  "/podium-alternative",
   "/tools/review-link-generator",
   "/tools/review-response-generator",
   "/dashboard",
@@ -160,9 +166,12 @@ export default async function middleware(request) {
 
   // FIX: Dynamic SPA routes — must pass through to React app
   if (normalized.startsWith('/r/')) return;
+  if (normalized.startsWith('/biz/')) return;
   if (normalized.startsWith('/blog/')) return;
   if (normalized.startsWith('/industry/')) return;
   if (normalized.startsWith('/invite/')) return;
+  if (normalized.startsWith('/vs/')) return;
+  if (normalized.startsWith('/tools/')) return;
 
   // Unknown route - return proper 404 status
   const title = "Page Not Found - ReviewPing";

@@ -27,7 +27,7 @@ const translations = {
     "Leave a review": "Dejar una reseña",
     "Share your feedback": "Comparte tu opinión",
 
-    // SMS
+    // Messaging templates
     "Hi {name}, thanks for visiting {business}! We'd love your feedback:": "Hola {name}, ¡gracias por visitar {business}! Nos encantaría tu opinión:",
     "Tap here to leave a review": "Toca aquí para dejar una reseña",
     "Or copy this link": "O copia este enlace",
@@ -77,9 +77,6 @@ export function getDefaultTemplates(locale = "en") {
     email: {
       subject: t("How was your experience?", locale),
       body: `${t("Hi", locale)} {{customer_name}},\n\n${t("Thank you for choosing", locale)} {{business_name}}. ${t("We hope you enjoyed your experience.", locale)}\n\n${t("Your feedback helps us improve and serve you better.", locale)}\n\n{{review_link}}\n\n${t("Thank you!", locale)}\n${t("The", locale)} {{business_name}} ${t("Team", locale)}`,
-    },
-    sms: {
-      body: `${t("Hi", locale)} {{customer_name}}, thanks for visiting {{business_name}}! ${t("We'd love your feedback", locale)}: {{review_link}}`,
     },
   };
   return templates;

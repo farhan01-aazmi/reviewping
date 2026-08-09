@@ -5,38 +5,46 @@ import SEO from "../SEO";
 const sections = [
   {
     t: "1. Acceptance of Terms",
-    b: 'By accessing or using ReviewPing ("the Service"), you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you may not use the Service. These terms apply to all users, including business owners, employees, and anyone accessing the platform.',
+    b: 'By accessing or using ReviewPing ("the Service"), operated by ReviewPing (a business based in Bareilly, Uttar Pradesh, India), you agree to be bound by these Terms of Service, which are governed by the laws of India. If you do not agree with any part of these terms, you may not use the Service. These terms apply to all users, including business owners, employees, and anyone accessing the platform.',
   },
   {
     t: "2. Description of Service",
-    b: 'ReviewPing is an automated review request platform that enables small businesses to send review requests to their customers via SMS and email. The Service helps businesses manage their online reputation by automating the process of asking for reviews. ReviewPing does not write, publish, or modify reviews on behalf of users, nor does it guarantee any specific review outcome.',
+    b: 'ReviewPing is an automated review request platform that enables small businesses to send review requests to their customers via SMS, email, and WhatsApp. The Service helps businesses manage their online reputation by automating the process of asking for reviews. ReviewPing does not write, publish, or modify reviews on behalf of users, nor does it guarantee any specific review outcome.',
   },
   {
     t: "3. Payment and Refunds",
-    b: 'ReviewPing operates on a monthly subscription basis. All subscriptions billed on a monthly or annual cycle. We offer a 14-day free trial for new accounts — no payment information is required during the trial period. After the trial ends, your subscription will begin and you will be charged the applicable fee. No refunds are provided for partial months of service. If you cancel, you will retain access to your account through the end of the current billing period. We reserve the right to change pricing with 30 days\' notice.',
+    b: 'ReviewPing operates on a subscription basis, with plans priced in Indian Rupees (₹). All subscriptions are billed on a monthly or annual cycle via our payment processor. No refunds are provided for partial months or years of service already rendered, except as required under the Consumer Protection Act, 2019 and applicable e-commerce rules. If you cancel, you will retain access to your account through the end of the current billing period. We reserve the right to change pricing with 30 days\' prior notice, communicated via email or in-app notification.',
   },
   {
-    t: "4. User Responsibilities",
-    b: 'You are responsible for providing accurate and complete information when creating your account and using the Service. You must maintain the confidentiality of your login credentials and are liable for all activity under your account. You agree to comply with all applicable local, state, federal, and international laws when using ReviewPing, including but not limited to anti-spam laws (CAN-SPAM, TCPA), privacy regulations (GDPR, CCPA), and review platform terms of service. You represent that the customer contact information you upload has been obtained lawfully and with appropriate consent.',
+    t: "4. User Responsibilities and Messaging Compliance",
+    b: 'You are responsible for providing accurate and complete information when creating your account and using the Service. You must maintain the confidentiality of your login credentials and are liable for all activity under your account. If you send SMS messages through the Service to recipients in India, you are solely responsible for ensuring your own sender registration, template approval, and consent records comply with the Telecom Regulatory Authority of India (TRAI) Distributed Ledger Technology (DLT) regulations and the National Customer Preference Register (NCPR/DND) framework. You represent that all customer contact information you upload has been obtained lawfully, with appropriate consent, and in compliance with the Digital Personal Data Protection Act, 2023 ("DPDP Act") and other applicable Indian laws, as well as any relevant international regulations where your customers are located.',
   },
   {
     t: "5. Prohibited Uses",
-    b: 'You may not use ReviewPing to generate fake reviews, incentivize positive reviews in exchange for rewards, harass or solicit customers who have opted out, send messages to individuals who have not done business with you, engage in any illegal or fraudulent activity, or use the Service in any way that violates the terms of Google, Facebook, or any other review platform. Violation of these prohibitions may result in immediate account termination without notice.',
+    b: 'You may not use ReviewPing to generate fake reviews, incentivize positive reviews in exchange for rewards, harass or solicit customers who have opted out, send messages to individuals who have not done business with you, engage in any illegal or fraudulent activity, or use the Service in any way that violates the terms of Google, Meta/WhatsApp, or any other platform. Violation of these prohibitions may result in immediate account termination without notice.',
   },
   {
     t: "6. Intellectual Property",
-    b: 'The ReviewPing name, logo, website, and all related content, features, and functionality are owned by ReviewPing and are protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, modify, or create derivative works without our express written permission. You retain all ownership of the customer data and business information you upload to the Service.',
+    b: 'The ReviewPing name, logo, website, and all related content, features, and functionality are owned by ReviewPing and are protected under the Copyright Act, 1957, the Trade Marks Act, 1999, and other applicable Indian intellectual property laws. You may not reproduce, distribute, modify, or create derivative works without our express written permission. You retain all ownership of the customer data and business information you upload to the Service.',
   },
   {
     t: "7. Limitation of Liability",
-    b: 'ReviewPing is provided "as is" and "as available" without warranties of any kind, either express or implied. We do not guarantee that the Service will be uninterrupted, secure, or error-free. To the maximum extent permitted by law, ReviewPing shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or relating to your use of the Service. Our total liability is limited to the amount you have paid us in the 12 months preceding the claim.',
+    b: 'ReviewPing is provided "as is" and "as available" without warranties of any kind, either express or implied. We do not guarantee that the Service will be uninterrupted, secure, or error-free. To the maximum extent permitted under Indian law, ReviewPing shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or relating to your use of the Service. Our total liability is limited to the amount you have paid us in the 12 months preceding the claim.',
   },
   {
     t: "8. Termination",
-    b: 'You may cancel your account at any time by emailing billing@reviewping.pro or through your account dashboard. We reserve the right to suspend or terminate access to the Service for any violation of these terms, without prior notice. Upon termination, your access to the Service will cease, and your data will be deleted within 90 days unless required otherwise by law.',
+    b: 'You may cancel your account at any time by emailing billing@reviewping.pro or through your account dashboard. We reserve the right to suspend or terminate access to the Service for any violation of these terms, without prior notice. Upon termination, your access to the Service will cease, and your data will be deleted within 90 days unless retention is required under the DPDP Act, the Income Tax Act, or other applicable Indian law.',
   },
   {
-    t: "9. Contact",
+    t: "9. Governing Law and Jurisdiction",
+    b: 'These Terms are governed by and construed in accordance with the laws of India, including the Information Technology Act, 2000 and rules made thereunder. Subject to the grievance redressal process below, courts in Bareilly, Uttar Pradesh shall have exclusive jurisdiction over any disputes arising from these Terms or your use of the Service.',
+  },
+  {
+    t: "10. Grievance Officer",
+    b: 'In accordance with the Information Technology Act, 2000 and the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, the Grievance Officer for ReviewPing can be contacted at grievance@reviewping.pro. We will acknowledge complaints within 24 hours and resolve them within 15 days, as required by law.',
+  },
+  {
+    t: "11. Contact",
     b: 'If you have any questions about these Terms of Service, please contact us at legal@reviewping.pro.',
   },
 ];

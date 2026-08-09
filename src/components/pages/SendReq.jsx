@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Btn, Card, Field, Sel } from "../ui";
 import { toast } from "sonner";
 import { generateGatewayLink, createSubscription } from "../../api";
-import { getDailyLimit } from "../../data/constants";
+import { getDailyLimit, hasFeature } from "../../data/constants";
 import { getLanguages } from "../../data/i18n";
 import PricingModal from "../ui/PricingModal";
 
@@ -46,6 +46,24 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [errors, setErrors] = useState({});
+  const [locations, setLocations] = useState([]);
+  const [locationId, setLocationId] = useState("");
+
+  // Fetch locations
+  useEffect(() => {
+    if (!userId) return;
+    supabase
+      .from("locations")
+      .select("id, name")
+      .eq("user_id", userId)
+      .order("is_primary", { ascending: false })
+      .then(({ data }) => {
+        if (data?.length) {
+          setLocations(data);
+          setLocationId(data[0].id);
+        }
+      });
+  }, [userId]);
 
   // AI-generated message state
   const [subject, setSubject] = useState("");
@@ -60,7 +78,7 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
     const e = {};
     if (!name.trim()) e.name = "Customer name is required";
     if (channel === "email" && !email.trim()) e.email = "Email is required";
-    if ((channel === "sms" || channel === "whatsapp") && !phone.trim()) e.phone = "Phone is required";
+    if (channel === "whatsapp" && !phone.trim()) e.phone = "Phone is required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -134,6 +152,7 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
         customer_email: email.trim() || null,
         customer_phone: phone.trim() || null,
         channel,
+        location_id: locationId || null,
         status: "pending",
         sent_at: new Date().toISOString(),
       }).select("id").single();
@@ -171,7 +190,6 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
 
       try {
         const channelBody = channel === "email" ? { to: email.trim(), subject: finalSubject, message: msgWithLink }
-          : channel === "sms" ? { to: phone.trim(), message: msgWithLink }
           : { to: phone.trim(), message: msgWithLink, customer_name: name.trim(), review_link: reviewLink };
 
         const res = await callEdgeFn(`/send-${channel}`, channelBody, token);
@@ -179,6 +197,19 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
           const err = await res.json().catch(() => ({ error: res.statusText }));
           throw new Error(err.error || `Failed to send ${channel}`);
         }
+
+        // Mark delivery status as sent
+        const resData = await res.json().catch(() => ({}));
+        supabase
+          .from("review_requests")
+          .update({
+            status: "sent",
+            delivery_status: "sent",
+            provider_message_id: resData.sid || resData.id || resData.request_id || null,
+          })
+          .eq("id", requestId)
+          .then()
+          .catch(() => {});
       } catch (e) {
         toast.error("Failed to send: " + (e.message || "Service unavailable"));
         setLoading(false);
@@ -206,7 +237,7 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
           Request sent.
         </h2>
         <p style={{ color: G.muted, marginBottom: 28, fontSize: 14, lineHeight: 1.7 }}>
-          {channel === "email" ? `Your email was sent to ${name}.` : channel === "whatsapp" ? `Your WhatsApp was sent to ${name}.` : `Your SMS was sent to ${name}.`}
+          {channel === "email" ? `Your email was sent to ${name}.` : `Your WhatsApp was sent to ${name}.`}
           <br />You'll be notified when they leave a review.
         </p>
         <Btn onClick={onBack} variant="secondary">← Back to dashboard</Btn>
@@ -228,7 +259,7 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
         Send review request
       </h2>
       <p style={{ color: G.muted, fontSize: 13.5, marginBottom: 22 }}>
-        Send a review request via email, SMS, or WhatsApp.
+        Send a review request via email or WhatsApp.
       </p>
 
       {/* ── CARD 1: Customer Info ── */}
@@ -256,30 +287,19 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
             }}>
               ✉️ Email
             </button>
-            <button onClick={() => setChannel("sms")} style={{
-              flex: 1, padding: "10px 14px",
-              background: channel === "sms" ? G.accent : G.surface,
-              color: channel === "sms" ? "white" : G.ink,
-              border: `1.5px solid ${channel === "sms" ? G.accent : G.border}`,
-              borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: 13,
-              fontFamily: "'Manrope',sans-serif", transition: "all 0.15s",
-            }}>
-              💬 SMS
-            </button>
-            <button onClick={() => plan === "growth" || plan === "agency" ? setChannel("whatsapp") : null}
+            <button onClick={() => hasFeature(plan, "whatsappChannel") ? setChannel("whatsapp") : setShowPricing(true)}
               style={{
                 flex: 1, padding: "10px 14px",
                 background: channel === "whatsapp" ? G.accent : G.surface,
                 color: channel === "whatsapp" ? "white" : G.ink,
                 border: `1.5px solid ${channel === "whatsapp" ? G.accent : G.border}`,
                 borderRadius: 10,
-                cursor: plan !== "free" && plan !== "starter" ? "pointer" : "not-allowed",
+                cursor: hasFeature(plan, "whatsappChannel") ? "pointer" : "pointer",
                 fontWeight: 700, fontSize: 13,
                 fontFamily: "'Manrope',sans-serif", transition: "all 0.15s",
-                opacity: plan === "free" || plan === "starter" ? 0.5 : 1,
               }}>
               📱 WhatsApp <span style={{ fontSize: 10, opacity: 0.8 }}>
-                {plan === "free" || plan === "starter" ? "🔒 Growth plan only" : "— 3x higher open rate"}
+                {hasFeature(plan, "whatsappChannel") ? "— 3x higher open rate" : "🔒 Upgrade to access"}
               </span>
             </button>
           </div>
@@ -287,6 +307,11 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
         <Sel label="Language" value={lang} onChange={(e) => setLang(e.target.value)}
           options={getLanguages().map(l => ({ value: l.code, label: l.native + " (" + l.name + ")" }))}
         />
+        {locations.length > 1 && (
+          <Sel label="Location" value={locationId} onChange={(e) => setLocationId(e.target.value)}
+            options={locations.map(l => ({ value: l.id, label: l.name }))}
+          />
+        )}
         {channel === "email" && (
           <Field label="Email address" value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -294,8 +319,8 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
             error={errors.email} disabled={loading}
           />
         )}
-        {(channel === "sms" || channel === "whatsapp") && (
-          <Field label={channel === "whatsapp" ? "WhatsApp number" : "Phone number"} value={phone}
+        {channel === "whatsapp" && (
+          <Field label="WhatsApp number" value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+1 (555) 000-0000" error={errors.phone} disabled={loading}
           />
@@ -393,7 +418,7 @@ export default function SendReq({ onBack, onSent, biz, userId, plan }) {
       </Card>
 
       <Btn fullWidth size="lg" onClick={send} loading={loading} disabled={loading}>
-        {loading ? "Sending…" : `Send ${channel === "email" ? "Email" : channel === "whatsapp" ? "WhatsApp" : "SMS"} →`}
+        {loading ? "Sending…" : `Send ${channel === "email" ? "Email" : "WhatsApp"} →`}
       </Btn>
       <p style={{ textAlign: "center", fontSize: 12, color: G.muted, marginTop: 8 }}>
         GDPR compliant · Encrypted · Opt-out included

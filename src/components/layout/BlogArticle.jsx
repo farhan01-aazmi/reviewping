@@ -308,7 +308,7 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               "@context": "https://schema.org",
               "@type": "Product",
               name: "ReviewPing",
-              description: "Automated review request platform for small businesses. Send SMS and email review requests automatically.",
+              description: "Automated review request platform for small businesses. Send email and WhatsApp review requests automatically.",
               brand: { "@type": "Brand", name: "ReviewPing" },
               offers: {
                 "@type": "AggregateOffer",
@@ -345,14 +345,14 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               name: "Review Request Automation",
               applicationCategory: "BusinessApplication",
               operatingSystem: "Web",
-              description: "Software that automatically sends SMS and email requests to customers asking them to leave a Google review after a service or purchase.",
+              description: "Software that automatically sends email and WhatsApp requests to customers asking them to leave a Google review after a service or purchase.",
               offers: {
                 "@type": "AggregateOffer",
                 priceCurrency: "USD",
                 lowPrice: "0",
                 highPrice: "149",
               },
-              featureList: "Automated SMS review requests, Automated email review requests, Direct Google review links, Analytics dashboard, Multi-location management, AI reply generation",
+              featureList: "Automated WhatsApp review requests, Automated email review requests, Direct Google review links, Analytics dashboard, Multi-location management, AI reply generation",
               url: "https://reviewping.pro",
               provider: { "@type": "Organization", name: "ReviewPing" },
             })}
@@ -372,7 +372,7 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               step: [
                 { "@type": "HowToStep", position: 1, name: "Create an account", text: "Create your free ReviewPing account at reviewping.pro." },
                 { "@type": "HowToStep", position: 2, name: "Connect your Google Business Profile", text: "Link your Google Business Profile in the dashboard." },
-                { "@type": "HowToStep", position: 3, name: "Set up your review request template", text: "Choose SMS, email, or WhatsApp template and customise your message." },
+                { "@type": "HowToStep", position: 3, name: "Set up your review request template", text: "Choose email or WhatsApp template and customise your message." },
                 { "@type": "HowToStep", position: 4, name: "Import your customers", text: "Add customer names and contact info manually or via CSV." },
                 { "@type": "HowToStep", position: 5, name: "Send review requests", text: "Send individually or in bulk. ReviewPing delivers the request at the optimal time." },
               ],
@@ -391,8 +391,9 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               temporalCoverage: "2024/2026",
               measurementTechnique: "Survey and platform analytics data",
               variableMeasured: [
-                { "@type": "PropertyValue", name: "SMS review request open rate", value: "45%", unitText: "Percent" },
-                { "@type": "PropertyValue", name: "Email review request open rate", value: "20%", unitText: "Percent" },
+                { "@type": "PropertyValue", name: "WhatsApp review request open rate", value: "98%", unitText: "Percent" },
+                { "@type": "PropertyValue", name: "Email review request open rate", value: "23%", unitText: "Percent" },
+                { "@type": "PropertyValue", name: "WhatsApp review completion rate", value: "4.8%", unitText: "Percent" },
                 { "@type": "PropertyValue", name: "Review conversion rate with automation", value: "35%", unitText: "Percent" },
                 { "@type": "PropertyValue", name: "Revenue boost from 1-star increase", minValue: "5", maxValue: "9", unitText: "Percent" },
               ],
@@ -411,7 +412,7 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               numberOfItems: 6,
               itemListElement: [
                 { "@type": "ListItem", position: 1, item: { "@type": "SoftwareApplication", name: "ReviewPing", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "29", priceCurrency: "USD" } } },
-                { "@type": "ListItem", position: 2, item: { "@type": "SoftwareApplication", name: "Podium", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "400", priceCurrency: "USD" } } },
+                { "@type": "ListItem", position: 2, item: { "@type": "SoftwareApplication", name: "Podium", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "449", priceCurrency: "USD" } } },
                 { "@type": "ListItem", position: 3, item: { "@type": "SoftwareApplication", name: "Birdeye", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "299", priceCurrency: "USD" } } },
                 { "@type": "ListItem", position: 4, item: { "@type": "SoftwareApplication", name: "Widewail", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "199", priceCurrency: "USD" } } },
                 { "@type": "ListItem", position: 5, item: { "@type": "SoftwareApplication", name: "Reputation", applicationCategory: "BusinessApplication", offers: { "@type": "Offer", price: "299", priceCurrency: "USD" } } },
@@ -421,6 +422,21 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
           </script>
         ) : null}
       </Helmet>
+      {post.content.filter(s => s.type === "faq").length > 0 ? (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: post.content.filter(s => s.type === "faq").flatMap(s => s.items).map(item => ({
+                "@type": "Question",
+                name: item.q,
+                acceptedAnswer: { "@type": "Answer", text: item.a },
+              })),
+            })}
+          </script>
+        </Helmet>
+      ) : null}
       <div
         style={{
           background: G.bg,
@@ -676,7 +692,7 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               }}
             >
               Join 2,400+ businesses using ReviewPing to automate review
-              requests via SMS and email. Set it up in 2 minutes.
+              requests via email and WhatsApp. Set it up in 2 minutes.
             </p>
             <Btn size="lg" onClick={onSignup}>
               Start free — no card needed →

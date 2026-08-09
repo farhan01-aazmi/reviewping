@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { CORS, verifyAuth, checkDailyLimit } from "../_shared/auth.ts";
+import { captureServerEvent } from "../_shared/posthog.ts";
 
 serve(async (req) => {
   // Handle CORS preflight
@@ -8,6 +9,7 @@ serve(async (req) => {
     return new Response(null, { status: 204, headers: CORS });
   }
 
+  let auth;
   try {
     // Only allow POST
     if (req.method !== "POST") {
@@ -46,7 +48,7 @@ serve(async (req) => {
       });
     }
 
-    const { to, message } = body || {};
+    const { to, message, contact_id, source, ai_generated, template_used } = body || {};
 
     if (!to || !message) {
       return new Response(
@@ -82,6 +84,14 @@ serve(async (req) => {
 
     const result = await twilioRes.json();
 
+    await captureServerEvent(auth.userId, "review_request.sent", {
+      channel: "sms",
+      source: source || "manual",
+      ai_generated: ai_generated ?? false,
+      template_used: template_used ?? false,
+      contact_id: contact_id || "",
+    }, auth.userId);
+
     return new Response(
       JSON.stringify({ success: true, sid: result.sid }),
       { headers: CORS },
@@ -89,6 +99,12 @@ serve(async (req) => {
   } catch (err) {
     console.error("send-sms error:", err);
     const msg = err instanceof Error ? err.message : "Failed to send SMS";
+    if (auth && !(auth instanceof Response)) {
+      await captureServerEvent(auth.userId, "review_request.failed", {
+        channel: "sms",
+        reason: msg,
+      }, auth.userId);
+    }
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: CORS,

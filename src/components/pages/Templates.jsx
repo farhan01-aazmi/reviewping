@@ -8,6 +8,7 @@ import Sel from "../ui/Sel";
 import Pill from "../ui/Pill";
 import { toast } from "sonner";
 import { supabase } from "../../config/supabase";
+import { trackTemplateCreated } from "../../tracking";
 
 const DEFAULT_TEMPLATES = [
   {
@@ -101,6 +102,7 @@ export default function Templates({ userId }) {
           .select();
         if (error) throw error;
         setTemplates((p) => [...p, data[0]]);
+        trackTemplateCreated({ channel: "all" });
         toast.success("Template saved");
       } else if (editing <= 5) {
         // Editing a default template — create a custom copy
@@ -110,6 +112,7 @@ export default function Templates({ userId }) {
           .select();
         if (error) throw error;
         setTemplates((p) => [...p, data[0]]);
+        trackTemplateCreated({ channel: "all" });
         toast.success("Template saved as custom");
       } else {
         // Editing a custom template — update in DB

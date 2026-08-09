@@ -5,10 +5,12 @@ import { validateEmail, validatePassword } from "../../utils/validators";
 import { Card, Field, Btn, LogoMark } from "../ui";
 import SEO from "../SEO";
 import { toast } from "sonner";
+import { trackUserSignedUp } from "../../tracking";
 
 export default function Signup({ onDone, onLogin }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [biz, setBiz] = useState("");
   const [error, setError] = useState("");
@@ -18,13 +20,17 @@ export default function Signup({ onDone, onLogin }) {
   const [resendLoading, setResendLoading] = useState(false);
 
   const go = async () => {
-    if (!name || !email || !password || !biz) {
+    if (!name || !email || !phone || !password || !biz) {
       setError("All fields required.");
       return;
     }
     const emailErr = validateEmail(email);
     if (emailErr) {
       setError(emailErr);
+      return;
+    }
+    if (!/^[+\d][\d\s\-()]{7,17}$/.test(phone.trim())) {
+      setError("Enter a valid mobile number with country code (e.g. +91 98765 43210).");
       return;
     }
     const pwErr = validatePassword(password);
@@ -39,6 +45,7 @@ export default function Signup({ onDone, onLogin }) {
     const { data, error: authErr } = await supabase.auth.signUp({
       email,
       password,
+      options: { data: { phone } },
     });
 
     if (authErr) {
@@ -57,8 +64,9 @@ export default function Signup({ onDone, onLogin }) {
       id: data.user.id,
       email,
       name,
+      phone: phone.trim(),
       business_name: biz,
-      plan: "free",
+      plan: "starter",
     });
 
     if (profileErr) {
@@ -66,7 +74,8 @@ export default function Signup({ onDone, onLogin }) {
     }
 
     setLoading(false);
-    onDone({ name, email, biz, id: data.user.id });
+    trackUserSignedUp({ signup_method: "email" });
+    onDone({ name, email, phone: phone.trim(), biz, id: data.user.id });
   };
 
   const handleResend = async () => {
@@ -250,6 +259,14 @@ export default function Signup({ onDone, onLogin }) {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="mike@mydental.com"
                 type="email"
+              />
+              <Field
+                label="Mobile number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+91 98765 43210"
+                type="tel"
+                hint="Required — used for WhatsApp review requests and alerts"
               />
               <Field
                 label="Password"

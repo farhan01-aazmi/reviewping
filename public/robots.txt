@@ -36,7 +36,3 @@ Disallow: /api
 Disallow: /r/
 
 Sitemap: https://www.reviewping.pro/sitemap.xml
-# Also submit non-www version (redirects to www)
-Sitemap: https://reviewping.pro/sitemap.xml
-
-# SPA redirect fix deploy - 2026-06-20

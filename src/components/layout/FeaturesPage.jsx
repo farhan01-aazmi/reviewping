@@ -8,7 +8,7 @@ export default function FeaturesPage({ onSignup, onLogin, onBack }) {
     <>
       <SEO
         title="Features — Everything you need to get more Google Reviews"
-        description="ReviewPing helps businesses automate Google review requests via SMS and email. AI-powered replies, real-time analytics, multi-location support, and more."
+        description="ReviewPing helps businesses automate Google review requests via email and WhatsApp. AI-powered replies, real-time analytics, multi-location support, and more."
         path="/features"
       />
       <div

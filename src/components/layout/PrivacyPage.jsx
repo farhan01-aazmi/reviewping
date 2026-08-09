@@ -5,30 +5,34 @@ import SEO from "../SEO";
 const sections = [
   {
     t: "1. Information We Collect",
-    b: 'We collect the following information when you use ReviewPing: account registration details (your name, email address, and business name), billing information (processed securely by Stripe — we do not store full payment card details), customer data you choose to upload (customer names, phone numbers, and email addresses used solely for sending review requests), and usage data (how you interact with the Service, features used, and page views).',
+    b: 'We collect the following information when you use ReviewPing: account registration details (your name, email address, and business name), billing information (processed securely by our payment processor, Dodo Payments — we do not store full payment card details), customer data you choose to upload (customer names, phone numbers, and email addresses used solely for sending review requests), and usage data (how you interact with the Service, features used, and actions taken, collected via PostHog analytics).',
   },
   {
     t: "2. How We Use Your Information",
-    b: 'We use your information to provide, maintain, and improve the ReviewPing service, including sending review requests to your customers via SMS and email as you direct, processing payments and managing subscriptions, sending service-related communications (billing notices, product updates, support responses), analyzing usage patterns to improve our platform, and complying with legal obligations.',
+    b: 'We use your information to provide, maintain, and improve the ReviewPing service, including sending review requests to your customers via SMS, email, and WhatsApp as you direct, processing payments and managing subscriptions, sending service-related communications (billing notices, product updates, support responses), analyzing usage patterns to improve our platform, and complying with legal obligations under Indian law.',
   },
   {
     t: "3. Data Sharing",
-    b: 'We do not sell your personal data or your customer data. We share information only with trusted third-party service providers who help us operate the Service: Supabase (database and authentication), Stripe (payment processing), Resend (email delivery), and Twilio (SMS delivery). Each of these providers is contractually obligated to protect your data and may only process it for the purposes we specify. We may also disclose information if required by law or to protect our legal rights.',
+    b: 'We do not sell your personal data or your customer data. We share information only with trusted third-party service providers who help us operate the Service: Supabase (database and authentication), Dodo Payments (payment processing), Resend (email delivery), Twilio (SMS and WhatsApp delivery), and PostHog (product analytics). Each of these providers is contractually obligated to protect your data and may only process it for the purposes we specify. We may also disclose information if required by law or to protect our legal rights.',
   },
   {
     t: "4. Data Retention",
-    b: 'We retain your account information and customer data for as long as your account remains active. If you delete your account or request deletion, your data will be permanently removed within 90 days. You may request deletion at any time by contacting privacy@reviewping.pro.',
+    b: 'We retain your account information and customer data for as long as your account remains active. If you delete your account or request deletion, your data will be permanently removed within 90 days, unless a longer retention period is required under the Digital Personal Data Protection Act, 2023 or other applicable Indian law. You may request deletion at any time by contacting privacy@reviewping.pro.',
   },
   {
-    t: "5. Your Rights",
-    b: 'Depending on your jurisdiction, you may have the right to access the personal data we hold about you, request correction of inaccurate data, request deletion of your data ("right to be forgotten"), request a copy of your data in a portable format, and withdraw consent where processing is based on consent. To exercise any of these rights, contact privacy@reviewping.pro. We will respond within 30 days.',
+    t: "5. Your Rights Under the DPDP Act, 2023",
+    b: 'As a Data Principal under India\'s Digital Personal Data Protection Act, 2023, you have the right to access a summary of the personal data we hold about you and the processing activities we carry out, request correction or completion of inaccurate or incomplete data, request erasure of your personal data, withdraw consent at any time (without affecting the lawfulness of processing carried out before withdrawal), and nominate another individual to exercise these rights on your behalf in the event of death or incapacity. If you are located outside India, you may also have equivalent rights under your local data protection law. To exercise any of these rights, contact privacy@reviewping.pro. We will respond within 30 days.',
   },
   {
-    t: "6. Cookies",
-    b: 'ReviewPing uses only essential cookies that are necessary for the Service to function properly. These include session cookies that keep you logged in and security cookies that help prevent fraud. We do not use tracking cookies, advertising cookies, or third-party analytics cookies that collect personal information for marketing purposes. You can disable cookies through your browser settings, though this may affect the functionality of the Service.',
+    t: "6. Cookies and Analytics",
+    b: 'ReviewPing uses essential cookies necessary for the Service to function (such as session cookies that keep you logged in and security cookies that help prevent fraud), as well as product analytics cookies via PostHog, which help us understand how the Service is used so we can improve it. Analytics data is tied to your business account, not to your customers, and is never used for advertising or sold to third parties. You can disable non-essential cookies through your browser settings, though this may affect certain Service features.',
   },
   {
-    t: "7. Contact",
+    t: "7. Grievance Officer",
+    b: 'In accordance with the Information Technology Act, 2000 and rules made thereunder, the Grievance Officer for ReviewPing can be contacted at grievance@reviewping.pro for any complaints regarding the processing of your personal data. We will acknowledge complaints within 24 hours and endeavour to resolve them within 15 days.',
+  },
+  {
+    t: "8. Contact",
     b: 'If you have any questions or concerns about this Privacy Policy or how we handle your data, please contact us at privacy@reviewping.pro.',
   },
 ];

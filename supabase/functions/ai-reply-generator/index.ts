@@ -1,5 +1,10 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { CORS, verifyAuth } from "../_shared/auth.ts"
+import { captureServerEvent } from "../_shared/posthog.ts"
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || ""
+const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
 
 interface RequestBody {
   review_text: string
@@ -24,6 +29,12 @@ serve(async (req) => {
   const auth = await verifyAuth(req);
   if (auth instanceof Response) return auth;
 
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+  const countGeneration = () =>
+    supabase
+      .rpc("increment_ai_generations", { count: 1, user_uuid: auth.userId })
+      .catch(() => {})
+
   try {
     const { review_text, rating, author_name, tone } = await req.json() as RequestBody
 
@@ -44,9 +55,10 @@ serve(async (req) => {
       ? "Thank the customer for their positive feedback."
       : "Acknowledge their feedback and mention you'll share it with the team."
 
-    const nvidiaApiKey = Deno.env.get("NVIDIA_API_KEY")
+    const apiKey = Deno.env.get("AI_API_KEY")
+    const baseUrl = Deno.env.get("AI_BASE_URL") || "https://integrate.api.nvidia.com/v1"
 
-    if (nvidiaApiKey) {
+    if (apiKey) {
       const prompt = `You are a business owner responding to a customer review.
 
 Review: "${review_text || "No review text provided"}"
@@ -58,13 +70,14 @@ ${sentimentInstruction}
 
 Reply:`
 
-      const res = await fetch("https://api.nvcf.nvidia.com/v2/nvcf/pexec/functions/a1b2c3d4", {
+      const res = await fetch(`${baseUrl}/chat/completions`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${nvidiaApiKey}`,
+          "Authorization": `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          model: "meta/llama-3.1-8b-instruct",
           messages: [
             { role: "system", content: "You are a helpful business owner assistant. Generate short, genuine review replies." },
             { role: "user", content: prompt },
@@ -77,6 +90,11 @@ Reply:`
       if (res.ok) {
         const data = await res.json()
         const reply = data.choices?.[0]?.message?.content || data.message || ""
+        await captureServerEvent(auth.userId, "ai_reply.generated", {
+          rating,
+          sent: false,
+        }, auth.userId)
+        await countGeneration()
         return new Response(JSON.stringify({ reply: reply.trim() }), {
           headers: CORS,
         })
@@ -101,6 +119,13 @@ Reply:`
 
     const toneTemplates = templates[tone] || templates.Professional
     const reply = toneTemplates[Math.floor(Math.random() * toneTemplates.length)]
+
+    await captureServerEvent(auth.userId, "ai_reply.generated", {
+      rating,
+      sent: false,
+    }, auth.userId)
+
+    await countGeneration()
 
     return new Response(JSON.stringify({ reply }), {
       headers: CORS,

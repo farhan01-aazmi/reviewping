@@ -7,7 +7,7 @@ export const SEED_REVIEWS = [
     text: "Absolutely wonderful. Professional and thorough from start to finish.",
     sentAt: Date.now() - 0 * 86400000 + 10 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -29,7 +29,7 @@ export const SEED_REVIEWS = [
     text: null,
     sentAt: Date.now() - 0 * 86400000 + 16 * 3600000,
     status: "pending",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -51,7 +51,7 @@ export const SEED_REVIEWS = [
     text: "Quick response, fixed the problem same day. Will call again.",
     sentAt: Date.now() - 1 * 86400000 + 9 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -62,7 +62,7 @@ export const SEED_REVIEWS = [
     text: "Outstanding. My car runs like new.",
     sentAt: Date.now() - 1 * 86400000 + 11 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -73,7 +73,7 @@ export const SEED_REVIEWS = [
     text: "Brilliant facility, staff are incredibly knowledgeable.",
     sentAt: Date.now() - 2 * 86400000 + 8 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -95,7 +95,7 @@ export const SEED_REVIEWS = [
     text: "Perfect stay. Breakfast was exceptional.",
     sentAt: Date.now() - 3 * 86400000 + 10 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -106,7 +106,7 @@ export const SEED_REVIEWS = [
     text: "Incredible work. First time getting balayage done right!",
     sentAt: Date.now() - 3 * 86400000 + 13 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -117,7 +117,7 @@ export const SEED_REVIEWS = [
     text: "Took longer than quoted but quality was fine.",
     sentAt: Date.now() - 4 * 86400000 + 9 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -139,7 +139,7 @@ export const SEED_REVIEWS = [
     text: "Tasting menu was phenomenal. Will return for anniversaries.",
     sentAt: Date.now() - 5 * 86400000 + 20 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -150,7 +150,7 @@ export const SEED_REVIEWS = [
     text: "Gentle and thorough. Kids loved it too.",
     sentAt: Date.now() - 6 * 86400000 + 11 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -161,7 +161,7 @@ export const SEED_REVIEWS = [
     text: "Emergency call at 10pm, showed up in 30 mins. Hero.",
     sentAt: Date.now() - 6 * 86400000 + 22 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -183,7 +183,7 @@ export const SEED_REVIEWS = [
     text: "Great product knowledge. Helped me find exactly what I needed.",
     sentAt: Date.now() - 8 * 86400000 + 14 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -194,7 +194,7 @@ export const SEED_REVIEWS = [
     text: "Personal trainer is exceptional. Already seeing results.",
     sentAt: Date.now() - 9 * 86400000 + 8 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -205,7 +205,7 @@ export const SEED_REVIEWS = [
     text: "Best cut I've had in years. Listened to exactly what I wanted.",
     sentAt: Date.now() - 10 * 86400000 + 16 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -227,7 +227,7 @@ export const SEED_REVIEWS = [
     text: "Good value, transparent about costs. Would recommend.",
     sentAt: Date.now() - 14 * 86400000 + 11 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -238,7 +238,7 @@ export const SEED_REVIEWS = [
     text: "Date night perfected. Ambiance, food, service — all 10/10.",
     sentAt: Date.now() - 16 * 86400000 + 20 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -260,7 +260,7 @@ export const SEED_REVIEWS = [
     text: "Very reliable, always on time.",
     sentAt: Date.now() - 20 * 86400000 + 10 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
   {
@@ -271,7 +271,7 @@ export const SEED_REVIEWS = [
     text: "Upgraded our room as a surprise. Made our anniversary.",
     sentAt: Date.now() - 22 * 86400000 + 12 * 3600000,
     status: "reviewed",
-    channel: "SMS",
+    channel: "WhatsApp",
     reply: null,
   },
 ];

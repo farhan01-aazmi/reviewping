@@ -6,12 +6,16 @@ import Field from "../ui/Field";
 import Sel from "../ui/Sel";
 import { toast } from "sonner";
 
-export default function QRCode({ biz }) {
-  const [url, setUrl] = useState(
-    biz.googleLink || "https://g.page/r/mybiz"
-  );
+const SITE_URL = import.meta.env.VITE_SITE_URL || "https://reviewping.pro";
+
+export default function QRCode({ biz, gbpConnected }) {
+  const bizSlug = biz?.slug || "";
+  const googleConnected = gbpConnected && !!biz?.googleLink;
+  const bizGatewayUrl = bizSlug ? `${SITE_URL}/biz/${bizSlug}` : "";
+
+  const [url, setUrl] = useState(bizGatewayUrl || "");
   const [label, setLabel] = useState(
-    `Review ${biz.bizName || "us"} on Google`
+    bizSlug ? `Scan to review ${biz.bizName || "us"}` : ""
   );
   const [size, setSize] = useState("200");
   const [generated, setGenerated] = useState(false);
@@ -19,6 +23,25 @@ export default function QRCode({ biz }) {
   const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(
     url
   )}&bgcolor=FFFFFF&color=1A1714&margin=16`;
+
+  if (!googleConnected) {
+    return (
+      <div>
+        <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 26, fontWeight: 400, margin: "0 0 4px", letterSpacing: "-0.5px" }}>
+          QR Code Generator
+        </h2>
+        <Card sx={{ marginTop: 14, padding: "24px", textAlign: "center", background: "#fefce8", border: "1.5px solid #fde68a" }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🏪</div>
+          <h3 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 20, fontWeight: 400, margin: "0 0 8px" }}>
+            Connect your Google Business Profile first
+          </h3>
+          <p style={{ color: G.muted, fontSize: 13.5, margin: "0 0 16px", lineHeight: 1.6 }}>
+            You need to connect your GBP to generate QR codes. The QR code will automatically use your business slug and Google review link.
+          </p>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -34,15 +57,36 @@ export default function QRCode({ biz }) {
         QR Code Generator
       </h2>
       <p style={{ margin: "0 0 22px", color: G.muted, fontSize: 13.5 }}>
-        Print your QR code on receipts, menus, or signage — customers scan to
-        review instantly.
+        Print your QR code on receipts, menus, or signage — customers scan to review instantly.
       </p>
+
       <Card sx={{ marginBottom: 14 }}>
+        <div
+          style={{
+            background: G.infoBg,
+            border: `1.5px solid ${G.infoBd}`,
+            borderRadius: 10,
+            padding: "12px 16px",
+            marginBottom: 16,
+            fontSize: 13,
+            lineHeight: 1.6,
+            color: G.ink,
+          }}
+        >
+          <strong>⭐ Smart Review Gateway</strong>
+          <br />
+          Customer scans → selects 5★ → auto-generated review text appears
+          → one-click copy &amp; open Google.
+          <br />
+          <span style={{ color: G.muted, fontSize: 12 }}>
+            Best for: counters, receipts, tables, waiting rooms
+          </span>
+        </div>
         <Field
-          label="Google review link"
+          label="QR Code URL"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://g.page/r/..."
+          placeholder="https://reviewping.pro/biz/..."
         />
         <Field
           label="Label text (printed below QR)"
@@ -128,8 +172,7 @@ export default function QRCode({ biz }) {
               marginTop: 14,
             }}
           >
-            Print on receipts · menus · signage · business cards ·
-            packaging
+            Print on receipts · menus · signage · business cards · packaging
           </p>
         </Card>
       )}

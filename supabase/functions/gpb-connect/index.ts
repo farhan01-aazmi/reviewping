@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { captureServerEvent } from "../_shared/posthog.ts"
 
 const GOOGLE_CLIENT_ID = Deno.env.get("GOOGLE_OAUTH_CLIENT_ID") || ""
 const GOOGLE_CLIENT_SECRET = Deno.env.get("GOOGLE_OAUTH_CLIENT_SECRET") || ""
@@ -84,6 +85,7 @@ serve(async (req) => {
       return json({ error: "Unauthorized" }, 401)
     }
     await supabase.from("gbp_connections").delete().eq("user_id", user.id)
+    await captureServerEvent(user.id, "gbp.disconnected", {}, user.id)
     return json({ success: true })
   }
 
@@ -179,6 +181,8 @@ serve(async (req) => {
       is_connected: true,
       last_sync_at: new Date().toISOString(),
     }, { onConflict: "user_id" })
+
+    await captureServerEvent(userId, "gbp.connected", {}, userId)
 
     // ── Auto-save Google review link after successful GBP connect ──
     try {

@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Spinner } from "../ui";
+import { getDefaultReviewTemplates, getCategoryGroup } from "../../data/reviewTemplates";
+import SEO from "../SEO";
 
 const STAR_LABELS = ["Poor", "Fair", "Good", "Great", "Excellent"];
 const API_BASE = import.meta.env.VITE_SUPABASE_URL || "";
@@ -22,40 +24,77 @@ export default function ReviewGatewayPage() {
   const [gateway, setGateway] = useState(null);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
-  const [feedback, setFeedback] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [clickId, setClickId] = useState(null);
-  const [showOptions, setShowOptions] = useState(false);
-  const [showTextForm, setShowTextForm] = useState(false);
   const [confetti, setConfetti] = useState(false);
-  const [submittedMsg, setSubmittedMsg] = useState("");
+  const [reviewText, setReviewText] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [templateOptions, setTemplateOptions] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [gatewayToken, setGatewayToken] = useState("");
+  const [privateMode, setPrivateMode] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const trackedRef = useRef(false);
+  const eventLogged = useRef(false);
 
   // ── Parse token & resolve gateway info ──
   useEffect(() => {
-    const token = window.location.pathname.replace("/r/", "");
-    if (!token || token.length < 6) {
-      setError("Invalid review link");
-      setLoading(false);
-      return;
-    }
+    const path = window.location.pathname;
+    const isBiz = /^\/biz\//.test(path);
 
-    fetch(`${API_BASE}/functions/v1/resolve-gateway`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) throw new Error(data.error);
-        setGateway(data);
+    if (isBiz) {
+      const slug = path.replace("/biz/", "").replace(/\/+$/, "").replace(/[^a-zA-Z0-9-]/g, "").toLowerCase();
+      if (!slug || slug.length < 2) {
+        setError("Invalid business link");
         setLoading(false);
+        return;
+      }
+
+      fetch(`${API_BASE}/functions/v1/resolve-biz-gateway`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
       })
-      .catch((err) => {
-        setError(err.message || "Could not load review page");
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.error) throw new Error(data.error);
+          if (data.blocked) {
+            setError("unavailable");
+            setLoading(false);
+            return;
+          }
+          setGateway({ ...data, isBiz: true });
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message || "Could not load business page");
+          setLoading(false);
+        });
+    } else {
+      const token = path.replace("/r/", "");
+      if (!token || token.length < 6) {
+        setError("Invalid review link");
         setLoading(false);
-      });
+        return;
+      }
+      setGatewayToken(token);
+
+      fetch(`${API_BASE}/functions/v1/resolve-gateway`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.error) throw new Error(data.error);
+          setGateway({ ...data, isBiz: false });
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message || "Could not load review page");
+          setLoading(false);
+        });
+    }
   }, []);
 
   // ── Track the click on first load (fire once) ──
@@ -87,102 +126,108 @@ export default function ReviewGatewayPage() {
   }, [gateway]);
 
   // ── Handle star selection ──
-  const handleStarClick = (star) => {
+  const handleStarClick = async (star) => {
     setRating(star);
-    setShowOptions(false);
-    setShowTextForm(false);
+    setCopied(false);
+    setConfetti(true);
+    setSelectedTemplate(null);
+    setReviewText("");
+    setTimeout(() => setConfetti(false), 2000);
 
-    // Track rating on review_gateway_clicks
-    if (clickId) {
-      supabase
-        .from("review_gateway_clicks")
-        .update({ rating: star })
-        .eq("id", clickId)
-        .then()
-        .catch(() => {});
-    }
+    const bizName = gateway?.business_name || "this business";
+    const bizType = gateway?.business_type || "default";
 
+    // Templates only for public Google reviews (4-5★); private feedback stays blank
+    let options = [];
     if (star >= 4) {
-      // 4–5★ → show celebration + options
-      setConfetti(true);
-      setTimeout(() => setConfetti(false), 2000);
-      setShowOptions(true);
-    }
-    // 1–3★ stays on page to show feedback form (no confetti)
-  };
+      try {
+        const { data } = await supabase
+          .from("review_templates")
+          .select("id, template_text")
+          .eq("user_id", gateway?.user_id)
+          .eq("biz_type", bizType)
+          .eq("star_rating", star);
+        if (data && data.length > 0) {
+          options = data.map((t) => ({ id: t.id, text: t.template_text.replace(/{business}/g, bizName) }));
+        }
+      } catch (_) {}
 
-  // ── Handle "Post on Google" button ──
-  const handlePostOnGoogle = () => {
-    if (gateway?.google_review_link) {
-      window.open(gateway.google_review_link, "_blank", "noopener");
-      markConverted("google");
-      setDone(true);
-      setSubmittedMsg(
-        "The Google review page opened in a new tab. Thank you!"
-      );
+      // Fall back to category defaults
+      if (options.length === 0) {
+        const defaults = getDefaultReviewTemplates(bizType, star);
+        options = defaults.map((text, i) => ({ id: `default-${i}`, text: text.replace(/{business}/g, bizName), isDefault: true }));
+      }
+
+      setTemplateOptions(options);
+      if (options.length > 0) {
+        setSelectedTemplate(options[0].id);
+        setReviewText(options[0].text);
+      }
     } else {
-      // No GBP link — go straight to text form
-      setShowTextForm(true);
-      setShowOptions(false);
+      setTemplateOptions([]);
+      setSelectedTemplate(null);
+      setReviewText("");
     }
+
+    // Track rating
+    if (clickId) {
+      supabase.from("review_gateway_clicks").update({ rating: star }).eq("id", clickId).then().catch(() => {});
+    }
+
+    // Log event to review_events
+    supabase.from("review_events").insert({
+      user_id: gateway?.user_id,
+      slug: gateway?.slug,
+      star_rating: star,
+      template_used: options[0]?.text || "",
+      destination_url: gateway?.google_review_link || "",
+      source: gateway?.isBiz ? "qr" : "link",
+    }).then().catch(() => {});
   };
 
-  // ── Show text form for writing a review here ──
-  const handleWriteHere = () => {
-    setShowTextForm(true);
-    setShowOptions(false);
+  const handleSelectTemplate = (id, text) => {
+    setSelectedTemplate(id);
+    setReviewText(text);
   };
 
-  // ── Submit feedback / private review ──
-  const handleSubmitFeedback = async () => {
-    if (!feedback.trim() && rating < 4) return;
+  // ── Copy review text & open Google in one click (4-5★ only) ──
+  const handleCopyAndGo = () => {
+    if (!reviewText) return;
+    navigator.clipboard.writeText(reviewText).catch(() => {});
+    setCopied(true);
+
+    supabase.from("review_events").update({ copied_at: new Date().toISOString() }).eq("slug", gateway?.slug).eq("star_rating", rating).order("created_at", { ascending: false }).limit(1).then().catch(() => {});
+
+    setTimeout(() => {
+      if (gateway?.google_review_link) {
+        window.location.href = gateway.google_review_link;
+      }
+      supabase.from("review_events").update({ redirected_at: new Date().toISOString() }).eq("slug", gateway?.slug).eq("star_rating", rating).order("created_at", { ascending: false }).limit(1).then().catch(() => {});
+      setDone(true);
+    }, 1500);
+  };
+
+  // ── Send private feedback (1-3★) — NEVER goes to Google ──
+  const handlePrivateFeedback = async () => {
+    if (submitting) return;
     setSubmitting(true);
 
+    const payload = { rating, feedback: reviewText, click_id: clickId };
+    if (gatewayToken) payload.token = gatewayToken;
+    else payload.user_id = gateway?.user_id;
+
     try {
-      const token = window.location.pathname.replace("/r/", "");
       const res = await fetch(`${API_BASE}/functions/v1/submit-gateway-feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token,
-          rating,
-          feedback: feedback.trim(),
-          click_id: clickId,
-        }),
+        body: JSON.stringify(payload),
       });
-
-      const data = await res.json();
-      if (!res.ok || data.error) {
-        throw new Error(data.error || "Failed to submit");
+      if (res.ok) {
+        setPrivateMode(true);
+        setDone(true);
       }
-
-      setDone(true);
-      if (rating >= 4) {
-        setSubmittedMsg("Your review has been submitted. Thank you!");
-      } else {
-        setSubmittedMsg(
-          "Thank you for your honest feedback. We'll use it to improve."
-        );
-      }
-    } catch (err) {
-      console.error("Submit error:", err);
-    }
+    } catch (_) {}
     setSubmitting(false);
-  };
-
-  // ── Mark converted in review_gateway_clicks ──
-  const markConverted = (platform) => {
-    if (!clickId) return;
-    supabase
-      .from("review_gateway_clicks")
-      .update({
-        converted: true,
-        rating,
-        review_posted_on: platform || "reviewping",
-      })
-      .eq("id", clickId)
-      .then()
-      .catch(() => {});
   };
 
   // ── Confetti particles ──
@@ -226,6 +271,7 @@ export default function ReviewGatewayPage() {
 
   // Error state
   if (error) {
+    const isUnavailable = error === "unavailable";
     return (
       <div
         style={{
@@ -241,7 +287,7 @@ export default function ReviewGatewayPage() {
         }}
       >
         <div>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🔗</div>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>{isUnavailable ? "⏳" : "🔗"}</div>
           <h2
             style={{
               fontFamily: "'Instrument Serif',serif",
@@ -250,11 +296,18 @@ export default function ReviewGatewayPage() {
               margin: "0 0 8px",
             }}
           >
-            Invalid review link
+            {isUnavailable
+              ? "This page is not available right now"
+              : error.includes("business") || error.includes("Business")
+                ? "Business not found"
+                : "Invalid review link"}
           </h2>
           <p style={{ color: G.muted, fontSize: 14, margin: 0 }}>
-            This link is invalid or has expired. Please contact the business
-            for a new link.
+            {isUnavailable
+              ? "Please check back later or contact the business directly."
+              : error.includes("business") || error.includes("Business")
+                ? "This business link is invalid. Please check the URL or contact the business directly."
+                : "This link is invalid or has expired. Please contact the business for a new link."}
           </p>
         </div>
       </div>
@@ -284,42 +337,20 @@ export default function ReviewGatewayPage() {
             padding: "48px 40px",
             maxWidth: 480,
             width: "100%",
-            textAlign: "center",
             boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
             animation: "fs 0.5s ease",
           }}
         >
-          <div style={{ fontSize: 56, marginBottom: 16 }}>
-            {rating >= 4 ? "⭐" : "💬"}
-          </div>
-          <h2
-            style={{
-              fontFamily: "'Instrument Serif',serif",
-              fontSize: 24,
-              fontWeight: 400,
-              margin: "0 0 8px",
-            }}
-          >
-            {rating >= 4 ? "Amazing, thank you!" : "Thanks for sharing"}
+          <div style={{ fontSize: 56, marginBottom: 16 }}>{privateMode ? "📨" : "★".repeat(rating)}</div>
+          <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 24, fontWeight: 400, margin: "0 0 8px" }}>
+            {privateMode ? "Thank you for your feedback!" : "Thank you for your review!"}
           </h2>
-          <p
-            style={{
-              color: G.muted,
-              fontSize: 14,
-              margin: 0,
-              lineHeight: 1.6,
-            }}
-          >
-            {submittedMsg}
+          <p style={{ color: G.muted, fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+            {privateMode
+              ? "Your feedback has been sent privately to the business. It won't be posted publicly."
+              : "Redirecting you to Google to post your review..."}
           </p>
-          <p
-            style={{
-              color: G.mutedLo,
-              fontSize: 11,
-              marginTop: 32,
-              opacity: 0.6,
-            }}
-          >
+          <p style={{ color: G.mutedLo, fontSize: 11, marginTop: 32, opacity: 0.6 }}>
             Powered by ReviewPing
           </p>
         </div>
@@ -329,20 +360,42 @@ export default function ReviewGatewayPage() {
 
   // ── Main gateway UI ──
   return (
-    <div
-      style={{
-        background: "linear-gradient(135deg, #f0f5ff 0%, #faf5ff 100%)",
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "'Manrope',sans-serif",
-        color: G.ink,
-        padding: 24,
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
+    <>
+      <SEO
+        title="Submit a Review"
+        description="Share your experience with this business. Leave a Google review through our review request platform."
+        path={window.location.pathname}
+      />
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: `Submit a review for ${gateway?.business_name || "this business"}`,
+          description: "Share your experience and leave feedback on this page.",
+          url: `${GATEWAY_URL}${window.location.pathname}`,
+          potentialAction: {
+            "@type": "ReviewAction",
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: `${GATEWAY_URL}${window.location.pathname}`,
+            },
+          },
+        })}
+      </script>
+      <div
+        style={{
+          background: "linear-gradient(135deg, #f0f5ff 0%, #faf5ff 100%)",
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "'Manrope',sans-serif",
+          color: G.ink,
+          padding: 24,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
       {/* ── Confetti overlay ── */}
       {confetti && (
         <div
@@ -434,341 +487,177 @@ export default function ReviewGatewayPage() {
           {gateway?.business_name || "Business"}
         </h1>
 
-        {/* Rating not yet selected — show question */}
-        {rating === 0 && !showOptions && (
-          <>
-            <p
-              style={{
-                color: G.muted,
-                fontSize: 14,
-                margin: "8px 0 28px",
-                lineHeight: 1.6,
-              }}
-            >
-              Hi {gateway?.customer_name || "there"}, how was your experience?
-            </p>
-          </>
+        {/* Question */}
+        {rating === 0 && (
+          <p style={{ color: G.muted, fontSize: 14, margin: "8px 0 28px", lineHeight: 1.6 }}>
+            {gateway?.isBiz ? `How was your experience at ${gateway?.business_name || "this business"}?` : `Hi ${gateway?.customer_name || "there"}, how was your experience?`}
+          </p>
         )}
 
-        {/* 4–5★ options */}
-        {showOptions && (
+        {/* Template + Copy button */}
+        {rating > 0 && (
           <>
-            <div style={{ fontSize: 48, marginBottom: 8 }}>
-              {"★".repeat(rating)}
-            </div>
-            <h2
-              style={{
-                fontFamily: "'Instrument Serif',serif",
-                fontSize: 24,
-                fontWeight: 400,
-                margin: "0 0 6px",
-              }}
-            >
-              Amazing! 🤩
+            <div style={{ fontSize: 48, marginBottom: 8 }}>{"★".repeat(rating)}</div>
+            <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 24, fontWeight: 400, margin: "0 0 6px" }}>
+              {rating >= 4 ? "Amazing! 🤩" : rating === 3 ? "Thanks for your feedback" : "We appreciate your honesty"}
             </h2>
-            <p
-              style={{
-                color: G.muted,
-                fontSize: 14,
-                margin: "0 0 24px",
-                lineHeight: 1.6,
-              }}
-            >
-              Would you like to share your experience on Google to help others
-              discover this business?
+            <p style={{ color: G.muted, fontSize: 14, margin: "0 0 16px", lineHeight: 1.6 }}>
+              {rating >= 4 ? "Share your experience with one click" : "Help the business improve — your feedback stays private"}
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {gateway?.google_review_link ? (
-                <button
-                  onClick={handlePostOnGoogle}
-                  style={{
-                    padding: "14px 24px",
-                    background: G.accent,
-                    color: "white",
-                    border: "none",
-                    borderRadius: 12,
-                    fontSize: 15,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    fontFamily: "'Manrope',sans-serif",
-                    transition: "transform 0.15s, opacity 0.15s",
-                    boxShadow: `0 4px 16px ${G.accent}40`,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = "scale(1.02)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = "scale(1)";
-                  }}
-                >
-                  Post on Google ★
-                </button>
-              ) : null}
+
+            {rating >= 4 ? (<>
+            {/* Template options */}
+            {templateOptions.length > 1 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
+                {templateOptions.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => handleSelectTemplate(opt.id, opt.text)}
+                    style={{
+                      textAlign: "left", width: "100%", padding: "12px 14px", borderRadius: 10,
+                      border: `1.5px solid ${selectedTemplate === opt.id ? G.accent : G.border}`,
+                      background: selectedTemplate === opt.id ? G.accentBg : G.surface,
+                      cursor: "pointer", fontFamily: "'Manrope',sans-serif", fontSize: 13, lineHeight: 1.6,
+                      color: G.ink, transition: "all 0.12s",
+                    }}
+                  >
+                    {opt.text}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {reviewText && (
+              <div style={{
+                background: G.bg,
+                borderRadius: 12,
+                padding: "16px 18px",
+                marginBottom: 16,
+                textAlign: "left",
+                border: `1px solid ${G.border}`,
+                fontSize: 14,
+                lineHeight: 1.7,
+                color: G.ink,
+              }}>
+                {reviewText}
+              </div>
+            )}
+
+            {reviewText && (
               <button
-                onClick={handleWriteHere}
+                onClick={handleCopyAndGo}
                 style={{
-                  padding: "14px 24px",
-                  background: gateway?.google_review_link ? G.surface : G.accent,
-                  color: gateway?.google_review_link ? G.inkSoft : "white",
-                  border: gateway?.google_review_link ? `1.5px solid ${G.border}` : "none",
+                  width: "100%",
+                  padding: "16px 24px",
+                  background: copied ? "#16a34a" : G.accent,
+                  color: "white",
+                  border: "none",
                   borderRadius: 12,
                   fontSize: 15,
                   fontWeight: 700,
                   cursor: "pointer",
                   fontFamily: "'Manrope',sans-serif",
-                  transition: "transform 0.15s",
-                  boxShadow: gateway?.google_review_link ? "none" : `0 4px 16px ${G.accent}40`,
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = "scale(1.02)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = "scale(1)";
-                }}
-              >
-                {gateway?.google_review_link ? "Leave review here instead" : "Write a review ★"}
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* 1–3★ feedback form */}
-        {rating >= 1 && rating <= 3 && !showTextForm && (
-          <>
-            <div style={{ fontSize: 40, marginBottom: 4 }}>💬</div>
-            <h2
-              style={{
-                fontFamily: "'Instrument Serif',serif",
-                fontSize: 22,
-                fontWeight: 400,
-                margin: "0 0 6px",
-              }}
-            >
-              Help us improve
-            </h2>
-            <p
-              style={{
-                color: G.muted,
-                fontSize: 14,
-                margin: "0 0 20px",
-                lineHeight: 1.6,
-              }}
-            >
-              We value your honesty. Tell us what went wrong — this is private
-              and won't be posted publicly.
-            </p>
-            <div>
-              <textarea
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                placeholder="What could be better?"
-                rows={3}
-                style={{
-                  width: "100%",
-                  border: `1.5px solid ${G.border}`,
-                  borderRadius: 12,
-                  padding: "12px 14px",
-                  fontSize: 14,
-                  fontFamily: "'Manrope',sans-serif",
-                  resize: "none",
-                  outline: "none",
-                  marginBottom: 16,
-                  background: G.bg,
-                  boxSizing: "border-box",
-                  color: G.ink,
-                }}
-              />
-              <button
-                onClick={handleSubmitFeedback}
-                disabled={submitting}
-                style={{
-                  width: "100%",
-                  padding: "14px 24px",
-                  background: submitting ? G.border : G.accent,
-                  color: "white",
-                  border: "none",
-                  borderRadius: 12,
-                  fontSize: 15,
-                  fontWeight: 700,
-                  cursor: submitting ? "not-allowed" : "pointer",
-                  fontFamily: "'Manrope',sans-serif",
-                  transition: "opacity 0.15s",
-                  opacity: submitting ? 0.6 : 1,
+                  transition: "all 0.2s",
+                  boxShadow: copied ? "none" : `0 4px 16px ${G.accent}40`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 8,
                 }}
+                onMouseEnter={(e) => { if (!copied) e.target.style.transform = "scale(1.02)"; }}
+                onMouseLeave={(e) => { e.target.style.transform = "scale(1)"; }}
               >
-                {submitting ? (
-                  <>
-                    <span
-                      style={{
-                        width: 16,
-                        height: 16,
-                        border: "2px solid rgba(255,255,255,0.3)",
-                        borderTopColor: "white",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                      }}
-                    />
-                    Submitting…
-                  </>
-                ) : (
-                  "Send feedback →"
-                )}
+                {copied ? "✅ Copied! Opening Google…" : "📋 Copy & Post on Google →"}
               </button>
-            </div>
-          </>
-        )}
-
-        {/* 4–5★ text form (when "Leave review here" is chosen) */}
-        {showTextForm && (
-          <>
-            <div style={{ fontSize: 40, marginBottom: 4 }}>✍️</div>
-            <h2
-              style={{
-                fontFamily: "'Instrument Serif',serif",
-                fontSize: 22,
-                fontWeight: 400,
-                margin: "0 0 6px",
-              }}
-            >
-              Share your experience
-            </h2>
-            <p
-              style={{
-                color: G.muted,
-                fontSize: 14,
-                margin: "0 0 20px",
-                lineHeight: 1.6,
-              }}
-            >
-              Write a quick review — it helps others discover this business.
-            </p>
-            <div>
+            )}
+            </>) : (
+            <>
               <textarea
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                placeholder="What did you love about your experience?"
-                rows={3}
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                placeholder="Share your honest experience — what went well and where the business can improve. This goes only to the business, not to Google."
+                rows={4}
                 style={{
                   width: "100%",
-                  border: `1.5px solid ${G.border}`,
+                  padding: "14px 16px",
                   borderRadius: 12,
-                  padding: "12px 14px",
-                  fontSize: 14,
+                  border: `1.5px solid ${G.border}`,
+                  background: G.surface,
                   fontFamily: "'Manrope',sans-serif",
-                  resize: "none",
-                  outline: "none",
-                  marginBottom: 16,
-                  background: G.bg,
-                  boxSizing: "border-box",
+                  fontSize: 14,
+                  lineHeight: 1.7,
                   color: G.ink,
+                  resize: "vertical",
+                  boxSizing: "border-box",
+                  outline: "none",
+                  marginBottom: 14,
                 }}
               />
               <button
-                onClick={handleSubmitFeedback}
+                onClick={handlePrivateFeedback}
                 disabled={submitting}
                 style={{
                   width: "100%",
-                  padding: "14px 24px",
-                  background: submitting ? G.border : G.accent,
+                  padding: "16px 24px",
+                  background: G.accent,
                   color: "white",
                   border: "none",
                   borderRadius: 12,
                   fontSize: 15,
                   fontWeight: 700,
-                  cursor: submitting ? "not-allowed" : "pointer",
+                  cursor: submitting ? "default" : "pointer",
                   fontFamily: "'Manrope',sans-serif",
-                  transition: "opacity 0.15s",
-                  opacity: submitting ? 0.6 : 1,
+                  transition: "all 0.2s",
+                  boxShadow: `0 4px 16px ${G.accent}40`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 8,
+                  opacity: submitting ? 0.7 : 1,
                 }}
               >
-                {submitting ? (
-                  <>
-                    <span
-                      style={{
-                        width: 16,
-                        height: 16,
-                        border: "2px solid rgba(255,255,255,0.3)",
-                        borderTopColor: "white",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                      }}
-                    />
-                    Submitting…
-                  </>
-                ) : (
-                  "Submit review →"
-                )}
+                {submitting ? "Sending…" : "📨 Send Private Feedback"}
               </button>
-            </div>
+            </>
+            )}
           </>
         )}
 
-        {/* Stars — show unless options/text form shown */}
-        {!showOptions && !showTextForm && (
-          <div style={{ marginBottom: rating === 0 ? 0 : 16 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: 8,
-                marginBottom: 10,
-              }}
-            >
-              {[1, 2, 3, 4, 5].map((star) => {
-                const filled = star <= (hover || rating);
-                return (
-                  <button
-                    key={star}
-                    onClick={() => handleStarClick(star)}
-                    onMouseEnter={() => setHover(star)}
-                    onMouseLeave={() => setHover(0)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      fontSize: 42,
-                      cursor: "pointer",
-                      padding: "4px 2px",
-                      transition: "transform 0.15s, filter 0.2s",
-                      transform:
-                        hover >= star ? "scale(1.2)" : "scale(1)",
-                      filter: filled ? "none" : "grayscale(1) opacity(0.3)",
-                      outline: "none",
-                    }}
-                    aria-label={`${star} star${star > 1 ? "s" : ""}`}
-                  >
-                    {filled ? "★" : "☆"}
-                  </button>
-                );
-              })}
-            </div>
-            {rating === 0 && (
-              <p style={{ fontSize: 13, color: G.muted, margin: 0 }}>
-                {hover > 0 ? STAR_LABELS[hover - 1] : "Tap a star to rate"}
-              </p>
-            )}
-            {rating >= 1 && rating <= 3 && (
-              <p
-                style={{
-                  fontSize: 12.5,
-                  color: G.muted,
-                  margin: "8px 0 0",
-                }}
-              >
-                You selected {rating} {rating === 1 ? "star" : "stars"}
-              </p>
-            )}
+        {/* Stars */}
+        <div style={{ marginTop: rating > 0 ? 24 : 0, marginBottom: rating === 0 ? 0 : 16 }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 10 }}>
+            {[1, 2, 3, 4, 5].map((star) => {
+              const filled = star <= (hover || rating);
+              return (
+                <button
+                  key={star}
+                  onClick={() => handleStarClick(star)}
+                  onMouseEnter={() => setHover(star)}
+                  onMouseLeave={() => setHover(0)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: 42,
+                    cursor: "pointer",
+                    padding: "4px 2px",
+                    transition: "transform 0.15s, filter 0.2s",
+                    transform: hover >= star ? "scale(1.2)" : "scale(1)",
+                    filter: filled ? "none" : "grayscale(1) opacity(0.3)",
+                    outline: "none",
+                  }}
+                  aria-label={`${star} star${star > 1 ? "s" : ""}`}
+                >
+                  {filled ? "★" : "☆"}
+                </button>
+              );
+            })}
           </div>
-        )}
+          {rating === 0 && (
+            <p style={{ fontSize: 13, color: G.muted, margin: 0 }}>
+              {hover > 0 ? STAR_LABELS[hover - 1] : "Tap a star to rate"}
+            </p>
+          )}
+        </div>
 
         {/* Powered by */}
         {!done && (
@@ -784,6 +673,30 @@ export default function ReviewGatewayPage() {
           </p>
         )}
       </div>
+      {/* Why your feedback matters */}
+      <div
+        style={{
+          maxWidth: 480,
+          width: "100%",
+          margin: "24px auto 0",
+          textAlign: "center",
+        }}
+      >
+        <p
+          style={{
+            color: G.muted,
+            fontSize: 13,
+            lineHeight: 1.7,
+            margin: 0,
+          }}
+        >
+          Your feedback helps this business understand what they're doing right 
+          and where they can improve. Every review — whether public or private — 
+          is read and valued. Thank you for taking the time to share your 
+          experience.
+        </p>
+      </div>
     </div>
+    </>
   );
 }

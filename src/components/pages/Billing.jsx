@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { G } from "../../data/theme";
-import { PLANS } from "../../data/constants";
+import { PLANS, getLimit } from "../../data/constants";
 import { createSubscription } from "../../api";
 import Btn from "../ui/Btn";
 import Card from "../ui/Card";
@@ -8,13 +8,14 @@ import Pill from "../ui/Pill";
 import ConfirmModal from "../ui/ConfirmModal";
 import { toast } from "sonner";
 import { supabase } from "../../config/supabase";
+import { trackCheckoutStarted } from "../../tracking";
 
-export default function Billing({ userId, plan, setPlan }) {
-  const cur = PLANS.find((p) => p.id === plan) || PLANS[1];
+export default function Billing({ userId, plan, setPlan, trialEnd, trialDaysLeft }) {
+  const cur = PLANS.find((p) => p.id === plan) || PLANS[0];
   const [annual, setAnnual] = useState(false);
   const [confirm, setConfirm] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [usage, setUsage] = useState({ requests: 0, sms: 0, email: 0 });
+  const [usage, setUsage] = useState({ requests: 0, email: 0, aiGens: 0, qrScans: 0 });
   const [usageLoading, setUsageLoading] = useState(true);
 
   useEffect(() => {
@@ -33,31 +34,27 @@ export default function Billing({ userId, plan, setPlan }) {
           .select("*", { count: "exact", head: true })
           .eq("user_id", userId)
           .gte("sent_at", startOfMonth);
-
         if (err1) throw err1;
 
-        const { count: smsCount, error: err2 } = await supabase
-          .from("review_requests")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", userId)
-          .eq("channel", "sms")
-          .gte("sent_at", startOfMonth);
-
-        if (err2) throw err2;
-
-        const { count: emailCount, error: err3 } = await supabase
+        const { count: emailCount, error: err2 } = await supabase
           .from("review_requests")
           .select("*", { count: "exact", head: true })
           .eq("user_id", userId)
           .eq("channel", "email")
           .gte("sent_at", startOfMonth);
+        if (err2) throw err2;
 
-        if (err3) throw err3;
+        const { data: bizData } = await supabase
+          .from("business_settings")
+          .select("qr_scans_this_month, ai_generations_this_month")
+          .eq("user_id", userId)
+          .single();
 
         setUsage({
           requests: totalRequests ?? 0,
-          sms: smsCount ?? 0,
           email: emailCount ?? 0,
+          aiGens: bizData?.ai_generations_this_month ?? 0,
+          qrScans: bizData?.qr_scans_this_month ?? 0,
         });
       } catch (err) {
         toast.error(err.message || "Failed to load usage");
@@ -71,6 +68,7 @@ export default function Billing({ userId, plan, setPlan }) {
     setLoading(true);
     try {
       const billing = annual ? "annual" : "monthly";
+      trackCheckoutStarted({ target_plan: p.id, billing_cycle: billing });
       const result = await createSubscription({
         plan: p.id,
         billing,
@@ -78,7 +76,7 @@ export default function Billing({ userId, plan, setPlan }) {
       });
       if (result?.url) {
         window.location.href = result.url;
-        return; // page will navigate away
+        return;
       }
       toast.error("Checkout URL not returned");
     } catch (err) {
@@ -89,13 +87,10 @@ export default function Billing({ userId, plan, setPlan }) {
   };
 
   const usageItems = [
-    {
-      l: "Review requests",
-      v: usage.requests,
-      max: plan === "free" ? 150 : plan === "starter" ? 100 : null,
-    },
-    { l: "SMS messages", v: usage.sms, max: null },
+    { l: "Review requests", v: usage.requests, max: getLimit(plan, "reviewRequests") > 999 ? null : getLimit(plan, "reviewRequests") },
     { l: "Email messages", v: usage.email, max: null },
+    { l: "AI generations", v: usage.aiGens, max: getLimit(plan, "aiGenerations") },
+    { l: "QR scans", v: usage.qrScans, max: null },
   ];
 
   return (
@@ -151,7 +146,7 @@ export default function Billing({ userId, plan, setPlan }) {
               {cur.name}
             </div>
             <div style={{ fontSize: 13, color: G.muted, marginTop: 2 }}>
-              {cur.f.slice(0, 2).join(" · ")}
+              {cur.f.slice(0, 2).join(" \u00b7 ")}
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
@@ -162,12 +157,35 @@ export default function Billing({ userId, plan, setPlan }) {
                 color: G.ink,
               }}
             >
-              ${annual ? Math.round(cur.annual / 12) : cur.price}
+              ₹{annual ? Math.round(cur.annual / 12) : cur.price}
             </div>
             <div style={{ fontSize: 12, color: G.muted }}>/month</div>
           </div>
         </div>
       </Card>
+
+      {trialDaysLeft > 0 && (
+        <Card
+          sx={{
+            marginBottom: 14,
+            background: G.goldBg,
+            border: `1.5px solid ${G.goldBd}`,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontSize: 32 }}>{"\uD83C\uDF89"}</span>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: "#8B6914" }}>
+                {trialDaysLeft}-day free trial
+              </div>
+              <div style={{ fontSize: 12.5, color: "#8B6914", opacity: 0.8, marginTop: 2 }}>
+                Trial ends {trialEnd ? new Date(trialEnd).toLocaleDateString() : "soon"}. Choose a plan to continue.
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <Card sx={{ marginBottom: 14 }}>
         <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 14 }}>
           This month's usage
@@ -181,7 +199,7 @@ export default function Billing({ userId, plan, setPlan }) {
               fontSize: 13,
             }}
           >
-            Loading usage…
+            Loading usage\u2026
           </div>
         ) : (
           usageItems.map((u) => (
@@ -305,51 +323,140 @@ export default function Billing({ userId, plan, setPlan }) {
       >
         Available plans
       </div>
-      {PLANS.map((p) => (
-        <Card
-          key={p.id}
-          sx={{
-            marginBottom: 10,
-            border: `1.5px solid ${p.id === plan ? G.accent : G.border}`,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+      {PLANS.map((p) => {
+        const isPremium = p.id === "premium";
+        return (
+          <Card
+            key={p.id}
+            sx={{
+              marginBottom: 10,
+              border: `1.5px solid ${p.id === plan ? G.accent : G.border}`,
+              position: "relative",
+              overflow: "hidden",
             }}
           >
-            <div>
+            {isPremium && (
               <div
                 style={{
-                  fontFamily: "'Instrument Serif',serif",
-                  fontSize: 20,
-                  marginBottom: 2,
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  background: G.accent,
+                  color: "#fff",
+                  fontSize: 9.5,
+                  fontWeight: 700,
+                  letterSpacing: "0.6px",
+                  textTransform: "uppercase",
+                  padding: "3px 12px",
+                  borderBottomLeftRadius: 8,
                 }}
               >
-                {p.name} — ${annual ? Math.round(p.annual / 12) : p.price}/mo
+                Most Popular
               </div>
-              <div style={{ fontSize: 12, color: G.muted }}>
-                {p.f.slice(0, 2).join(" · ")}
+            )}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                marginBottom: 10,
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontFamily: "'Instrument Serif',serif",
+                    fontSize: 20,
+                    marginBottom: 2,
+                  }}
+                >
+                  {p.name}
+                </div>
+                <div style={{ fontSize: 12, color: G.muted }}>
+                  {p.sub}
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div
+                  style={{
+                    fontFamily: "'Instrument Serif',serif",
+                    fontSize: 24,
+                    color: G.ink,
+                  }}
+                >
+                  ₹{annual ? Math.round(p.annual / 12) : p.price}
+                </div>
+                <div style={{ fontSize: 11, color: G.muted }}>/month</div>
               </div>
             </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "4px 16px",
+                marginBottom: 12,
+                fontSize: 12.5,
+                color: G.muted,
+              }}
+            >
+              {[
+                { label: "Review requests", val: p.limits.reviewRequests > 999 ? "Unlimited" : `${p.limits.reviewRequests}/mo` },
+                { label: "Templates per rating", val: p.limits.templatesPerRating > 100 ? "Unlimited" : p.limits.templatesPerRating },
+                { label: "AI generations", val: `${p.limits.aiGenerations}/mo` },
+                { label: "Business locations", val: p.limits.locations > 1 ? `Up to ${p.limits.locations}` : "1" },
+                { label: "Team members", val: p.limits.teamMembers > 1 ? `Up to ${p.limits.teamMembers}` : "1" },
+              ].map((item) => (
+                <div key={item.label} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  <span style={{ color: G.success, fontSize: 11 }}>{"\u2713"}</span>
+                  <span>
+                    <strong>{item.label}:</strong> {item.val}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 4,
+                marginBottom: 10,
+              }}
+            >
+              {(p.f || []).map((feat, i) => (
+                <span
+                  key={i}
+                  style={{
+                    fontSize: 11,
+                    color: G.mutedLo,
+                    background: G.bg,
+                    padding: "2px 8px",
+                    borderRadius: 4,
+                  }}
+                >
+                  {feat}
+                </span>
+              ))}
+            </div>
+
             {p.id === plan ? (
-              <Pill color={G.success}>Current</Pill>
+              <Pill color={G.success} style={{ alignSelf: "flex-start" }}>Current</Pill>
             ) : (
               <Btn
                 size="sm"
-                variant="secondary"
+                variant={isPremium ? "primary" : "secondary"}
                 onClick={() => setConfirm(p)}
                 loading={loading}
                 disabled={loading}
+                fullWidth
               >
-                {p.price > cur.price ? "Upgrade →" : "Downgrade"}
+                {p.price > cur.price ? "Upgrade \u2192" : "Downgrade"}
               </Btn>
             )}
-          </div>
-        </Card>
-      ))}
+          </Card>
+        );
+      })}
       <Card sx={{ marginBottom: 14 }}>
         <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
           Payment method
@@ -367,7 +474,7 @@ export default function Billing({ userId, plan, setPlan }) {
             textAlign: "center",
           }}
         >
-          <span style={{ fontSize: 28, opacity: 0.4 }}>💳</span>
+          <span style={{ fontSize: 28, opacity: 0.4 }}>{"\uD83D\uDCB3"}</span>
           <div style={{ fontSize: 13, color: G.muted }}>
             No payment method saved yet.
           </div>
@@ -395,8 +502,8 @@ export default function Billing({ userId, plan, setPlan }) {
       <ConfirmModal
         open={!!confirm}
         title={confirm ? `Upgrade to ${confirm.name}` : ""}
-        message={confirm ? `Switch to the ${confirm.name} plan at $${annual ? Math.round(confirm.annual / 12) : confirm.price}/mo?` : ""}
-        confirmLabel={loading ? "Processing…" : "Confirm upgrade"}
+        message={confirm ? `Switch to the ${confirm.name} plan at ₹${annual ? Math.round(confirm.annual / 12) : confirm.price}/mo?` : ""}
+        confirmLabel={loading ? "Processing\u2026" : "Confirm upgrade"}
         onConfirm={() => doSwitch(confirm)}
         onCancel={() => setConfirm(null)}
         loading={loading}

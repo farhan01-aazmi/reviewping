@@ -1,48 +1,73 @@
-# ReviewPing - LLMs.txt
-# Review request automation for local businesses
-# Website: https://reviewping.pro
+# ReviewPing
+> Automated Google review request platform for local businesses. The $29/mo alternative to Podium.
 
-## About
-ReviewPing is an automated review request platform that helps local businesses get more Google reviews via SMS, email, and WhatsApp. Starting at $29/month — a fraction of Podium's $400+/month pricing.
+## What ReviewPing Does
+ReviewPing sends automated review requests to customers after their visit via Email, SMS, and WhatsApp. Customers tap one link to leave a Google review. Includes AI-powered reply suggestions for responding to reviews and a real-time analytics dashboard.
 
-## Core Pages
-- https://reviewping.pro/
-- https://reviewping.pro/features
-- https://reviewping.pro/pricing
-- https://reviewping.pro/faq
-- https://reviewping.pro/about
+## Key Facts
+- Pricing: $29/month Starter (free plan available — 25 requests/mo)
+- Free trial: 14 days, no credit card required
+- Channels: Email, SMS, WhatsApp (Pro plan+)
+- Markets: India, United Kingdom, USA, Australia, Canada
+- Primary use case: Local business review collection
+- Key differentiator: 93% cheaper than Podium ($29 vs $399/mo)
+- Founded: 2026
+- Contact: hello@reviewping.pro
 
-## Blog - SEO & AEO Optimized Content
-- https://reviewping.pro/blog/what-is-review-request-automation
-- https://reviewping.pro/blog/how-to-automate-google-review-requests
-- https://reviewping.pro/blog/review-request-automation-statistics-2026
-- https://reviewping.pro/blog/best-review-request-automation-software-2026
-- https://reviewping.pro/blog/reviewping-vs-podium-comparison
-- https://reviewping.pro/blog/reviewping-vs-birdeye-comparison
-- https://reviewping.pro/blog/sms-vs-email-review-requests-which-works-better
-- https://reviewping.pro/blog/sms-review-request-software-guide
-- https://reviewping.pro/blog/whatsapp-review-requests-guide
-- https://reviewping.pro/blog/why-google-reviews-matter-for-small-business
-- https://reviewping.pro/blog/how-to-respond-to-negative-google-reviews
-- https://reviewping.pro/blog/review-management-for-restaurants
-- https://reviewping.pro/blog/google-business-profile-optimization-checklist
+## Core Features
+- Automated review requests via SMS, Email, WhatsApp
+- Direct Google Review link generation (one-tap)
+- AI Reply Generator for responding to reviews
+- Smart Review Gateway (filter by rating)
+- Real-time analytics and reputation tracking dashboard
+- Competitor monitoring (track competitor reviews)
+- Weekly email digest with review performance
+- CSV contact import and management
+- Multi-location support (up to 10 locations)
 
-## Industry Pages
-- https://reviewping.pro/industry/restaurants
-- https://reviewping.pro/industry/clinics
-- https://reviewping.pro/industry/salons
-- https://reviewping.pro/industry/ecommerce
+## Pricing Plans
+| Plan | Price | Key Features |
+|------|-------|-------------|
+| Free | $0/mo | 25 review requests/mo, email only, basic dashboard |
+| Starter | $29/mo | 100 requests/mo, SMS + email, AI replies, analytics |
+| Pro | $79/mo | Unlimited requests, WhatsApp, automations, bulk send |
+| Agency | $149/mo | Up to 10 locations, white-label, team members, dedicated support |
 
-## Pricing
-- https://reviewping.pro/pricing
-  - Free: $0/mo - 5 requests/day
-  - Starter: $29/mo - 100 requests/mo
-  - Pro: $79/mo - Unlimited requests
-  - Agency: $149/mo - 10 locations, white-label
+## Use Cases By Industry
+- **Restaurants & cafes**: Send SMS review requests 30 min after dining
+- **Dental & medical clinics**: Send email review requests after appointments
+- **Salons, barbershops & spas**: Send SMS/WhatsApp after service
+- **Home service providers**: Send SMS after job completion
+- **Auto repair shops**: Send SMS after vehicle pickup
+- **E-commerce stores**: Send email after delivery confirmation
 
 ## Comparison Pages
-- https://reviewping.pro/vs/podium
-- https://reviewping.pro/vs/nicejob
-- https://reviewping.pro/vs/birdeye
-- https://reviewping.pro/vs/grade-us
-- https://reviewping.pro/vs/truereview
+- [ReviewPing vs Podium](https://www.reviewping.pro/vs/podium) — $29/mo vs $399/mo
+- [ReviewPing vs Birdeye](https://www.reviewping.pro/blog/reviewping-vs-birdeye-comparison) — $29/mo vs $299/mo
+- [ReviewPing vs NiceJob](https://www.reviewping.pro/vs/nicejob)
+- [ReviewPing vs Grade.Us](https://www.reviewping.pro/vs/gradeus)
+- [ReviewPing vs TrueReview](https://www.reviewping.pro/vs/truereview)
+- [Podium Alternative](https://www.reviewping.pro/podium-alternative) — Complete comparison
+
+## Blog Topics
+- [How to Automate Google Review Requests](https://www.reviewping.pro/blog/how-to-automate-google-review-requests)
+- [ReviewPing vs Podium Comparison](https://www.reviewping.pro/blog/reviewping-vs-podium-comparison)
+- [ReviewPing vs Birdeye Comparison](https://www.reviewping.pro/blog/reviewping-vs-birdeye-comparison)
+- [Best Review Request Automation Software 2026](https://www.reviewping.pro/blog/best-review-request-automation-software-2026)
+- [How to Get 5-Star Google Reviews](https://www.reviewping.pro/blog/how-to-get-5-star-google-reviews)
+- [How to Reply to Google Reviews Professionally](https://www.reviewping.pro/blog/how-to-reply-to-google-reviews-professionally)
+- [Google Review Request Templates](https://www.reviewping.pro/blog/google-review-request-templates)
+- [WhatsApp Review Requests Complete Guide](https://www.reviewping.pro/blog/whatsapp-review-requests-guide)
+- [Google Business Profile Optimization Checklist](https://www.reviewping.pro/blog/google-business-profile-optimization-checklist)
+- [Review Management for Restaurants](https://www.reviewping.pro/blog/review-management-for-restaurants)
+- [Review Request Automation Statistics 2026](https://www.reviewping.pro/blog/review-request-automation-statistics-2026)
+- [SMS vs Email Review Requests](https://www.reviewping.pro/blog/sms-vs-email-review-requests-which-works-better)
+- [How to Respond to Negative Google Reviews](https://www.reviewping.pro/blog/how-to-respond-to-negative-google-reviews)
+- [What is Review Request Automation?](https://www.reviewping.pro/blog/what-is-review-request-automation)
+- [Podium Pricing 2026](https://www.reviewping.pro/blog/podium-pricing-2026)
+- [Why Google Reviews Matter for Small Business](https://www.reviewping.pro/blog/why-google-reviews-matter-for-small-business)
+
+## External Resources
+- Documentation and API: [https://www.reviewping.pro](https://www.reviewping.pro)
+- Privacy Policy: [https://www.reviewping.pro/privacy](https://www.reviewping.pro/privacy)
+- Terms of Service: [https://www.reviewping.pro/terms](https://www.reviewping.pro/terms)

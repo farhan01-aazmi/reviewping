@@ -47,7 +47,7 @@ const CLOG = [
     tc: G.purple,
     items: [
       "AI messages using Gemini 2.0 Flash — faster and more natural",
-      "Send via SMS, Email, or Both",
+      "Send via Email, WhatsApp, or Both",
       "Notifications centre with badge",
       "Settings — API keys, notifications",
     ],
@@ -60,7 +60,7 @@ const CLOG = [
     items: [
       "ReviewPing launches publicly",
       "Dashboard, send requests, onboarding wizard",
-      "SMS and email delivery",
+      "email and WhatsApp delivery",
       "14-day free trial for all new accounts",
     ],
   },

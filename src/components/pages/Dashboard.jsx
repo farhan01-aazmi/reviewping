@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { Send, BellRing } from "lucide-react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { Btn, Card, Pill, Stars, Spinner, EmptyState } from "../ui";
-import PremiumFeature from "../ui/PremiumFeature";
 import { fmtDate } from "../../utils/formatters";
-import CompetitorRadar from "../layout/CompetitorRadar";
-import ReputationScore from "../ui/ReputationScore";
-import VelocityInsight from "../ui/VelocityInsight";
-import { listCompetitors, syncCompetitors, sendTestDigest } from "../../api";
+import { sendTestDigest } from "../../api";
+import { trackMilestoneReached } from "../../tracking";
 
 const THIRTY_DAYS = 30 * 86400000;
 
@@ -53,11 +51,8 @@ function buildDayLabels() {
 export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [copied, setCopied] = useState(false);
   const [stats, setStats] = useState(null);
   const [negCount, setNegCount] = useState(0);
-  const [competitors, setCompetitors] = useState([]);
-  const [competitorsLoading, setCompetitorsLoading] = useState(true);
   const [sendingDigest, setSendingDigest] = useState(false);
 
   // ── Handle GBP OAuth callback ──
@@ -91,6 +86,9 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
         const sLastMonth = startOfMonth(-1);
         const thirtyDaysAgo = new Date(now - THIRTY_DAYS).toISOString();
 
+        const safeQuery = (promise) =>
+          promise.then(r => ({ data: r.data, error: r.error, count: r.count })).catch(e => ({ data: null, error: e, count: 0 }));
+
         const [
           totalRes,
           ratingsRes,
@@ -101,112 +99,81 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
           pendingRes,
           dailyRes,
           negRes,
-          gatewayClicksRes,
-          gatewayConvertedRes,
           reviewReqsRes,
           reviewSubsRes,
-          competitorsRes,
         ] = await Promise.all([
           supabase
-            .from("reviews")
-            .select("*", { count: "exact", head: true })
+            .from("review_submissions")
+            .select("id", { count: "exact", head: true })
             .eq("user_id", userId),
           supabase
-            .from("reviews")
+            .from("review_submissions")
             .select("rating")
             .eq("user_id", userId)
             .not("rating", "is", null),
           supabase
-            .from("reviews")
+            .from("review_submissions")
             .select("id", { count: "exact", head: true })
             .eq("user_id", userId)
-            .gte("sentAt", sMonth),
-          supabase
-            .from("reviews")
-            .select("id", { count: "exact", head: true })
-            .eq("user_id", userId)
-            .gte("sentAt", sLastMonth)
-            .lt("sentAt", sMonth),
-          supabase
-            .from("reviews")
-            .select("id, reply")
-            .eq("user_id", userId),
-          supabase
-            .from("reviews")
-            .select("*")
-            .eq("user_id", userId)
-            .eq("status", "reviewed")
-            .order("sentAt", { ascending: false })
-            .limit(5),
-          supabase
-            .from("reviews")
-            .select("*")
-            .eq("user_id", userId)
-            .eq("status", "pending")
-            .order("sentAt", { ascending: false })
-            .limit(10),
-          supabase
-            .from("reviews")
-            .select("sentAt")
-            .eq("user_id", userId)
-            .gte("sentAt", thirtyDaysAgo),
+            .gte("created_at", sMonth),
           supabase
             .from("review_submissions")
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", userId)
-            .lte("rating", 2)
-            .eq("moderation_status", "approved"),
-          supabase
-            .from("review_gateway_clicks")
             .select("id", { count: "exact", head: true })
             .eq("user_id", userId)
-            .gte("clicked_at", sMonth),
-          supabase
-            .from("review_gateway_clicks")
-            .select("id", { count: "exact", head: true })
-            .eq("user_id", userId)
-            .eq("converted", true)
-            .gte("clicked_at", sMonth),
-          supabase
-            .from("review_requests")
-            .select("id, customer_name, customer_email, channel, status, sent_at, reviewed_at, gateway_rating")
-            .eq("user_id", userId)
-            .order("sent_at", { ascending: false })
-            .limit(20),
+            .gte("created_at", sLastMonth)
+            .lt("created_at", sMonth),
           supabase
             .from("review_submissions")
-            .select("id, rating, review_text, author_name, source, created_at")
+            .select("review_text")
+            .eq("user_id", userId)
+            .not("review_text", "is", null),
+          supabase
+            .from("review_submissions")
+            .select("*")
             .eq("user_id", userId)
             .not("rating", "is", null)
             .order("created_at", { ascending: false })
             .limit(5),
           supabase
-            .from("competitors")
+            .from("review_submissions")
             .select("*")
             .eq("user_id", userId)
-            .order("created_at", { ascending: true }),
+            .eq("moderation_status", "pending")
+            .order("created_at", { ascending: false })
+            .limit(10),
+          supabase
+            .from("review_submissions")
+            .select("created_at")
+            .eq("user_id", userId)
+            .gte("created_at", thirtyDaysAgo),
+          safeQuery(
+            supabase
+              .from("review_submissions")
+              .select("*", { count: "exact", head: true })
+              .eq("user_id", userId)
+              .lte("rating", 2)
+              .eq("moderation_status", "approved")
+          ),
+          safeQuery(
+            supabase
+              .from("review_requests")
+              .select("id, customer_name, customer_email, channel, status, sent_at, reviewed_at, gateway_rating")
+              .eq("user_id", userId)
+              .order("sent_at", { ascending: false })
+              .limit(20)
+          ),
+          safeQuery(
+            supabase
+              .from("review_submissions")
+              .select("id, rating, review_text, author_name, source, created_at")
+              .eq("user_id", userId)
+              .not("rating", "is", null)
+              .order("created_at", { ascending: false })
+              .limit(5)
+          ),
         ]);
 
         if (cancelled) return;
-
-        const anyError =
-          totalRes.error ||
-          ratingsRes.error ||
-          thisMonthRes.error ||
-          lastMonthRes.error ||
-          replyRes.error ||
-          recentRes.error ||
-          pendingRes.error ||
-          dailyRes.error ||
-          negRes.error ||
-          gatewayClicksRes.error ||
-          gatewayConvertedRes.error ||
-          reviewReqsRes.error ||
-          reviewSubsRes.error;
-
-        if (anyError) {
-          throw new Error(anyError.message || "Failed to load dashboard data");
-        }
 
         const totalReviews = totalRes.count ?? 0;
         const ratings = (ratingsRes.data || []).map((r) => r.rating);
@@ -217,7 +184,7 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
         const thisMonth = thisMonthRes.count ?? 0;
         const lastMonth = lastMonthRes.count ?? 0;
         const replyData = replyRes.data || [];
-        const repliedCount = replyData.filter((r) => !!r.reply).length;
+        const repliedCount = replyData.filter((r) => !!r.review_text).length;
         const responseRate =
           replyData.length > 0
             ? Math.round((repliedCount / replyData.length) * 100)
@@ -238,14 +205,6 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
         // Negative review count
         setNegCount(negRes.count ?? 0);
 
-        // Gateway analytics
-        const gatewayClicks = gatewayClicksRes.count ?? 0;
-        const gatewayConverted = gatewayConvertedRes.count ?? 0;
-        const gatewayConversionRate =
-          gatewayClicks > 0
-            ? Math.round((gatewayConverted / gatewayClicks) * 100)
-            : 0;
-
         // Recent reviewed reviews
         const recentReviews = recentRes.data || [];
 
@@ -255,7 +214,7 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
         // Reviews per day for last 30 days
         const dayCounts = {};
         (dailyRes.data || []).forEach((r) => {
-          const day = new Date(r.sentAt).toISOString().slice(0, 10);
+          const day = new Date(r.created_at).toISOString().slice(0, 10);
           dayCounts[day] = (dayCounts[day] || 0) + 1;
         });
 
@@ -273,17 +232,13 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
           recentReviews,
           pendingReviews,
           dayCounts,
-          gatewayClicks,
-          gatewayConverted,
-          gatewayConversionRate,
           reviewRequests,
           recentSubmissions,
         });
-        setCompetitors(competitorsRes.data || []);
-        setCompetitorsLoading(false);
       } catch (err) {
         if (cancelled) return;
         const msg = err?.message || "Something went wrong";
+        console.error("Dashboard fetch error:", err);
         setError(msg);
         toast.error(msg);
       } finally {
@@ -361,6 +316,8 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
           return;
         }
 
+        trackMilestoneReached({ milestone_name: m.key });
+
         if (!cancelled) {
           setMilestone(m);
         }
@@ -388,15 +345,6 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
     }
   };
 
-  const handleCopyLink = () => {
-    const link = biz.googleLink || "reviewping.io/r/mybiz";
-    navigator.clipboard.writeText(link).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast.success("Link copied");
-    });
-  };
-
   // ── Error state ──
   if (error) {
     return (
@@ -412,7 +360,7 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
         >
           Failed to load data
         </h3>
-        <p style={{ color: G.muted, fontSize: 13, margin: "0 0 16px" }}>
+        <p style={{ color: G.muted, fontSize: 13, margin: "0 0 4px" }}>
           {error}
         </p>
         <Btn size="sm" onClick={() => window.location.reload()}>
@@ -675,39 +623,22 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
         </Card>
       )}
 
-      {/* ── Competitor Radar (Growth+) ── */}
-      {!loading && stats && (
-        <PremiumFeature feature="competitorRadar" plan={plan}>
-          <CompetitorRadar
-            userRating={stats.avgRating !== "—" ? parseFloat(stats.avgRating) : 0}
-            userReviewCount={stats.totalReviews || 0}
-            businessName={biz?.bizName || biz?.biz || "Your Business"}
-            userId={userId}
-          />
-        </PremiumFeature>
-      )}
-
-      {/* ── Reputation Score (Growth+) ── */}
-      {!loading && stats && (
-        <PremiumFeature feature="reputationScore" plan={plan}>
-          <ReputationScore
-            avgRating={stats.avgRating}
-            reviewCount={stats.totalReviews}
-            responseRate={stats.responseRate}
-            positiveRatio={
-              stats.sentiments.positive + stats.sentiments.neutral + stats.sentiments.negative > 0
-                ? stats.sentiments.positive / (stats.sentiments.positive + stats.sentiments.neutral + stats.sentiments.negative)
-                : 0
-            }
-          />
-        </PremiumFeature>
-      )}
-
-      {/* ── Review Velocity (Growth+) ── */}
-      {!loading && stats && stats.totalReviews > 0 && (
-        <PremiumFeature feature="competitorRadar" plan={plan}>
-          <VelocityInsight />
-        </PremiumFeature>
+      {/* ── GBP connect prompt (if not connected) ── */}
+      {!loading && (!biz.slug && !biz.googleLink) && (
+        <Card sx={{ marginBottom: 14, padding: "14px 16px", background: "#fefce8", border: "1.5px solid #fde68a" }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+            <span style={{ fontSize: 20, flexShrink: 0 }}>🏪</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, fontSize: 13.5, marginBottom: 2 }}>Connect Google Business Profile</div>
+              <p style={{ margin: "0 0 8px", fontSize: 12.5, color: G.muted, lineHeight: 1.5 }}>
+                Link your GBP to unlock QR code generation, auto-fetch reviews, and smart review gateway.
+              </p>
+              <Btn size="sm" onClick={() => onNav('integrations')}>
+                Connect GBP →
+              </Btn>
+            </div>
+          </div>
+        </Card>
       )}
 
       {/* ── Quick actions ── */}
@@ -734,30 +665,7 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
           }}
           className="action-btn"
         >
-          ⚡ Send Review Request
-        </button>
-        <button
-          onClick={handleCopyLink}
-          style={{
-            padding: "14px 16px",
-            background: G.surface,
-            border: `1.5px solid ${G.border}`,
-            borderRadius: 10,
-            cursor: "pointer",
-            fontFamily: "'Manrope',sans-serif",
-            fontWeight: 700,
-            fontSize: 13,
-            color: G.inkSoft,
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            flexShrink: 0,
-            transition: "transform 0.15s",
-          }}
-          className="action-btn"
-          title="Copy review link"
-        >
-          {copied ? "✓ Copied" : "🔗 Copy Link"}
+          <Send size={16} /> Send Review Request
         </button>
         <button
           onClick={() => handleSendDigest("daily")}
@@ -782,81 +690,9 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
           className="action-btn"
           title="Send test daily digest email"
         >
-          {sendingDigest ? "⏳" : "☀️ Test Daily Digest"}
+          {sendingDigest ? <span style={{display:"inline-block",width:16,height:16,border:"2px solid "+G.accent,borderTopColor:"transparent",borderRadius:"50%",animation:"spin 0.6s linear infinite"}} /> : <><BellRing size={16} /> Test Daily Digest</>}
         </button>
       </div>
-
-      {/* ── Review Gateway Analytics ── */}
-      {!loading && stats && (
-        <Card sx={{ padding: "14px 16px", marginBottom: 14 }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 700,
-              color: G.muted,
-              letterSpacing: "1px",
-              textTransform: "uppercase",
-              marginBottom: 12,
-            }}
-          >
-            Review Gateway
-          </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontFamily: "'Instrument Serif',serif",
-                  fontSize: 28,
-                  color: G.accent,
-                  lineHeight: 1,
-                  marginBottom: 4,
-                }}
-              >
-                {stats.gatewayClicks}
-              </div>
-              <div style={{ fontSize: 12, color: G.muted }}>
-                Clicks this month
-              </div>
-            </div>
-            <div>
-              <div
-                style={{
-                  fontFamily: "'Instrument Serif',serif",
-                  fontSize: 28,
-                  color: G.success,
-                  lineHeight: 1,
-                  marginBottom: 4,
-                }}
-              >
-                {stats.gatewayConversionRate}%
-              </div>
-              <div style={{ fontSize: 12, color: G.muted }}>
-                Conversion rate
-              </div>
-            </div>
-          </div>
-          {stats.gatewayClicks > 0 && (
-            <div
-              style={{
-                fontSize: 11,
-                color: G.mutedLo,
-                marginTop: 8,
-                paddingTop: 8,
-                borderTop: `1px solid ${G.border}`,
-              }}
-            >
-              {stats.gatewayConverted} converted ·{" "}
-              {stats.gatewayClicks - stats.gatewayConverted} pending
-            </div>
-          )}
-        </Card>
-      )}
 
       {/* ── Sentiment breakdown ── */}
       {hasReviews && !loading && (
@@ -1039,15 +875,15 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
                     flexShrink: 0,
                   }}
                 >
-                  {r.name?.[0] || "?"}
+                  {r.author_name?.[0] || "?"}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, fontSize: 14 }}>
-                    {r.name}
+                    {r.author_name}
                   </div>
                   <div style={{ fontSize: 12, color: G.muted }}>
-                    {r.service} · {fmtDate(r.sentAt)} ·{" "}
-                    {r.channel}
+                    {r.source || "reviewping"} · {fmtDate(r.created_at)} ·{" "}
+                    {r.moderation_status}
                   </div>
                 </div>
                 <Pill variant="warning">Pending</Pill>
@@ -1128,7 +964,7 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
                   flexShrink: 0,
                 }}
               >
-                {r.name?.[0] || "?"}
+                {r.author_name?.[0] || "?"}
               </div>
               <div style={{ flex: 1 }}>
                 <div
@@ -1139,7 +975,7 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
                   }}
                 >
                   <span style={{ fontWeight: 700, fontSize: 13.5 }}>
-                    {r.name}
+                    {r.author_name}
                   </span>
                   <Stars rating={r.rating} size={12} />
                 </div>
@@ -1151,10 +987,10 @@ export default function Dashboard({ userId, biz, plan, onSend, onNav }) {
                     fontFamily: "'Instrument Serif',serif",
                   }}
                 >
-                  "{r.text}"
+                  "{r.review_text}"
                 </div>
                 <div style={{ fontSize: 11, color: G.mutedLo, marginTop: 4 }}>
-                  {r.service} · {fmtDate(r.sentAt)}
+                  {r.source || "reviewping"} · {fmtDate(r.created_at)}
                 </div>
               </div>
             </div>

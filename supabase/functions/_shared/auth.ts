@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { captureServerEvent } from "./posthog.ts";
 
 /**
  * Check if a user has exceeded their daily request limit.
@@ -39,6 +40,10 @@ export async function checkDailyLimit(
 
   if (remaining <= 0) {
     console.warn(`Daily limit hit for user ${userId}: ${used} used, max ${maxPerDay}`);
+    await captureServerEvent(userId, "limit.reached", {
+      plan,
+      limit_type: "daily_requests",
+    }, userId);
     return new Response(
       JSON.stringify({
         error: `Daily limit reached (${used}/${maxPerDay}). Upgrade your plan to send more review requests.`,
@@ -105,6 +110,7 @@ export const CORS = corsObject(resolveOrigin(""));
 export async function verifyAuth(req: Request): Promise<
   { userId: string } | Response
 > {
+  const hdrs = corsHeaders(req);
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
@@ -113,7 +119,7 @@ export async function verifyAuth(req: Request): Promise<
       console.error("Missing SUPABASE_URL or SUPABASE_ANON_KEY env vars");
       return new Response(JSON.stringify({ error: "Server configuration error" }), {
         status: 500,
-        headers: CORS,
+        headers: hdrs,
       });
     }
 
@@ -123,7 +129,7 @@ export async function verifyAuth(req: Request): Promise<
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Authentication required" }), {
         status: 401,
-        headers: CORS,
+        headers: hdrs,
       });
     }
 
@@ -131,7 +137,7 @@ export async function verifyAuth(req: Request): Promise<
     if (parts.length !== 2 || parts[0].toLowerCase() !== "bearer") {
       return new Response(JSON.stringify({ error: "Invalid authorization header format" }), {
         status: 401,
-        headers: CORS,
+        headers: hdrs,
       });
     }
 
@@ -142,7 +148,7 @@ export async function verifyAuth(req: Request): Promise<
       console.error("JWT verification failed:", error?.message);
       return new Response(JSON.stringify({ error: "Invalid or expired token" }), {
         status: 401,
-        headers: CORS,
+        headers: hdrs,
       });
     }
 
@@ -151,7 +157,7 @@ export async function verifyAuth(req: Request): Promise<
     console.error("verifyAuth unexpected error:", err);
     return new Response(JSON.stringify({ error: "Authentication failed" }), {
       status: 401,
-      headers: CORS,
+      headers: hdrs,
     });
   }
 }

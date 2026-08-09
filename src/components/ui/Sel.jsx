@@ -76,6 +76,15 @@ export default function Sel({
           </option>
         )}
         {options.map((opt) => {
+          if (opt.items) {
+            return (
+              <optgroup key={opt.label} label={opt.label}>
+                {opt.items.map((item) => (
+                  <option key={item} value={item}>{item}</option>
+                ))}
+              </optgroup>
+            );
+          }
           const val = typeof opt === "string" ? opt : opt.value;
           const lbl = typeof opt === "string" ? opt : opt.label;
           return (

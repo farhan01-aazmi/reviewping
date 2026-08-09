@@ -371,6 +371,129 @@ const styles = {
     textDecoration: "underline",
     textUnderlineOffset: 2,
   },
+
+  /* ───────────── detailed comparison ───────────── */
+  detailedSection: {
+    padding: "8px 32px 56px",
+    maxWidth: 900,
+    margin: "0 auto",
+  },
+  detailedHeading: {
+    fontSize: 32,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 8px",
+    color: G.ink,
+    textAlign: "center",
+  },
+  detailedSub: {
+    fontSize: 16,
+    color: G.mutedLo,
+    marginBottom: 32,
+    textAlign: "center",
+    maxWidth: 640,
+    margin: "0 auto 32px",
+    lineHeight: 1.6,
+  },
+  detailGrid: {
+    overflowX: "auto",
+    borderRadius: 16,
+    border: `1px solid ${G.border}`,
+    background: G.surface,
+    boxShadow: "0 4px 24px rgba(26,23,20,0.06)",
+  },
+  detailTable: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: 15,
+  },
+  detailTh: {
+    textAlign: "left",
+    padding: "14px 20px",
+    fontWeight: 700,
+    fontSize: 14,
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    borderBottom: `2px solid ${G.border}`,
+    background: G.bg,
+  },
+  detailThCenter: {
+    textAlign: "center",
+    width: "30%",
+  },
+  detailThCompetitor: {
+    color: G.mutedLo,
+  },
+  detailThPing: {
+    color: G.accent,
+  },
+  detailTd: {
+    padding: "12px 20px",
+    borderBottom: `1px solid ${G.border}`,
+    verticalAlign: "middle",
+  },
+  detailTdCenter: {
+    textAlign: "center",
+  },
+  detailTdFeature: {
+    fontWeight: 600,
+    color: G.ink,
+  },
+  detailRowAlt: {
+    background: G.bg,
+  },
+
+  /* ───────────── who section ───────────── */
+  whoSection: {
+    padding: "8px 32px 48px",
+    maxWidth: 900,
+    margin: "0 auto",
+  },
+  whoHeading: {
+    fontSize: 28,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 16px",
+    color: G.ink,
+  },
+  whoText: {
+    fontSize: 16,
+    color: G.mutedLo,
+    lineHeight: 1.7,
+    margin: 0,
+  },
+
+  /* ───────────── faq section ───────────── */
+  faqSection: {
+    padding: "40px 32px 56px",
+    maxWidth: 720,
+    margin: "0 auto",
+  },
+  faqHeading: {
+    fontSize: 28,
+    fontWeight: 800,
+    letterSpacing: "-0.02em",
+    margin: "0 0 32px",
+    color: G.ink,
+    textAlign: "center",
+  },
+  faqItem: {
+    borderBottom: `1px solid ${G.border}`,
+    padding: "20px 0",
+  },
+  faqQuestion: {
+    fontSize: 17,
+    fontWeight: 700,
+    color: G.ink,
+    margin: "0 0 8px",
+    lineHeight: 1.4,
+  },
+  faqAnswer: {
+    fontSize: 15,
+    color: G.mutedLo,
+    lineHeight: 1.7,
+    margin: 0,
+  },
 };
 
 /* ───────────── main component ───────────── */
@@ -380,7 +503,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
     {
       feature: "Price",
       truereview: <span style={styles.priceHighlight}>$49/mo</span>,
-      ping: <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>$29/mo</span>,
+      ping: <span style={{ ...styles.priceHighlight, ...styles.reviewPingPrice }}>₹599/mo</span>,
       highlight: true,
     },
     {
@@ -422,7 +545,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
       ),
       ping: (
         <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>$149/mo Agency</span>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>₹1,499/mo Agency</span>
         </>
       ),
     },
@@ -452,7 +575,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
     <div style={styles.page}>
       <SEO
         title="ReviewPing vs TrueReview: Best Budget Review Tool?"
-        description="Compare ReviewPing ($29/mo) vs TrueReview ($49/mo). ReviewPing offers more features, free plan, and lower starting price than TrueReview."
+        description="Compare ReviewPing (₹599/mo) vs TrueReview ($49/mo). ReviewPing offers more features, free plan, and lower starting price than TrueReview."
         path="/vs/truereview"
       />
 
@@ -488,13 +611,16 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
           <span style={styles.heroTitleEm}>But $49/mo for one plan?</span>
         </h1>
         <p style={styles.heroSub}>
-          You get the same core review-requesting power — SMS, email,
-          AI replies — starting at <strong>$29/mo</strong>. More plans,
-          a free tier, and WhatsApp requests TrueReview doesn't offer.
+          You get the same core review-requesting power — email, WhatsApp, and
+          AI-powered replies — starting at just <strong>₹599/mo</strong>,
+          which is nearly 40% less than TrueReview's single $49 plan.
+          ReviewPing also offers multiple pricing tiers, a generous
+          <strong> free plan at $0/mo</strong>, and WhatsApp review
+          requests that TrueReview does not support at any price level.
         </p>
         <div style={styles.heroCtaRow}>
           <button style={styles.primaryCta} onClick={onSignup}>
-            Start Free Trial — $29/mo
+            Start Free Trial — ₹599/mo
           </button>
           <button style={styles.secondaryCta} onClick={onLogin}>
             See My Dashboard
@@ -557,9 +683,14 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
           Why ReviewPing wins against TrueReview
         </h2>
         <p style={styles.whySub}>
-          TrueReview is a fine product with a single $49/mo plan. ReviewPing
-          gives you more flexibility — more plans, a free tier, WhatsApp
-          requests, and no per-location surprises.
+          TrueReview is a capable review platform, but its single $49/mo
+          plan leaves you with few options if your needs change or your
+          budget is tight. ReviewPing gives you far more flexibility —
+          multiple pricing tiers including a <strong>free $0/mo plan</strong>,
+          WhatsApp review requests for reaching customers on their preferred
+          channel, and transparent pricing with no per-location fees that
+          appear after you sign up. It is a more complete solution for
+          businesses that want choices, not limitations.
         </p>
 
         <div style={styles.cardsGrid}>
@@ -567,7 +698,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
             <span style={styles.cardIcon}>💰</span>
             <h3 style={styles.cardTitle}>Price Flexibility</h3>
             <p style={styles.cardText}>
-              TrueReview locks you into $49/mo. ReviewPing starts at $29/mo
+              TrueReview locks you into $49/mo. ReviewPing starts at ₹599/mo
               with a free plan, so you only pay for what you need.
             </p>
           </div>
@@ -595,9 +726,142 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
             <h3 style={styles.cardTitle}>No Per-Location Fees</h3>
             <p style={styles.cardText}>
               TrueReview charges $39 extra per location. ReviewPing's
-              Agency plan covers unlimited locations at $149/mo flat.
+              Agency plan covers up to 5 locations at ₹1,499/mo flat.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* ── detailed feature comparison ── */}
+      <section style={styles.detailedSection}>
+        <h2 style={styles.detailedHeading}>
+          Detailed Feature Comparison
+        </h2>
+        <p style={styles.detailedSub}>
+          TrueReview and ReviewPing share similar DNA as modern review
+          management platforms, but the details reveal important differences
+          in pricing flexibility, feature depth, and scalability. Here is
+          an honest comparison to help you decide which platform fits your
+          business better.
+        </p>
+
+        <div style={styles.detailGrid}>
+          <table style={styles.detailTable}>
+            <thead>
+              <tr>
+                <th style={styles.detailTh}>Feature</th>
+                <th style={{...styles.detailTh, ...styles.detailThCenter, ...styles.detailThCompetitor}}>TrueReview</th>
+                <th style={{...styles.detailTh, ...styles.detailThCenter, ...styles.detailThPing}}>ReviewPing</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Core review requests (Email + WhatsApp)</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>AI reply generation</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Free plan available</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Per-location fees</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.accent, fontWeight: 600 }}>$39/location extra</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><span style={{ color: G.success, fontWeight: 600 }}>₹1,499/mo unlimited</span></td>
+              </tr>
+              <tr>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>WhatsApp integration</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span></td>
+              </tr>
+              <tr style={styles.detailRowAlt}>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Month-to-month contracts</td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> Cancel anytime</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ── who should choose ── */}
+      <section style={styles.whoSection}>
+        <h2 style={styles.whoHeading}>
+          Who should choose ReviewPing instead of TrueReview?
+        </h2>
+        <p style={styles.whoText}>
+          ReviewPing is the smarter choice for budget-conscious business
+          owners who want to start small and scale on their own terms.
+          Our <strong>free plan</strong> lets you test the platform at
+          $0/month before committing, whereas TrueReview requires payment
+          from day one. Multi-location operators will prefer ReviewPing's
+          flat-rate Agency plan over TrueReview's per-location fee model.
+          And any business that wants WhatsApp review requests, flexible
+          plan options, or the ability to upgrade incrementally will find
+          ReviewPing's tiered approach far more accommodating than
+          TrueReview's single-plan structure.
+        </p>
+      </section>
+
+      {/* ── faq ── */}
+      <section style={styles.faqSection}>
+        <h2 style={styles.faqHeading}>
+          Frequently asked questions about TrueReview alternatives
+        </h2>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            How does ReviewPing compare to TrueReview on pricing?
+          </h3>
+          <p style={styles.faqAnswer}>
+            ReviewPing is significantly more affordable and flexible.
+            TrueReview charges a flat <strong>$49/month</strong> for a
+            single plan with no free tier and additional per-location fees.
+            ReviewPing starts at <strong>₹599/month</strong> with a
+            <strong> free plan available at $0/month</strong>, multiple
+            upgrade paths, and a flat-rate Agency plan at ₹1,499/month that
+            covers up to 5 locations. Whether you are a solo operator
+            or a growing agency, ReviewPing's pricing scales with you
+            rather than against you.
+          </p>
+        </div>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            Does ReviewPing offer WhatsApp review requests like it claims?
+          </h3>
+          <p style={styles.faqAnswer}>
+            Yes. ReviewPing includes WhatsApp review requests on our
+            Growth+ plans and above, giving your customers the convenience
+            of leaving a review through the messaging app they already use
+            every day. TrueReview does not offer WhatsApp integration at
+            any price point. This is a significant advantage for businesses
+            whose customers are more responsive to WhatsApp messages than
+            traditional email, particularly in markets where WhatsApp
+            is the primary communication channel.
+          </p>
+        </div>
+
+        <div style={styles.faqItem}>
+          <h3 style={styles.faqQuestion}>
+            Is it easy to migrate from TrueReview to ReviewPing?
+          </h3>
+          <p style={styles.faqAnswer}>
+            Yes. ReviewPing provides free migration support for TrueReview
+            users switching to our platform. Our team helps you transfer
+            your review request templates, automation rules, and connected
+            locations so you can continue collecting reviews without
+            interruption. The migration process typically takes just a few
+            days, and because ReviewPing is designed for ease of use, your
+            team will be comfortable with the new interface almost
+            immediately after a brief walkthrough.
+          </p>
         </div>
       </section>
 
@@ -606,11 +870,15 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
         <div style={styles.ctaWrap}>
           <h2 style={styles.ctaTitle}>
             Switch from TrueReview. Start at{" "}
-            <span style={{ color: G.gold }}>$29/mo</span>.
+            <span style={{ color: G.gold }}>₹599/mo</span>.
           </h2>
           <p style={styles.ctaSub}>
-            No setup fees. Free plan available. Cancel anytime. You'll be up
-            and running in 5 minutes.
+            No setup fees, a generous free plan to get started, and the
+            freedom to cancel anytime — no questions asked. You will be up
+            and running in 5 minutes with your first review request sent
+            within the hour. Already using TrueReview? Our team offers free
+            migration support so you can switch without losing any data or
+            disrupting your existing review collection workflow.
           </p>
           <button style={styles.ctaBtn} onClick={onSignup}>
             Start Free Trial

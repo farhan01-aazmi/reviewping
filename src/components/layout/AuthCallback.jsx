@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../config/supabase";
 import { G } from "../../data/theme";
 import { LogoMark, Spinner, Btn, Field } from "../ui";
+import { identifyUser, trackUserSignedUp, trackUserLoggedIn } from "../../tracking";
 
 /**
  * AuthCallback — handles OAuth redirect and password reset callbacks.
@@ -30,6 +31,20 @@ export default function AuthCallback({ onDone, onError }) {
 
     function finish(user, profile) {
       if (!cancelled) {
+        identifyUser(user, {
+          id: profile?.id || user.id,
+          name: profile?.name,
+          business_name: profile?.biz,
+          plan: profile?.plan,
+          gbp_connected: !!profile?.gbp_connected,
+          is_internal: profile?.is_internal,
+          created_at: profile?.created_at || user.created_at,
+        });
+        if (profile?.isNew) {
+          trackUserSignedUp({ signup_method: "google" });
+        } else {
+          trackUserLoggedIn({ method: "google" });
+        }
         onDone(
           profile || {
             name: user.email?.split("@")[0] || "User",
@@ -226,16 +241,28 @@ export default function AuthCallback({ onDone, onError }) {
 async function fetchProfile(userId) {
   try {
     const { data } = await supabase.from("profiles").select("*").eq("id", userId).single();
-    if (data) return { name: data.name, email: data.email, biz: data.business_name, id: data.id };
-    // No profile yet — upsert one with free plan
+    if (data) {
+      return {
+        name: data.name,
+        email: data.email,
+        biz: data.business_name,
+        id: data.id,
+        plan: data.plan,
+        gbp_connected: data.gbp_connected,
+        is_internal: data.is_internal,
+        created_at: data.created_at,
+        isNew: false,
+      };
+    }
+    // No profile yet — upsert one with starter plan
     await supabase.from("profiles").upsert({
       id: userId,
       email: "",
       name: "",
       business_name: "",
-      plan: "free",
+      plan: "starter",
     });
-    return { name: "", email: "", biz: "", id: userId };
+    return { name: "", email: "", biz: "", id: userId, plan: "starter", isNew: true };
   } catch (e) { console.error("Profile fetch error:", e); }
   return null;
 }

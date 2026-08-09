@@ -6,6 +6,9 @@ import './index.css'
 import App from './App.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { ThemeProvider } from './data/ThemeProvider'
+import { initPostHog } from './tracking'
+
+initPostHog()
 
 Sentry.init({
   dsn: "https://d6d14d34380ba55eeb322339d776fe66@o4511460334829568.ingest.us.sentry.io/4511460362092544",
