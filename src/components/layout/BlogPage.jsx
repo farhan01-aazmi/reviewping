@@ -254,15 +254,27 @@ export default function BlogPage({ onSignup, onLogin, onBack }) {
 
                   {/* Read More */}
                   <div style={{ marginTop: "auto" }}>
-                    <Btn
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => {
-                        window.location.href = "/blog/" + post.slug;
+                    <a
+                      href={"/blog/" + post.slug}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 8,
+                        padding: "6px 14px",
+                        fontSize: 13,
+                        borderRadius: 8,
+                        fontFamily: "Manrope, sans-serif",
+                        fontWeight: 600,
+                        color: G.ink,
+                        background: "transparent",
+                        border: `1.5px solid ${G.borderHi}`,
+                        textDecoration: "none",
+                        transition: "all 0.15s ease",
+                        cursor: "pointer",
                       }}
                     >
                       Read more →
-                    </Btn>
+                    </a>
                   </div>
                 </div>
               </Card>

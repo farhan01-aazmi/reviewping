@@ -106,7 +106,23 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
   const post = BLOG_POSTS.find((p) => p.slug === slug);
 
   const relatedPosts = post
-    ? BLOG_POSTS.filter((p) => p.slug !== slug).slice(0, 3)
+    ? BLOG_POSTS.filter((p) => p.slug !== slug)
+        .map((p) => {
+          let score = 0;
+          if (p.category === post.category) score += 3;
+          const pKw = (p.keywords || []).join(" ").toLowerCase();
+          const cKw = (post.keywords || []).join(" ").toLowerCase();
+          for (const word of cKw.split(" ")) {
+            if (word.length > 3 && pKw.includes(word)) score += 1;
+          }
+          for (const word of p.title.toLowerCase().split(" ")) {
+            if (word.length > 4 && post.title.toLowerCase().includes(word)) score += 1;
+          }
+          return { p, score };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map((x) => x.p)
     : [];
 
   const blogLink = {
@@ -209,25 +225,27 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {BLOG_POSTS.map((p) => (
-                <Card
+                <a
                   key={p.slug}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => (window.location.href = "/blog/" + p.slug)}
+                  href={"/blog/" + p.slug}
+                  style={{ textDecoration: "none", display: "block" }}
                 >
-                  <div
-                    style={{
-                      fontFamily: "'Instrument Serif',serif",
-                      fontSize: 17,
-                      fontWeight: 400,
-                      marginBottom: 4,
-                    }}
-                  >
-                    {p.title}
-                  </div>
-                  <div style={{ fontSize: 12.5, color: G.muted }}>
-                    {p.date} · {p.readTime}
-                  </div>
-                </Card>
+                  <Card style={{ cursor: "pointer" }}>
+                    <div
+                      style={{
+                        fontFamily: "'Instrument Serif',serif",
+                        fontSize: 17,
+                        fontWeight: 400,
+                        marginBottom: 4,
+                      }}
+                    >
+                      {p.title}
+                    </div>
+                    <div style={{ fontSize: 12.5, color: G.muted }}>
+                      {p.date} · {p.readTime}
+                    </div>
+                  </Card>
+                </a>
               ))}
             </div>
           </section>
@@ -740,23 +758,26 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
               }}
             >
               {relatedPosts.map((rp) => (
-                <Card
+                <a
                   key={rp.slug}
-                  style={{
-                    padding: "18px 20px",
-                    cursor: "pointer",
-                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                  }}
-                  onClick={() => (window.location.href = "/blog/" + rp.slug)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,0,0,0.06)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
+                  href={"/blog/" + rp.slug}
+                  style={{ textDecoration: "none", display: "block" }}
                 >
+                  <Card
+                    style={{
+                      padding: "18px 20px",
+                      cursor: "pointer",
+                      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,0,0,0.06)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
                   <div
                     style={{
                       fontSize: 11.5,
@@ -791,11 +812,68 @@ export default function BlogArticle({ slug, onBack, onSignup, onLogin }) {
                   >
                     {rp.desc}
                   </div>
-                </Card>
+                  </Card>
+                </a>
               ))}
             </div>
           </section>
         )}
+
+        {/* Explore: money pages + comparisons */}
+        <section
+          style={{
+            maxWidth: 760,
+            margin: "0 auto",
+            padding: "0 22px 48px",
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: "'Instrument Serif',serif",
+              fontSize: 24,
+              fontWeight: 400,
+              margin: "0 0 18px",
+            }}
+          >
+            Keep exploring
+          </h2>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 10,
+            }}
+          >
+            {[
+              ["Features", "/features"],
+              ["Pricing", "/pricing"],
+              ["Podium Alternative", "/podium-alternative"],
+              ["ReviewPing vs Podium", "/vs/podium"],
+              ["ReviewPing vs Birdeye", "/vs/birdeye"],
+              ["ReviewPing vs Grade.us", "/vs/grade-us"],
+              ["ReviewPing vs Nicejob", "/vs/nicejob"],
+              ["ReviewPing vs TrueReview", "/vs/truereview"],
+              ["Free Review Link Generator", "/tools/review-link-generator"],
+            ].map(([label, path]) => (
+              <a
+                key={path}
+                href={path}
+                style={{
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  color: G.ink,
+                  background: G.surface,
+                  border: `1px solid ${G.border}`,
+                  borderRadius: 999,
+                  padding: "8px 16px",
+                  textDecoration: "none",
+                }}
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+        </section>
 
         {/* Footer */}
         <footer

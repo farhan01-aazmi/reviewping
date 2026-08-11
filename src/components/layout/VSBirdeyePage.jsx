@@ -877,6 +877,64 @@ export default function VSBirdeyePage({ onSignup, onLogin, onBack }) {
         </div>
       </section>
 
+      
+      {/* ── more comparisons ── */}
+      <section
+        style={{
+          maxWidth: 760,
+          margin: "0 auto",
+          padding: "0 32px 40px",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: G.muted,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            marginBottom: 14,
+          }}
+        >
+          More comparisons
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 10,
+            justifyContent: "center",
+          }}
+        >
+          {[
+            ["Podium", "/vs/podium"],
+            ["Birdeye", "/vs/birdeye"],
+            ["Grade.us", "/vs/grade-us"],
+            ["Nicejob", "/vs/nicejob"],
+            ["TrueReview", "/vs/truereview"],
+            ["Podium Alternative", "/podium-alternative"],
+          ].map(([label, path]) => (
+            <a
+              key={path}
+              href={path}
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                color: G.ink,
+                background: G.surface,
+                border: `1px solid ${G.border}`,
+                borderRadius: 999,
+                padding: "9px 18px",
+                textDecoration: "none",
+              }}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      </section>
+
       {/* ── cta ── */}
       <section style={styles.ctaSection}>
         <div style={styles.ctaWrap}>

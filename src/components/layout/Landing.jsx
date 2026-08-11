@@ -813,6 +813,41 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
             </tbody>
           </table>
         </Card>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 10,
+            justifyContent: "center",
+            marginTop: 20,
+          }}
+        >
+          {[
+            ["ReviewPing vs Podium", "/vs/podium"],
+            ["Podium Alternative", "/podium-alternative"],
+            ["ReviewPing vs Birdeye", "/vs/birdeye"],
+            ["ReviewPing vs Grade.us", "/vs/grade-us"],
+            ["ReviewPing vs Nicejob", "/vs/nicejob"],
+            ["ReviewPing vs TrueReview", "/vs/truereview"],
+          ].map(([label, href]) => (
+            <a
+              key={href}
+              href={href}
+              style={{
+                fontSize: 13.5,
+                fontWeight: 600,
+                color: G.ink,
+                background: G.surface,
+                border: `1px solid ${G.border}`,
+                borderRadius: 999,
+                padding: "8px 16px",
+                textDecoration: "none",
+              }}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
       </section>
 
       {/* Integrations */}

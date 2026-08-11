@@ -91,6 +91,7 @@ function renderSection(section, i) {
 const NAV_LINKS = [
   { label: "Features", href: "/features" },
   { label: "Pricing", href: "/pricing" },
+  { label: "ReviewPing vs Podium", href: "/vs/podium" },
   { label: "Blog", href: "/blog" },
   { label: "FAQ", href: "/faq" },
 ];
@@ -141,6 +142,51 @@ export default function PodiumAlternativePage({ onSignup, onLogin, onBack }) {
       <article style={{ maxWidth: 700, margin: "0 auto", padding: "0 24px 64px" }}>
         {data.content.map((section, i) => renderSection(section, i))}
       </article>
+
+      {/* ── Read next ── */}
+      <section
+        style={{
+          maxWidth: 700,
+          margin: "0 auto",
+          padding: "0 24px 56px",
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: "'Instrument Serif',serif",
+            fontSize: 24,
+            fontWeight: 400,
+            margin: "0 0 18px",
+          }}
+        >
+          Read next
+        </h2>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+          {[
+            ["ReviewPing vs Podium: Full Comparison", "/blog/reviewping-vs-podium-comparison"],
+            ["Podium Pricing 2026: Real Cost Breakdown", "/blog/podium-pricing-2026"],
+            ["ReviewPing vs Podium (Side by Side)", "/vs/podium"],
+            ["WhatsApp Review Requests Guide", "/blog/whatsapp-review-requests-guide"],
+          ].map(([label, path]) => (
+            <a
+              key={path}
+              href={path}
+              style={{
+                fontSize: 13.5,
+                fontWeight: 600,
+                color: G.ink,
+                background: G.surface,
+                border: `1px solid ${G.border}`,
+                borderRadius: 999,
+                padding: "8px 16px",
+                textDecoration: "none",
+              }}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      </section>
 
       {/* ── Footer ── */}
       <footer style={{ borderTop: `1px solid ${G.border}`, padding: "28px 32px", textAlign: "center" }}>
