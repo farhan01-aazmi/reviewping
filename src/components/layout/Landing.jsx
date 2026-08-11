@@ -29,8 +29,8 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
   return (
     <>
       <SEO
-        title="Get 30+ Google Reviews/Month Automatically"
-        description="Get 30+ new Google reviews every month automatically. AI-personalised Email & WhatsApp review requests after every customer visit. Free plan available. No contracts. Set up in 2 minutes."
+        title="ReviewPing — Automated Google Review Request Software | From ₹599/mo"
+        description="Get 30+ new Google reviews every month automatically with AI-personalised email and WhatsApp review requests. No contracts, no hidden fees. Set up in 2 minutes."
         path="/"
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{
@@ -58,9 +58,9 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
               "operatingSystem": "Web",
               "description": "Automated review request platform for Google Reviews. Send AI-personalised email and WhatsApp review requests.",
               "offers": [
-                { "@type": "Offer", "name": "Starter", "price": "29", "priceCurrency": "USD" },
-                { "@type": "Offer", "name": "Pro", "price": "79", "priceCurrency": "USD" },
-                { "@type": "Offer", "name": "Agency", "price": "149", "priceCurrency": "USD" }
+                { "@type": "Offer", "name": "Starter", "price": "599", "priceCurrency": "INR" },
+                { "@type": "Offer", "name": "Premium", "price": "999", "priceCurrency": "INR" },
+                { "@type": "Offer", "name": "Agency", "price": "1499", "priceCurrency": "INR" }
               ]
             },
             {
@@ -768,7 +768,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
                 ["No contract", "✓", "✗"],
                 ["Small biz focus", "✓", "✗"],
                 ["WhatsApp included", "✓", "Extra $"],
-                ["Free trial", "14 days", "Demo only"],
+                ["14-day free trial", "Yes, no card", "Demo only"],
               ].map(([f, r, p], i) => (
                 <tr
                   key={i}
@@ -1104,11 +1104,11 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
           },
           {
             q: "Can I use ReviewPing for multiple locations?",
-            a: "Yes. Our Agency plan supports up to 10 locations under one account with white-label reporting and team member access. Each location gets its own review request flow and analytics dashboard."
+            a: "Yes. Our Agency plan supports up to 5 locations under one account with white-label reporting and team member access. Each location gets its own review request flow and analytics dashboard."
           },
           {
             q: "Do I need to sign a contract?",
-            a: "Not at all. ReviewPing is month-to-month with no long-term commitment. You can cancel anytime from your dashboard. If you choose annual billing, you save 20% and still have the same cancellation flexibility."
+            a: "Not at all. ReviewPing is month-to-month with no long-term commitment. You can cancel anytime from your dashboard. If you choose annual billing, you save 17% and still have the same cancellation flexibility."
           },
         ].map((faq, i) => (
           <div
@@ -1182,7 +1182,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
             </Btn>
           </div>
           <p style={{ fontSize: 12.5, color: G.muted, margin: "14px 0 0" }}>
-            Free 14-day trial · No credit card · Cancel anytime
+            14-day free trial · No credit card · Cancel anytime
           </p>
         </div>
       </section>
@@ -1281,7 +1281,7 @@ export default function Landing({ onSignup, onLogin, onPrivacy, onTerms, onRefun
           >
             Annual{" "}
             <span style={{ color: G.success, fontWeight: 700, fontSize: 12 }}>
-              Save 20%
+              Save 17%
             </span>
           </span>
         </div>

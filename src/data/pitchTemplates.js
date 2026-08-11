@@ -168,7 +168,7 @@ For restaurants and cafes, timing is everything. A WhatsApp message sent 30 minu
 
 ReviewPing automates this. You connect your Google Business Profile once, and every customer automatically gets a friendly WhatsApp message with a direct Google review link 30 minutes after their visit. No awkward counterside requests. No forgotten follow-ups. Just more 5-star reviews rolling in on autopilot.
 
-It takes 2 minutes to set up. There's a free plan, and paid plans start at $29/mo.
+It takes 2 minutes to set up. paid plans start at ₹599/mo with a 14-day free trial.
 
 Would 15 minutes this week work for a quick walkthrough?
 
@@ -189,7 +189,7 @@ The issue isn't your service — it's the ask. A customer leaves your chair feel
 
 That's exactly what ReviewPing does. When a client finishes their appointment, they get an automatic WhatsApp message with a direct Google review link. One tap, 30 seconds, done. Our data shows personal care businesses using automation average 15 reviews per month — up from 3-5 with manual asking.
 
-2400+ businesses already use ReviewPing. The Starter plan is $29/mo with a free plan available. No contracts, cancel anytime.
+2400+ businesses already use ReviewPing. The Starter plan is ₹599/mo with a 14-day free trial. No contracts, cancel anytime.
 
 Worth a 10-minute call to see it in action?
 
@@ -210,7 +210,7 @@ Patients already expect email communication from their provider. A post-appointm
 
 ReviewPing sends automated review requests via email (or WhatsApp) after every appointment. Your patients get a simple, professional message at the right time — and your profile gets the fresh reviews it needs to stay visible in local search.
 
-We work with dental clinics, physiotherapists, dermatologists, chiropractors, and vets across 2,400+ businesses. Starting at $29/mo with a free plan.
+We work with dental clinics, physiotherapists, dermatologists, chiropractors, and vets across 2,400+ businesses. Starting at ₹599/mo with a 14-day free trial.
 
 Got 10 minutes this week to see how it works?
 
@@ -231,7 +231,7 @@ You do great work, fix the problem, and the customer is thrilled. But once you'r
 
 A simple WhatsApp message sent 30 minutes after the job is done changes everything. ReviewPing automates this: you finish a job, mark it complete in the app, and your customer gets a friendly message with a direct Google review link. No chasing, no awkwardness. Home services businesses using our platform average 10 reviews per month — up from 2-3.
 
-2400+ businesses already use ReviewPing. Free plan available, paid from $29/mo.
+2400+ businesses already use ReviewPing. Start free, paid plans from ₹599/mo.
 
 Worth a quick call this week?
 
@@ -273,7 +273,7 @@ Most lawyers, accountants, and agents I speak to say the same thing: "We ask cli
 
 Email works best for professional services. A post-engagement email with a direct Google review link turns a satisfied client into a public advocate. ReviewPing automates this — send a professional, personalized email after closing a deal, completing a tax return, or finishing a consultation.
 
-2400+ businesses use ReviewPing to grow their online reputation. Free plan available, paid plans from $29/mo. Set up in 2 minutes.
+2400+ businesses use ReviewPing to grow their online reputation. Start free, paid plans from ₹599/mo. Set up in 2 minutes.
 
 Would 15 minutes work for a quick demo?
 
@@ -294,7 +294,7 @@ But here's the reality: your happiest members walk out feeling great after a cla
 
 ReviewPing sends an automatic WhatsApp message 30 minutes after each class or session. Your member gets a personal message with a one-tap Google review link. It takes them 20 seconds. For you, it's fully automated.
 
-Fitness businesses on ReviewPing average 16 reviews per month. Same great service, just a smarter ask. 2400+ businesses already doing it. Plans from $29/mo, free tier available.
+Fitness businesses on ReviewPing average 16 reviews per month. Same great service, just a smarter ask. 2400+ businesses already doing it. Plans from ₹599/mo with a 14-day free trial.
 
 Got 10 minutes this week to see it?
 
@@ -315,7 +315,7 @@ The challenge? Your happy customers leave with a bag and a smile, but by the tim
 
 Email after purchase is the sweet spot for retail. ReviewPing sends a follow-up email after every sale with a direct Google review link. Professional, timely, and effortless. Retailers on our platform average 22 reviews per month — work that used to take hours now happens automatically.
 
-2400+ businesses trust ReviewPing. Free plan available, paid from $29/mo. Set up takes 2 minutes.
+2400+ businesses trust ReviewPing. Start free, paid from ₹599/mo. Set up takes 2 minutes.
 
 Worth a quick chat this week?
 
@@ -336,7 +336,7 @@ Most hotel and B&B owners tell me: "Guests say they loved their stay, but only a
 
 ReviewPing automates post-checkout review requests via email. Your guest gets a warm, professional message with a direct Google review link. They tap, leave a review, done. Accommodation businesses on our platform average 20 reviews per month.
 
-2400+ businesses already use ReviewPing. Plans from $29/mo with a free tier. No contracts, cancel anytime.
+2400+ businesses already use ReviewPing. Plans from ₹599/mo with a 14-day free trial. No contracts, cancel anytime.
 
 Would 10 minutes work for a quick walkthrough?
 
@@ -357,7 +357,7 @@ The natural time to capture a review is right after the experience. Your guests 
 
 ReviewPing sends an automatic WhatsApp message 30 minutes after their visit. A warm, short message with a direct Google review link. They tap, review, done. Entertainment venues on our platform average 12 reviews per month without any manual effort.
 
-2400+ businesses already trust ReviewPing. Free plan available, paid plans from $29/mo.
+2400+ businesses already trust ReviewPing. Start free, paid plans from ₹599/mo.
 
 Want to see how it works? 10 minutes is all I need.
 
@@ -378,7 +378,7 @@ Whether you run a tutoring center, pet grooming salon, or driving school, your h
 
 ReviewPing sends automated review requests after every session or service. Your customer gets a personal message with a direct Google review link at the perfect moment — not too early, not too late. Education and pet businesses using our platform average 10 reviews per month.
 
-2400+ businesses already use ReviewPing. Set up takes 2 minutes. Free plan available, paid from $29/mo.
+2400+ businesses already use ReviewPing. Set up takes 2 minutes. Start free, paid from ₹599/mo.
 
 Got 10 minutes for a quick call this week?
 
@@ -399,7 +399,7 @@ But I hear it from every service business owner I talk to: "I know I should ask 
 
 ReviewPing automates the process. After every job, your customer receives a thoughtful email or WhatsApp message with a direct Google review link. Professional, timely, and hands-off. You focus on the work, and the reviews take care of themselves.
 
-2400+ businesses already use ReviewPing. Free plan available, paid from $29/mo. No contracts, set up in 2 minutes.
+2400+ businesses already use ReviewPing. Start free, paid from ₹599/mo. No contracts, set up in 2 minutes.
 
 Would a quick 10-minute call this week work?
 

@@ -759,7 +759,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
               </tr>
               <tr>
-                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Free plan available</td>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>14-day free trial</td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
               </tr>
@@ -771,7 +771,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
               <tr>
                 <td style={{...styles.detailTd, ...styles.detailTdFeature}}>WhatsApp integration</td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
-                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Premium+</span></td>
               </tr>
               <tr style={styles.detailRowAlt}>
                 <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Month-to-month contracts</td>
@@ -793,7 +793,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
           store and need reliable review requests without enterprise
           complexity, ReviewPing is the smarter choice. Independent
           business owners love that they can start at <strong>$0/mo</strong>
-          on our free plan and upgrade only when their review volume grows.
+          on our free trial and upgrade only when their review volume grows.
           Multi-location operators save thousands annually compared to
           Podium's per-location pricing model. And any team that values
           AI-assisted review replies, WhatsApp outreach, and transparent
@@ -831,7 +831,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
             Podium starts at approximately <strong>$400+/month</strong> and
             often requires annual contracts with enterprise add-ons that push
             the real cost much higher. ReviewPing starts at just
-            <strong> ₹599/month</strong> with a free plan available. That is
+            <strong> ₹599/month</strong> with a 14-day free trial. That is
             a savings of over 90% for equivalent review request functionality.
             Even our multi-location Agency plan at ₹1,499/month costs less than
             what most Podium users pay for a single location.
@@ -844,7 +844,7 @@ export default function VSPodiumPage({ onSignup, onLogin, onBack }) {
           </h3>
           <p style={styles.faqAnswer}>
             Yes. Our Agency plan at <strong>₹1,499/month</strong> supports
-            unlimited locations with white-label branding, making it an
+            up to 5 locations with white-label branding, making it an
             excellent choice for multi-location operators, marketing
             agencies, and franchise groups. Podium charges per location
             with enterprise pricing, which quickly adds up. ReviewPing

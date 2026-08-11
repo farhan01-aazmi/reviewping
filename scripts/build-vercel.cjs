@@ -22,6 +22,9 @@ const FUNCTION_MAP = {
 console.log('▶ Generating sitemap...');
 execSync('node scripts/generate-sitemap.cjs', { cwd: root, stdio: 'inherit' });
 
+console.log('▶ Generating seo-map...');
+execSync('node scripts/generate-seo-map.cjs', { cwd: root, stdio: 'inherit' });
+
 console.log('▶ Running vite build...');
 execSync('npx vite build', { cwd: root, stdio: 'inherit' });
 
@@ -48,6 +51,52 @@ copyDir(distDir, staticDir);
 if (fs.existsSync(path.join(root, 'public', 'badge.js'))) {
   fs.copyFileSync(path.join(root, 'public', 'badge.js'), path.join(staticDir, 'badge.js'));
 }
+
+console.log('▶ Prerendering per-route SEO HTML...');
+const seoMap = JSON.parse(fs.readFileSync(path.join(root, 'seo-map.json'), 'utf8'));
+const baseHtml = fs.readFileSync(path.join(staticDir, 'index.html'), 'utf8');
+const seoRouteRules = [];
+
+function escAttr(v) {
+  return v.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function injectSeo(html, route, meta) {
+  let out = html;
+  const robots = meta.noindex
+    ? '\n    <meta name="robots" content="noindex, nofollow" />'
+    : '';
+  const jsonLd = meta.jsonLd
+    ? `\n    <script type="application/ld+json">${JSON.stringify(meta.jsonLd)}</script>`
+    : '';
+  out = out.replace('</head>', `${robots}${jsonLd}\n  </head>`);
+  out = out.replace(/<title>[^<]*<\/title>/, () => `<title>${escAttr(meta.title)}</title>`);
+  out = out.replace(/<meta name="description" content="[^"]*" \/>/, () => `<meta name="description" content="${escAttr(meta.desc)}" />`);
+  out = out.replace(/<link rel="canonical" href="[^"]*" \/>/, () => `<link rel="canonical" href="${escAttr(meta.canonical)}" />`);
+  out = out.replace(/<meta property="og:title" content="[^"]*" \/>/, () => `<meta property="og:title" content="${escAttr(meta.title)}" />`);
+  out = out.replace(/<meta property="og:description" content="[^"]*" \/>/, () => `<meta property="og:description" content="${escAttr(meta.desc)}" />`);
+  out = out.replace(/<meta property="og:url" content="[^"]*" \/>/, () => `<meta property="og:url" content="${escAttr(meta.canonical)}" />`);
+  out = out.replace(/<meta name="twitter:title" content="[^"]*" \/>/, () => `<meta name="twitter:title" content="${escAttr(meta.title)}" />`);
+  out = out.replace(/<meta name="twitter:description" content="[^"]*" \/>/, () => `<meta name="twitter:description" content="${escAttr(meta.desc)}" />`);
+  if (meta.ogImage) {
+    out = out.replace(/<meta property="og:image" content="[^"]*" \/>/, () => `<meta property="og:image" content="${escAttr(meta.ogImage)}" />`);
+    out = out.replace(/<meta name="twitter:image" content="[^"]*" \/>/, () => `<meta name="twitter:image" content="${escAttr(meta.ogImage)}" />`);
+  }
+  return out;
+}
+
+let homeHtml = baseHtml;
+for (const [route, meta] of Object.entries(seoMap)) {
+  if (route === '/') {
+    homeHtml = injectSeo(homeHtml, route, meta);
+    continue;
+  }
+  const htmlPath = path.join(staticDir, route.slice(1) + '.html');
+  fs.mkdirSync(path.dirname(htmlPath), { recursive: true });
+  fs.writeFileSync(htmlPath, injectSeo(baseHtml, route, meta));
+  seoRouteRules.push({ src: `^${route}/?$`, dest: `/${route.slice(1)}.html` });
+}
+fs.writeFileSync(path.join(staticDir, 'index.html'), homeHtml);
 
 console.log('▶ Creating /api/edge/[...slug] edge function...');
 const edgeFuncDir = path.join(functionsDir, 'api', 'edge', '[...slug].func');
@@ -86,6 +135,7 @@ console.log('▶ Generating config.json...');
 const config = {
   version: 3,
   routes: [
+    ...seoRouteRules,
     { handle: 'filesystem' },
     { src: '^/api/edge/?(.*)', dest: '/api/edge/[...slug]' },
     { handle: 'miss', src: '^/(?!api/).*$', dest: '/index.html' },

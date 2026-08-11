@@ -521,7 +521,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
       truereview: <Cross />,
       ping: (
         <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Premium+</span>
         </>
       ),
       highlight: true,
@@ -550,7 +550,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
       ),
     },
     {
-      feature: "Free Plan",
+      feature: "14-Day Free Trial",
       truereview: <Cross />,
       ping: <Check />,
       highlight: true,
@@ -575,7 +575,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
     <div style={styles.page}>
       <SEO
         title="ReviewPing vs TrueReview: Best Budget Review Tool?"
-        description="Compare ReviewPing (₹599/mo) vs TrueReview ($49/mo). ReviewPing offers more features, free plan, and lower starting price than TrueReview."
+        description="Compare ReviewPing (₹599/mo) vs TrueReview ($49/mo). ReviewPing offers more features and a lower starting price than TrueReview."
         path="/vs/truereview"
       />
 
@@ -615,7 +615,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
           AI-powered replies — starting at just <strong>₹599/mo</strong>,
           which is nearly 40% less than TrueReview's single $49 plan.
           ReviewPing also offers multiple pricing tiers, a generous
-          <strong> free plan at $0/mo</strong>, and WhatsApp review
+          <strong>14-day free trial</strong>, and WhatsApp review
           requests that TrueReview does not support at any price level.
         </p>
         <div style={styles.heroCtaRow}>
@@ -627,7 +627,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
           </button>
         </div>
         <p style={styles.heroDisclaimer}>
-          No credit card required • Cancel anytime • Free plan available
+          No credit card required • Cancel anytime • 14-day free trial
         </p>
       </section>
 
@@ -699,7 +699,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
             <h3 style={styles.cardTitle}>Price Flexibility</h3>
             <p style={styles.cardText}>
               TrueReview locks you into $49/mo. ReviewPing starts at ₹599/mo
-              with a free plan, so you only pay for what you need.
+              with a free trial, so you only pay for what you need.
             </p>
           </div>
 
@@ -708,13 +708,13 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
             <h3 style={styles.cardTitle}>WhatsApp Reviews</h3>
             <p style={styles.cardText}>
               Reach customers where they actually chat. TrueReview doesn't
-              offer WhatsApp review requests — ReviewPing does on Growth+.
+              offer WhatsApp review requests — ReviewPing does on Premium+.
             </p>
           </div>
 
           <div style={styles.card}>
             <span style={styles.cardIcon}>🆓</span>
-            <h3 style={styles.cardTitle}>Free Plan Available</h3>
+            <h3 style={styles.cardTitle}>Free to Start</h3>
             <p style={styles.cardText}>
               Test the waters with $0 commitment. TrueReview has no free
               tier — you're paying from day one.
@@ -766,7 +766,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
               </tr>
               <tr>
-                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Free plan available</td>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>14-day free trial</td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
               </tr>
@@ -778,7 +778,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
               <tr>
                 <td style={{...styles.detailTd, ...styles.detailTdFeature}}>WhatsApp integration</td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
-                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Premium+</span></td>
               </tr>
               <tr style={styles.detailRowAlt}>
                 <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Month-to-month contracts</td>
@@ -798,7 +798,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
         <p style={styles.whoText}>
           ReviewPing is the smarter choice for budget-conscious business
           owners who want to start small and scale on their own terms.
-          Our <strong>free plan</strong> lets you test the platform at
+          Our <strong>14-day free trial</strong> lets you test the platform at
           $0/month before committing, whereas TrueReview requires payment
           from day one. Multi-location operators will prefer ReviewPing's
           flat-rate Agency plan over TrueReview's per-location fee model.
@@ -824,7 +824,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
             TrueReview charges a flat <strong>$49/month</strong> for a
             single plan with no free tier and additional per-location fees.
             ReviewPing starts at <strong>₹599/month</strong> with a
-            <strong> free plan available at $0/month</strong>, multiple
+            <strong>14-day free trial</strong>, multiple
             upgrade paths, and a flat-rate Agency plan at ₹1,499/month that
             covers up to 5 locations. Whether you are a solo operator
             or a growing agency, ReviewPing's pricing scales with you
@@ -838,7 +838,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
           </h3>
           <p style={styles.faqAnswer}>
             Yes. ReviewPing includes WhatsApp review requests on our
-            Growth+ plans and above, giving your customers the convenience
+            Premium+ plans and above, giving your customers the convenience
             of leaving a review through the messaging app they already use
             every day. TrueReview does not offer WhatsApp integration at
             any price point. This is a significant advantage for businesses
@@ -873,7 +873,7 @@ export default function VSTruereviewPage({ onSignup, onLogin, onBack }) {
             <span style={{ color: G.gold }}>₹599/mo</span>.
           </h2>
           <p style={styles.ctaSub}>
-            No setup fees, a generous free plan to get started, and the
+            No setup fees, a 14-day free trial to get started, and the
             freedom to cancel anytime — no questions asked. You will be up
             and running in 5 minutes with your first review request sent
             within the hour. Already using TrueReview? Our team offers free

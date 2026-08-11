@@ -45,25 +45,14 @@ const INDUSTRY_PAGES = [
   { loc: '/industry/ecommerce', priority: '0.7', changefreq: 'monthly', date: '2026-06-15' },
 ];
 
-// Blog posts with dates
-const BLOG_POSTS = [
-  { slug: 'reviewping-vs-birdeye-comparison', date: '2026-06-18' },
-  { slug: 'whatsapp-review-requests-guide', date: '2026-06-16' },
-  { slug: 'best-review-request-automation-software-2026', date: '2026-06-14' },
-  { slug: 'review-request-automation-statistics-2026', date: '2026-06-12' },
-  { slug: 'what-is-review-request-automation', date: '2026-06-10' },
-  { slug: 'why-google-reviews-matter-for-small-business', date: '2026-05-20' },
-  { slug: 'sms-vs-email-review-requests-which-works-better', date: '2026-05-12' },
-  { slug: 'how-to-respond-to-negative-google-reviews', date: '2026-05-05' },
-  { slug: 'review-management-for-restaurants', date: '2026-04-28' },
-  { slug: 'google-business-profile-optimization-checklist', date: '2026-04-20' },
-  { slug: 'reviewping-vs-podium-comparison', date: '2026-06-03' },
-  { slug: 'how-to-automate-google-review-requests', date: '2026-06-02' },
-  { slug: 'podium-pricing-2026', date: '2026-06-22' },
-  { slug: 'google-review-request-templates', date: '2026-06-21' },
-  { slug: 'how-to-get-5-star-google-reviews', date: '2026-06-20' },
-  { slug: 'how-to-reply-to-google-reviews-professionally', date: '2026-06-19' },
-];
+// Blog posts with dates — derived from seoPages.js BLOG_POSTS (single source of truth)
+const dataSource = fs.readFileSync(DATA_FILE, 'utf8');
+const seoData = {};
+eval(dataSource.replace(/export const (\w+) =/g, (_, n) => `seoData.${n} =`));
+const BLOG_POSTS = seoData.BLOG_POSTS.map((p) => ({
+  slug: p.slug,
+  date: p.date || '2026-06-01',
+}));
 
 function escapeXml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

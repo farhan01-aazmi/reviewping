@@ -6,7 +6,7 @@ export default function ContactPage({ onSignup, onLogin, onBack }) {
   const faqs = [
     {
       q: "Which plan is right for my business?",
-      a: "It depends on your review volume and team size. The Free plan works well for solo businesses sending up to 25 requests per month. Starter ($29/mo) is ideal for growing businesses that want email and WhatsApp support. Pro ($79/mo) unlocks unlimited requests, AI personalisation, and advanced analytics. Agency ($149/mo) adds multi-location support, white-labeling, API access, and team accounts. If you are unsure, start with the Free plan — you can upgrade at any time with no penalties or data loss.",
+      a: "It depends on your review volume and team size. The 14-day free trial works well for solo businesses who want to test before paying. Starter (₹599/mo) is ideal for growing businesses that want email review requests and core analytics. Premium (₹999/mo) unlocks unlimited requests, WhatsApp support, AI personalisation, and advanced analytics. Agency (₹1,499/mo) adds multi-location support (up to 5 locations), white-labeling, API access, and team accounts. If you are unsure, start with the free trial — you can upgrade at any time with no penalties or data loss.",
     },
     {
       q: "Can I migrate from another review tool?",

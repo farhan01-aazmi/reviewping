@@ -528,7 +528,7 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
       competitor: <Cross />,
       ping: (
         <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Premium+</span>
         </>
       ),
     },
@@ -561,7 +561,7 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
       ),
     },
     {
-      feature: "Free Plan ($0/mo)",
+      feature: "14-Day Free Trial",
       competitor: <Cross />,
       ping: <Check />,
       highlight: true,
@@ -719,15 +719,15 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
             <h3 style={styles.cardTitle}>WhatsApp Review Requests</h3>
             <p style={styles.cardText}>
               Reach customers where they actually chat. ReviewPing sends review
-              requests over WhatsApp (Growth+). Grade.us doesn't offer this.
+              requests over WhatsApp (Premium+). Grade.us doesn't offer this.
             </p>
           </div>
 
           <div style={styles.card}>
             <span style={styles.cardIcon}>🆓</span>
-            <h3 style={styles.cardTitle}>Free Plan Available</h3>
+            <h3 style={styles.cardTitle}>Free to Start</h3>
             <p style={styles.cardText}>
-              Start at $0/mo with ReviewPing's free plan. Get real review
+              Start with a 14-day free trial — no credit card required. Get real review
               requests without committing a dime. Grade.us offers no free tier.
             </p>
           </div>
@@ -767,7 +767,7 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
               </tr>
               <tr>
-                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Free plan available</td>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>14-day free trial</td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
               </tr>
@@ -779,7 +779,7 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
               <tr>
                 <td style={{...styles.detailTd, ...styles.detailTdFeature}}>WhatsApp integration</td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
-                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Premium+</span></td>
               </tr>
               <tr style={styles.detailRowAlt}>
                 <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Month-to-month contracts</td>
@@ -801,7 +801,7 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
           staff without watching their software bill climb. Marketing agencies
           managing multiple client locations save significantly on our Agency
           plan at <strong>₹1,499/month</strong> with white-label branding
-          included. Small business owners who want a free plan to test the
+          included. Small business owners who want a free trial to test the
           waters before committing will appreciate our <strong>$0/mo</strong>
           tier. And any team that relies on AI-generated review replies or
           WhatsApp-based customer outreach will find those features baked
@@ -841,7 +841,7 @@ export default function VSGradeUsPage({ onSignup, onLogin, onBack }) {
             requests, analytics dashboards, custom templates, and
             multi-location support — and adds several that Grade.us lacks,
             including AI-powered reply generation, WhatsApp review requests,
-            and a free plan. The main difference is that ReviewPing is
+            and a free trial. The main difference is that ReviewPing is
             simpler to set up and more affordable, while Grade.us offers
             deeper enterprise integrations that most small businesses
             never actually use.

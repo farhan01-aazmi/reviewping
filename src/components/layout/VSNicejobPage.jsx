@@ -532,7 +532,7 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
       ping: (
         <>
           <Check />{" "}
-          <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span>
+          <span style={{ fontSize: 13, color: G.mutedLo }}>Premium+</span>
         </>
       ),
     },
@@ -549,7 +549,7 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
       ping: <Check />,
     },
     {
-      feature: "Free Plan",
+      feature: "14-Day Free Trial",
       nicejob: <Cross />,
       ping: <Check />,
     },
@@ -621,9 +621,9 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
         <p style={styles.heroSub}>
           Nicejob asks <strong>$75–$125/mo</strong> for basic review requests
           and monitoring — with no AI capabilities, no WhatsApp integration,
-          and no free plan to try before you buy. ReviewPing gives you
+          and no free trial to test before you buy. ReviewPing gives you
           <strong> AI-powered reply generation</strong>, WhatsApp review
-          requests, a full analytics dashboard, and a generous free plan —
+          requests, a full analytics dashboard, and a 14-day free trial —
           all starting at just <strong>₹599/mo</strong> with no contracts
           required.
         </p>
@@ -723,10 +723,10 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
 
           <div style={styles.card}>
             <span style={styles.cardIcon}>🆓</span>
-            <h3 style={styles.cardTitle}>Free Plan Available</h3>
+            <h3 style={styles.cardTitle}>Free to Start</h3>
             <p style={styles.cardText}>
               Nicejob starts at $75/mo with no free tier. ReviewPing has a
-              generous free plan so you can try before you buy.
+              14-day free trial so you can try before you buy.
             </p>
           </div>
 
@@ -774,7 +774,7 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
               </tr>
               <tr>
-                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Free plan available</td>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>14-day free trial</td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
               </tr>
@@ -786,7 +786,7 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
               <tr>
                 <td style={{...styles.detailTd, ...styles.detailTdFeature}}>WhatsApp integration</td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
-                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Premium+</span></td>
               </tr>
               <tr style={styles.detailRowAlt}>
                 <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Month-to-month contracts</td>
@@ -808,7 +808,7 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
           who want modern features like AI reply generation and WhatsApp
           outreach without paying for features they will never use.
           Independent restaurants, dental practices, and local service
-          providers will appreciate the <strong>$0/mo free plan</strong>
+          providers will appreciate the <strong>14-day free trial</strong>
           that lets them validate the platform before upgrading. Anyone
           frustrated by Nicejob's annual contract requirements will love
           ReviewPing's month-to-month flexibility. And e-commerce operators
@@ -831,7 +831,7 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
             In many ways, ReviewPing is actually more feature-rich. While
             Nicejob covers the basics of review requests and monitoring,
             ReviewPing adds AI-powered reply generation, WhatsApp review
-            requests, and a free plan — three features Nicejob simply does
+            requests, and a free trial — three things Nicejob simply does
             not offer. ReviewPing also provides a more modern analytics
             dashboard with actionable insights rather than just raw data.
             The only area where Nicejob may have an edge is in advanced
@@ -845,7 +845,7 @@ export default function VSNicejobPage({ onSignup, onLogin, onBack }) {
           </h3>
           <p style={styles.faqAnswer}>
             Absolutely. ReviewPing's Agency plan at <strong>₹1,499/month</strong>
-            supports unlimited locations with white-label branding, making
+            supports up to 5 locations with white-label branding, making
             it ideal for multi-location businesses and marketing agencies.
             Nicejob also supports multiple locations, but at a significantly
             higher price point. ReviewPing gives you predictable flat-rate

@@ -12,16 +12,16 @@ export const BLOG_POSTS = [
       { type: "p", text: "Birdeye is one of the most well-known reputation management platforms on the market. But at $299-449+ per month per location — plus a $500-1,500 onboarding fee and an 8% 'Innovation Fee' on renewals — it's priced for mid-market businesses, not the local coffee shop or dental practice that just wants more Google reviews." },
       { type: "p", text: "ReviewPing was built to solve exactly this problem. We took the core functionality that makes review request software work — automated email and WhatsApp requests, direct Google review links, real-time analytics — and made it accessible at ₹599/month." },
       { type: "h2", text: "Feature Comparison: ReviewPing vs Birdeye" },
-      { type: "table", headers: ["Feature", "ReviewPing", "Birdeye"], rows: [["Automated review requests", "✅ Email, WhatsApp", "✅ SMS, Email"], ["Direct Google review link", "✅ Yes", "✅ Yes"], ["Analytics dashboard", "✅ Real-time", "✅ Real-time"], ["AI reply generator", "✅ Included", "✅ Included (paywalled)"], ["Multi-location", "✅ Up to 10 (Agency plan)", "✅ Unlimited"], ["WhatsApp review requests", "✅ Yes", "❌ No"], ["White-label", "✅ Agency plan", "✅ Enterprise only"], ["CRM integrations", "✅ CSV import", "✅ 100+ integrations"], ["Starting price", "₹599/mo", "$299/mo per location"], ["Setup fee", "$0", "$500-1,500 one-time"], ["Renewal fee", "None", "8% Innovation Fee"], ["Free plan", "✅ Yes (25/mo)", "❌ No"], ["Free trial", "✅ 14 days, no card", "✅ Demo only"]] },
+      { type: "table", headers: ["Feature", "ReviewPing", "Birdeye"], rows: [["Automated review requests", "✅ Email, WhatsApp", "✅ SMS, Email"], ["Direct Google review link", "✅ Yes", "✅ Yes"], ["Analytics dashboard", "✅ Real-time", "✅ Real-time"], ["AI reply generator", "✅ Included", "✅ Included (paywalled)"], ["Multi-location", "✅ Up to 5 (Agency plan)", "✅ Unlimited"], ["WhatsApp review requests", "✅ Yes", "❌ No"], ["White-label", "✅ Agency plan", "✅ Enterprise only"], ["CRM integrations", "✅ CSV import", "✅ 100+ integrations"], ["Starting price", "₹599/mo", "$299/mo per location"], ["Setup fee", "$0", "$500-1,500 one-time"], ["Renewal fee", "None", "8% Innovation Fee"], ["Free trial", "✅ 14 days, no card", "✅ Demo only"]] },
       { type: "h2", text: "Pricing Comparison" },
       { type: "p", text: "The pricing difference is dramatic. Birdeye's Starter plan starts at $299/month per location, with their Professional plan at $449/month. Enterprise pricing is custom and typically $1,000+ per month. They also charge a $500-1,500 onboarding fee and an 8% 'Innovation Fee' at renewal." },
-      { type: "p", text: "ReviewPing starts at ₹599/month (Starter, 100 requests) and goes up to ₹1,499/month (Agency, 5 locations, white-label). Plus, ReviewPing has a free plan — 25 review requests per month at $0. Birdeye has no free plan." },
+      { type: "p", text: "ReviewPing starts at ₹599/month (Starter, 100 requests) and goes up to ₹1,499/month (Agency, 5 locations, white-label). And every plan starts with a 14-day free trial — no credit card required. Birdeye only offers sales demos." },
       { type: "h2", text: "Where Birdeye Wins" },
       { type: "p", text: "Let's be honest. Birdeye is a more comprehensive platform. They offer a full suite of reputation management tools including social media monitoring, survey campaigns, competitor tracking, and a customer experience platform. If you need all of those features, Birdeye might be worth the premium." },
       { type: "p", text: "They also have 100+ native integrations with CRMs, POS systems, and practice management software. For enterprise businesses with complex tech stacks, this matters." },
       { type: "h2", text: "Where ReviewPing Wins" },
       { type: "p", text: "ReviewPing wins on simplicity and value. Most small businesses don't need social media monitoring or survey campaigns — they just need more Google reviews. ReviewPing focuses on doing one thing exceptionally well: getting you more 5-star reviews automatically." },
-      { type: "ul", items: ["90%+ cheaper than Birdeye (₹599 vs $299-449/mo)", "WhatsApp review requests (Birdeye doesn't offer this)", "Free plan available (Birdeye has no free tier)", "No onboarding fees, no renewal surcharges", "No long-term contracts — cancel anytime", "Set up in 2 minutes, no onboarding needed", "Built specifically for small businesses, not enterprises"] },
+      { type: "ul", items: ["90%+ cheaper than Birdeye (₹599 vs $299-449/mo)", "WhatsApp review requests (Birdeye doesn't offer this)", "14-day free trial with no credit card required", "No onboarding fees, no renewal surcharges", "No long-term contracts — cancel anytime", "Set up in 2 minutes, no onboarding needed", "Built specifically for small businesses, not enterprises"] },
       { type: "h2", text: "Who Should Use Which?" },
       { type: "p", text: "If you're a mid-market business with complex needs, multiple locations, and a dedicated marketing budget, Birdeye is a solid choice. Their comprehensive feature set can replace multiple tools." },
       { type: "p", text: "But if you're a small business owner — a restaurant, dental practice, salon, or home service provider — who just wants more Google reviews without the enterprise price tag, ReviewPing is the obvious choice. You'll get the core functionality you need for a fraction of the cost." },
@@ -46,7 +46,7 @@ export const BLOG_POSTS = [
         { q: "Is Birdeye more expensive than ReviewPing?", a: "Yes, significantly. Birdeye starts at $299-449/month per location with $500-1,500 onboarding fees and an 8% Innovation Fee at renewal. ReviewPing starts at ₹599/month with no onboarding fees or renewal surcharges." },
         { q: "Does Birdeye offer WhatsApp review requests?", a: "No. Birdeye does not support WhatsApp review requests. ReviewPing offers WhatsApp requests on all paid plans." },
         { q: "Can I switch from Birdeye to ReviewPing?", a: "Absolutely. Export your customer contacts from Birdeye as CSV and import directly into ReviewPing. Your Google reviews stay with your Business Profile regardless of which platform you use. Most businesses complete the switch in under 30 minutes." },
-        { q: "Does ReviewPing have a free trial like Birdeye?", a: "Birdeye only offers a demo. ReviewPing offers a true 14-day free trial with no credit card required — and a free plan with 25 review requests per month." },
+        { q: "Does ReviewPing have a free trial like Birdeye?", a: "Birdeye only offers a demo. ReviewPing offers a true 14-day free trial with no credit card required." },
       ]},
     ],
   },
@@ -143,7 +143,7 @@ export const BLOG_POSTS = [
       { type: "p", text: "But with dozens of platforms on the market — ranging from ₹599/month all the way up to $1,000+/month for enterprise solutions — choosing the right one for your small business can be overwhelming. Do you need WhatsApp support? Multi-location features? AI reply generation? White-label capabilities?" },
       { type: "p", text: "We compared the top 6 review request automation platforms across features, pricing, ease of use, and customer satisfaction. Here's our honest assessment with current 2026 pricing data — no affiliate bias, no sponsored placements." },
       { type: "h2", text: "At a Glance: Top 6 Review Request Automation Platforms" },
-      { type: "table", headers: ["Platform", "Starting Price (2026)", "Best For", "Free Plan", "Rating"], rows: [["ReviewPing", "₹599/mo", "Small businesses on a budget", "✅ Yes", "⭐ 4.8/5"], ["Podium", "$449/mo (annual contract)", "Enterprise multi-location", "❌ No", "⭐ 4.2/5"], ["Birdeye", "$299-449/mo + $500 setup", "Mid-market reputation mgmt", "❌ No", "⭐ 4.3/5"], ["Widewail", "$199/mo", "Review generation focus", "❌ No", "⭐ 4.4/5"], ["Reputation", "$299/mo", "Enterprise with CRM", "❌ No", "⭐ 4.1/5"], ["Grade.us", "₹3,999/mo", "Agencies & white-label", "❌ No", "⭐ 4.3/5"]] },
+      { type: "table", headers: ["Platform", "Starting Price (2026)", "Best For", "Free Trial", "Rating"], rows: [["ReviewPing", "₹599/mo", "Small businesses on a budget", "✅ Yes", "⭐ 4.8/5"], ["Podium", "$449/mo (annual contract)", "Enterprise multi-location", "❌ No", "⭐ 4.2/5"], ["Birdeye", "$299-449/mo + $500 setup", "Mid-market reputation mgmt", "❌ No", "⭐ 4.3/5"], ["Widewail", "$199/mo", "Review generation focus", "❌ No", "⭐ 4.4/5"], ["Reputation", "$299/mo", "Enterprise with CRM", "❌ No", "⭐ 4.1/5"], ["Grade.us", "₹3,999/mo", "Agencies & white-label", "❌ No", "⭐ 4.3/5"]] },
       { type: "h2", text: "How We Evaluated These Platforms" },
       { type: "p", text: "We evaluated each platform on five criteria: pricing transparency (are costs clear or hidden behind demos?), feature completeness (does it support email and WhatsApp?), ease of use (can a non-technical business owner set it up in minutes?), customer support quality, and overall value for money. Pricing data was verified through platform websites, customer reports, and industry sources as of July 2026." },
       { type: "h2", text: "1. ReviewPing — Best Overall Value (₹599/mo)" },
@@ -158,11 +158,11 @@ export const BLOG_POSTS = [
         "Multi-location management — up to 5 locations on the Agency plan",
         "Delivery tracking — see when messages are delivered, opened, and clicked",
         "CSV import — bulk import customer contacts from any existing system",
-        "Free plan — 25 review requests per month at $0",
+        "Start free — no credit card required",
         "14-day free trial — no credit card required",
       ]},
       { type: "h3", text: "Pricing" },
-      { type: "p", text: "Starter: ₹599/mo (100 requests). Premium: ₹999/mo (unlimited requests, WhatsApp). Agency: ₹1,499/mo (5 locations, white-label). Free plan available." },
+      { type: "p", text: "Starter: ₹599/mo (100 requests). Premium: ₹999/mo (unlimited requests, WhatsApp). Agency: ₹1,499/mo (5 locations, white-label)." },
       { type: "h3", text: "Best For" },
       { type: "p", text: "Small businesses — restaurants, clinics, salons, home service providers — who want the core functionality of enterprise platforms like Podium and Birdeye at a fraction of the cost." },
       { type: "h2", text: "2. Podium — Most Feature-Rich ($449+/mo, annual contract)" },
@@ -216,7 +216,6 @@ export const BLOG_POSTS = [
         ["Email requests", "✅", "✅", "✅", "✅"],
         ["WhatsApp requests", "✅", "❌", "❌", "❌"],
         ["AI reply generator", "✅ Included", "✅ (add-on $50/mo)", "✅ Included", "✅ Included"],
-        ["Free plan", "✅ 25/mo", "❌", "❌", "❌"],
         ["Month-to-month", "✅", "❌ (annual)", "✅", "✅"],
         ["Setup fee", "$0", "$500-2,000", "$500-1,500", "$0"],
         ["Starting price", "₹599/mo", "$449/mo", "$299/mo", "$199/mo"],
@@ -233,12 +232,12 @@ export const BLOG_POSTS = [
       ]},
       { type: "faq", items: [
         { q: "What is the best review request automation software for small businesses in 2026?", a: "ReviewPing offers the best value at ₹599/month with email and WhatsApp support. For businesses that need enterprise features like AI chatbots and payment processing, Podium at $449/month is the most comprehensive option but requires an annual contract." },
-        { q: "Which review request platform is the most affordable?", a: "ReviewPing is the most affordable at ₹599/month with a free plan available (25 requests/month). Widewail is the next cheapest at $199/month but lacks WhatsApp support and has a smaller feature set." },
+        { q: "Which review request platform is the most affordable?", a: "ReviewPing is the most affordable at ₹599/month with a 14-day free trial and no contracts. Widewail is the next cheapest at $199/month but lacks WhatsApp support and has a smaller feature set." },
         { q: "Do any of these platforms support WhatsApp review requests?", a: "Only ReviewPing supports WhatsApp review requests among the platforms reviewed. Podium, Birdeye, Widewail, Reputation, and Grade.us do not offer WhatsApp as a review request channel." },
-        { q: "Which platform has a free plan for review requests?", a: "Only ReviewPing offers a free plan — 25 review requests per month at $0. All other platforms require a paid subscription starting at $199-449/month." },
+        { q: "Which platform lets you try review request software free?", a: "Only ReviewPing offers a 14-day free trial with no credit card required. All other platforms reviewed require a paid subscription from day one." },
         { q: "Can I switch from Podium or Birdeye to ReviewPing?", a: "Yes. Export your customer contacts as CSV from any platform and import them into ReviewPing. Your Google reviews stay with your Google Business Profile regardless of which platform you use. Most businesses complete the switch in under 30 minutes." },
       ]},
-      { type: "cta", heading: "Start with ReviewPing free for 14 days", text: "No credit card needed. Get your first 50 review requests free. Cancel anytime.", btn: "Start free →" },
+      { type: "cta", heading: "Start with ReviewPing free for 14 days", text: "No credit card needed. 14-day free trial. Cancel anytime.", btn: "Start free →" },
     ],
   },
   {
@@ -397,7 +396,7 @@ export const BLOG_POSTS = [
         { q: "Can I choose between email and WhatsApp?", a: "Yes. ReviewPing supports email and WhatsApp review requests. You can choose per customer, set channel preferences by industry, or let the customer decide. The multi-channel approach consistently delivers the highest conversion rates." },
         { q: "What if a customer had a bad experience?", a: "If someone had a bad experience, they were likely to leave that review anyway — on Google, Yelp, or social media. Automation doesn't create negative reviews; it just captures feedback that was already coming. Plus, generating 5-10x more reviews naturally dilutes the impact of occasional negative feedback." },
         { q: "Does this work with any Google Business Profile?", a: "Yes. ReviewPing works with any verified Google Business Profile. We generate a direct Google review link that takes customers straight to the review form — no searching for your business name required." },
-        { q: "How much does review request automation cost?", a: "ReviewPing starts at ₹599/month for 100 review requests. The Premium plan (₹1,500/month) offers unlimited requests and WhatsApp support. There's also a free plan with 25 requests per month. Compared to the $200-400/month in staff time for manual asking, automation pays for itself immediately." },
+        { q: "How much does review request automation cost?", a: "ReviewPing starts at ₹599/month for 100 review requests. The Premium plan (₹999/month) offers unlimited requests and WhatsApp support. Every plan starts with a 14-day free trial. Compared to the $200-400/month in staff time for manual asking, automation pays for itself immediately." },
         { q: "How quickly can I set up review request automation?", a: "With ReviewPing, setup takes approximately 2 minutes. Create an account, connect your Google Business Profile, customize your template, and import your contacts. No coding, no onboarding calls, no training required." },
       ]},
       { type: "cta", heading: "Try ReviewPing free for 14 days", text: "No credit card required. Set up takes 2 minutes. Start getting more Google reviews automatically.", btn: "Start free →" },
@@ -447,7 +446,7 @@ export const BLOG_POSTS = [
         "\"Automation will annoy customers.\" Reality: A single, well-timed WhatsApp request is far less intrusive than the 5-10 marketing emails most businesses already send.",
         "\"One bad review will ruin my business.\" Reality: A mix of reviews with professional responses builds more trust than a perfect rating with no responses.",
       ]},
-      { type: "cta", heading: "Start getting the Google reviews your business deserves", text: "ReviewPing automates the entire process. Set up in 2 minutes. First 50 requests free.", btn: "Start free →" },
+      { type: "cta", heading: "Start getting the Google reviews your business deserves", text: "ReviewPing automates the entire process. Set up in 2 minutes. Start with a 14-day free trial.", btn: "Start free →" },
     ],
   },
   {
@@ -575,7 +574,7 @@ export const BLOG_POSTS = [
       { type: "p", text: "Studies show that 70% of consumers who see a well-handled negative review will change their perception of the business for the better. ReviewPing's AI Reply Generator helps you craft the perfect response in seconds, suggesting the right tone for each situation." },
       { type: "h2", text: "Real Results: What Restaurants Achieve with ReviewPing" },
       { type: "p", text: "Restaurants using ReviewPing average 18 new Google reviews per month — compared to 3-5 for restaurants that ask manually. That's a 5x increase in social proof, directly translating to higher local search rankings, more bookings, and fuller dining rooms." },
-      { type: "cta", heading: "Get more 5-star reviews for your restaurant", text: "Set up automated review requests in 2 minutes. Your first 50 requests are free. No credit card needed.", btn: "Start free →" },
+      { type: "cta", heading: "Get more 5-star reviews for your restaurant", text: "Set up automated review requests in 2 minutes. 14-day free trial. No credit card needed.", btn: "Start free →" },
     ],
   },
   {
@@ -656,13 +655,12 @@ export const BLOG_POSTS = [
         ["Direct Google review link generation", "✅ Included", "✅ Included"],
         ["Real-time analytics dashboard", "✅ Included", "✅ Included"],
         ["AI reply generator", "✅ Included", "✅ Included"],
-        ["Multi-location management", "✅ Up to 10 (Agency)", "✅ Unlimited"],
+        ["Multi-location management", "✅ Up to 5 (Agency)", "✅ Unlimited"],
         ["AI chatbot for website", "❌ Not included", "✅ Included"],
         ["Payment processing", "❌ Not included", "✅ Podium Payments"],
         ["Team inbox / messaging", "❌ Not included", "✅ Included"],
         ["Social media monitoring", "❌ Not included", "✅ Included"],
         ["White-label / agency program", "✅ Agency plan", "✅ Enterprise"],
-        ["Free plan", "✅ 25 requests/mo", "❌ No"],
         ["Free trial", "✅ 14 days, no card", "❌ Demo only"],
         ["Contract required", "❌ Month-to-month", "✅ Annual contract"],
       ]},
@@ -693,7 +691,7 @@ export const BLOG_POSTS = [
         "Price — ₹599/month vs $449+/month. You save $400-1,100/month for the core review request functionality",
         "No contracts — month-to-month, cancel anytime. Podium now requires annual contracts",
         "WhatsApp support — Podium doesn't offer WhatsApp review requests. ReviewPing Premium does",
-        "Free plan — 25 review requests per month at $0. Podium has no free option",
+        "14-day free trial with no credit card — Podium only offers demos",
         "No overage charges — Podium charges extra for exceeding request limits. ReviewPing is transparent with clear tiers",
         "Built for small business — every feature decision starts with 'does a local business owner need this?'",
       ]},
@@ -735,7 +733,7 @@ export const BLOG_POSTS = [
         ["Revenue impact (est.)", "$0-5,000/yr", "$5,000-25,000/yr"],
       ]},
       { type: "h2", text: "Step 1: Create Your ReviewPing Account (30 Seconds)" },
-      { type: "p", text: "Go to reviewping.pro and click 'Start free trial.' Enter your email, business name, and create a password. No credit card required — you get your first 50 review requests completely free, and the 14-day trial gives you full access to all features." },
+      { type: "p", text: "Go to reviewping.pro and click 'Start free trial.' Enter your email, business name, and create a password. No credit card required — the 14-day free trial gives you full access to all features." },
       { type: "h2", text: "Step 2: Connect Your Google Business Profile (60 Seconds)" },
       { type: "p", text: "Once you're in the dashboard, click 'Connect Google.' ReviewPing automatically detects if you have a verified Google Business Profile (you need one — if you don't, set it up first at google.com/business). We generate a direct Google review link that takes customers straight to your review form with one tap. No searching for your business name, no logging in — just one click and they're reviewing." },
       { type: "tip", text: "You can test your Google review link by clicking the preview button. It should take you directly to the review form for your business. If it doesn't, your profile may not be fully verified or you may have multiple locations — contact support and we'll fix it in minutes." },
@@ -784,7 +782,7 @@ export const BLOG_POSTS = [
       { type: "p", text: "The most common objection to automated review requests is: 'What if someone had a bad experience and leaves a negative review?' Here's the honest answer:" },
       { type: "p", text: "If someone had a bad experience, they were going to leave that review anyway — on their own timeline, on whichever platform they choose, without the benefit of your response. Automation doesn't create negative reviews; it just captures the feedback that was already coming. The difference is that with 5-10x more total reviews, the occasional negative one gets statistically diluted, and you have the opportunity to respond professionally and publicly." },
       { type: "p", text: "Plus, ReviewPing's AI Reply Generator helps you respond to every review in seconds — positive or negative. A thoughtful response to a bad review actually builds more trust with future customers than having no bad reviews at all." },
-      { type: "cta", heading: "Stop chasing reviews. Start automating.", text: "Set up automated Google review requests in 5 minutes. First 50 requests free. ₹599/month after that.", btn: "Start free →" },
+      { type: "cta", heading: "Stop chasing reviews. Start automating.", text: "Set up automated Google review requests in 5 minutes. ₹599/month after your 14-day free trial.", btn: "Start free →" },
     ],
   },
   {
@@ -850,14 +848,13 @@ export const BLOG_POSTS = [
         "AI-powered reply generator for responding to reviews instantly",
         "Contact management with CSV import and opt-out tracking",
         "Multi-location support and white-label (Agency plan)",
-        "Free plan — 25 review requests per month at $0, no contract",
-        "14-day free trial, no credit card required",
+        "14-day free trial — no credit card, no contract",
       ]},
       { type: "cta", heading: "Save $400-1,100/month vs Podium", text: "Get the same core review request features for ₹599/month. No contracts, no setup fees, no surprises. Set up in 2 minutes.", btn: "Start free →" },
       { type: "faq", items: [
         { q: "How much does Podium cost in 2026?", a: "Podium's minimum plan in 2026 is $449/month, requiring an annual contract. Professional plans run $599-799/month and enterprise plans start at $1,199+/month. Setup fees add $500-2,000 one-time." },
         { q: "Does Podium have hidden fees?", a: "Yes. Beyond the base price, Podium charges setup fees ($500-2,000), overage charges ($0.10-0.50 per extra interaction), add-on fees (AI reply generator: $50/mo), and early termination penalties up to 50% of remaining contract value." },
-        { q: "Can I get review request software without an annual contract?", a: "Yes. ReviewPing offers month-to-month billing with no contracts. You can cancel anytime. The free plan gives you 25 review requests per month at $0 with no commitment." },
+        { q: "Can I get review request software without an annual contract?", a: "Yes. ReviewPing offers month-to-month billing with no contracts. You can cancel anytime. Our 14-day free trial requires no credit card and no commitment." },
         { q: "Does Podium support WhatsApp review requests?", a: "No. Podium does not offer WhatsApp review requests. ReviewPing supports WhatsApp on all paid plans." },
       ]},
     ],
@@ -940,7 +937,7 @@ export const BLOG_POSTS = [
         ["Auto Repair", "#1 or #3", "WhatsApp", "3-4%"],
         ["Retail", "#13 (in-person) + WhatsApp", "In-person + WhatsApp", "3-5%"],
       ]},
-      { type: "cta", heading: "Use these templates with ReviewPing — automatically", text: "Import any template, set your timing, and ReviewPing sends it automatically after every service. First 50 requests free.", btn: "Start free →" },
+      { type: "cta", heading: "Use these templates with ReviewPing — automatically", text: "Import any template, set your timing, and ReviewPing sends it automatically after every service. 14-day free trial.", btn: "Start free →" },
     ],
   },
   {
@@ -1015,7 +1012,7 @@ export const BLOG_POSTS = [
         ["Month 6", "90-130 total", "4.6+", "3-5x ROI on review request investment"],
       ]},
       { type: "p", text: "The businesses that commit to this system don't just get more reviews — they build a competitive moat. A steady stream of fresh 5-star reviews signals to Google that your business is active, popular, and trustworthy. Your ranking improves. Your click-through rate improves. Your revenue improves." },
-      { type: "cta", heading: "Start your 90-day review system today", text: "ReviewPing automates the entire process — from review requests to AI-powered replies. First 50 requests free. ₹599/month.", btn: "Start free →" },
+      { type: "cta", heading: "Start your 90-day review system today", text: "ReviewPing automates the entire process — from review requests to AI-powered replies. ₹599/month after your 14-day free trial.", btn: "Start free →" },
     ],
   },
   {
@@ -1077,7 +1074,7 @@ export const BLOG_POSTS = [
       { type: "h2", text: "How to Set Up a QR Review Gateway in 2 Minutes" },
       { type: "p", text: "Setting up a QR Review Gateway with ReviewPing takes less time than brewing a cup of coffee:" },
       { type: "ol", items: [
-        "Create your ReviewPing account — takes 30 seconds. Free plan available with 25 requests/month.",
+        "Create your ReviewPing account — takes 30 seconds. 14-day free trial, no credit card required.",
         "Connect your Google Business Profile — one click to link your GBP and auto-generate your review link.",
         "Go to the Gateway page in your dashboard — you'll see your unique gateway URL and QR code ready to use.",
         "Customize your gateway — choose your brand colors, logo, and the message that appears above the star ratings.",
@@ -1431,8 +1428,8 @@ export const PODIUM_ALTERNATIVE_DATA = {
         ["Automated scheduling", "✓", "✓"],
         ["AI reply generator", "✓", "✓ (paywalled)"],
         ["Review analytics dashboard", "✓", "✓"],
-        ["Multi-location support", "✓ (from $49/mo)", "✓ (from $800+/mo)"],
-        ["Free plan available", "✓ (14-day free trial, no card)", "✗"],
+        ["Multi-location support", "✓ (Agency plan, ₹1,499/mo)", "✓ (from $800+/mo)"],
+        ["14-day free trial", "✓ (no card)", "✗"],
         ["Message overage fees", "$0", "$0.10–$0.50 per message"],
         ["AI chatbot", "✗ (not needed)", "✓ (rarely used)"],
         ["Payments processing", "✗ (not needed)", "✓ (expensive rates)"],
@@ -1445,7 +1442,7 @@ export const PODIUM_ALTERNATIVE_DATA = {
     },
     {
       type: "tip",
-      text: "Podium doesn't support WhatsApp review requests at all. ReviewPing does — for free, on every plan. Given that WhatsApp has 2+ billion users and open rates above 90%, that's a big deal for local businesses serving international or younger customers."
+      text: "Podium doesn't support WhatsApp review requests at all. ReviewPing does — on Premium and Agency plans at no extra cost. Given that WhatsApp has 2+ billion users and open rates above 90%, that's a big deal for local businesses serving international or younger customers."
     },
     {
       type: "h2",
@@ -1519,7 +1516,7 @@ export const PODIUM_ALTERNATIVE_DATA = {
     {
       type: "ol",
       items: [
-        "Import your customer contacts — upload a CSV or connect via our simple API",
+        "Import your customer contacts — upload a CSV (Agency plans add API access)",
         "Choose your template — pick from email or WhatsApp (or both)",
         "Set your timing — send requests immediately, after a delay, or on a schedule",
         "Customise your message — your brand voice, your language, your direct Google Review link",
@@ -1541,7 +1538,7 @@ export const PODIUM_ALTERNATIVE_DATA = {
     },
     {
       type: "p",
-      text: "ReviewPing includes WhatsApp review requests on every paid plan at no extra cost. No add-ons, no per-message fees. Just automatic review requests that customers actually open."
+      text: "ReviewPing includes WhatsApp review requests on Premium and Agency plans at no extra cost. No add-ons, no per-message fees. Just automatic review requests that customers actually open."
     },
     {
       type: "h3",
@@ -1654,7 +1651,7 @@ export const PODIUM_ALTERNATIVE_DATA = {
         ["Team Inbox", "Use a shared Gmail inbox or Slack", "No — unless you have a large team handling messages"],
         ["Website Chat Widget", "Free alternatives (Tidio, Crisp, Tawk.to)", "Maybe — but at $0–$15/mo instead of Podium pricing"],
         ["Review Campaign Analytics", "ReviewPing analytics (included)", "No — ReviewPing's analytics are cleaner and more focused"],
-        ["Multi-location Dashboard", "ReviewPing multi-location ($49/mo)", "No — and you'll pay 90% less for it"]
+        ["Multi-location Dashboard", "ReviewPing Agency plan (₹1,499/mo, up to 5 locations)", "No — and you'll pay 90% less for it"]
       ]
     },
     {
@@ -1695,7 +1692,7 @@ export const PODIUM_ALTERNATIVE_DATA = {
     },
     {
       q: "Is ReviewPing suitable for multi-location businesses?",
-      a: "Yes. ReviewPing's multi-location plan starts at $49/month, compared to Podium's multi-location pricing which typically starts at $800+/month. You get separate review request workflows, analytics, and templates for each location, all from one dashboard."
+      a: "Yes. ReviewPing's multi-location (Agency) plan starts at ₹1,499/month for up to 5 locations, compared to Podium's multi-location pricing which typically starts at $800+/month. You get separate review request workflows, analytics, and templates for each location, all from one dashboard."
     },
     {
       q: "What's the catch with ReviewPing's ₹599/month price?",

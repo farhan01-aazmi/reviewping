@@ -1,0 +1,896 @@
+{
+  "/": {
+    "title": "ReviewPing — Automated Google Review Request Software | From ₹599/mo",
+    "desc": "Get 30+ new Google reviews every month automatically with AI-personalised email and WhatsApp review requests. No contracts, no hidden fees. Set up in 2 minutes.",
+    "canonical": "https://www.reviewping.pro/",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "ReviewPing",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "description": "Automated Google review requests via email and WhatsApp.",
+        "offers": {
+          "@type": "AggregateOffer",
+          "lowPrice": "599",
+          "highPrice": "1499",
+          "priceCurrency": "INR"
+        },
+        "url": "https://www.reviewping.pro"
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "ReviewPing",
+        "url": "https://www.reviewping.pro",
+        "description": "Automated Google review request software for small businesses."
+      }
+    ],
+    "ogImage": null,
+    "noindex": false
+  },
+  "/features": {
+    "title": "Features — Everything you need to get more Google Reviews · ReviewPing",
+    "desc": "ReviewPing helps businesses automate Google review requests via email and WhatsApp. AI-powered replies, real-time analytics, multi-location support, and more.",
+    "canonical": "https://www.reviewping.pro/features",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/pricing": {
+    "title": "Pricing · ReviewPing",
+    "desc": "Simple, transparent pricing for review request automation. Starter at ₹599/mo. No contracts. No per-message fees. Cancel anytime.",
+    "canonical": "https://www.reviewping.pro/pricing",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/faq": {
+    "title": "Frequently Asked Questions · ReviewPing",
+    "desc": "Find answers to common questions about ReviewPing — review request automation, pricing, GDPR compliance, WhatsApp vs email, and more.",
+    "canonical": "https://www.reviewping.pro/faq",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is ReviewPing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ReviewPing is an automated review request platform that helps small businesses get more Google reviews via email and WhatsApp. It's the ₹599/month alternative to Podium — built for restaurants, clinics, salons, and e-commerce businesses."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the review request automation work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You add your customers' names and contact info, choose a template, and ReviewPing sends a personalised email or WhatsApp message with a direct Google review link. You can send individually or in bulk. All requests are tracked in your dashboard."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need a Google Business Profile?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, you need a verified Google Business Profile to receive Google reviews. ReviewPing helps you get more reviews on your existing profile — we don't create or manage the profile itself."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I send both email and WhatsApp?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. You can send review requests via email, WhatsApp, or let the customer choose. WhatsApp works best for restaurants and retail. Email is preferred for clinics and professional services."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is ReviewPing GDPR compliant?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. We follow GDPR and UK privacy regulations. Every review request includes an opt-out link, and we never send unsolicited messages. You own your customer data — we never share or sell it."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I try before I buy?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. You can use our free Google Review Link Generator without signing up. The Starter plan is ₹599/month with 100 review requests, no commitment, cancel anytime."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How is ReviewPing different from Podium?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ReviewPing is built for small businesses who don't need Podium's enterprise complexity. We charge ₹599/month instead of Podium's $449+/month. Same core review request functionality, no bloated features, no long-term contracts."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you offer white-label?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Our Agency plan (₹1,499/month) includes white-label branding, multi-location management, up to 10 team members, and dedicated onboarding. Perfect for marketing agencies managing reviews for clients."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does it take to set up ReviewPing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Setting up ReviewPing takes approximately 2 minutes. Create your account, connect your Google Business Profile, choose or customise a review request template, and import your customer contacts. There's no onboarding call, no complex integration, and no waiting period — you can start sending automated review requests immediately after signing up."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I use ReviewPing for multiple Google Business Profiles?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. ReviewPing's multi-location plan supports multiple Google Business Profiles under one account. Each location gets its own review request settings, message templates, and analytics dashboard. Switch between locations with one click and manage all your Google reviews from a single, unified interface."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does ReviewPing work with WhatsApp?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. ReviewPing supports WhatsApp review requests on all paid plans. WhatsApp offers a 98% open rate within 5 minutes — significantly higher than email. Your customers receive a friendly WhatsApp message with a direct Google review link, making it effortless for them to leave feedback on their preferred messaging platform."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What happens if I exceed my monthly review request limit?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "If you exceed your plan's monthly limit, ReviewPing pauses new automated requests until the next billing cycle or until you upgrade to a higher tier. You'll receive a notification before hitting your limit so you can plan ahead. Upgrade at any time with no penalties, no service interruptions, and no overage fees."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I customise the email and WhatsApp templates?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Absolutely. ReviewPing gives you full control over your review request templates. You can customise every word of your email and WhatsApp messages, use personalisation tags like customer name and service details, add emojis, and adjust the tone to match your brand voice. We also provide industry-optimised default templates to get you started quickly."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does ReviewPing integrate with my POS or booking system?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ReviewPing supports CSV import for easy integration with most POS systems, booking platforms, and CRMs. Simply export your customer data from your existing system and upload it to ReviewPing. For custom integrations, our API allows developers to connect ReviewPing directly with your existing software for fully automated review request workflows."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does ReviewPing handle opt-outs and unsubscribes?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Every email and WhatsApp review request sent through ReviewPing includes a one-click opt-out link or reply-to-stop option. When a customer unsubscribes, they are automatically removed from all future campaigns. We maintain a permanent opt-out record to ensure full compliance with GDPR, CAN-SPAM, and UK privacy regulations at all times."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What support options are available?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ReviewPing offers email support for all plans with a typical response time of under 4 hours during business hours. Premium and Agency plan customers receive priority support with faster response times and a dedicated account manager. Our knowledge base also includes comprehensive setup guides, template examples, and best practice articles for self-service help."
+            }
+          }
+        ]
+      }
+    ],
+    "ogImage": null,
+    "noindex": false
+  },
+  "/blog": {
+    "title": "ReviewPing Blog · ReviewPing",
+    "desc": "Tips, guides, and strategies for getting more Google reviews, managing your online reputation, and growing your small business.",
+    "canonical": "https://www.reviewping.pro/blog",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/about": {
+    "title": "About Us · ReviewPing",
+    "desc": "Learn about ReviewPing — the affordable Google review management platform built for small businesses. Our story, mission, team, and values.",
+    "canonical": "https://www.reviewping.pro/about",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/contact": {
+    "title": "Contact Us · ReviewPing",
+    "desc": "Get in touch with ReviewPing. Email hello@reviewping.io for support, sales, or general inquiries. We reply within 2 hours during business hours.",
+    "canonical": "https://www.reviewping.pro/contact",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/privacy": {
+    "title": "Privacy Policy · ReviewPing",
+    "desc": "ReviewPing Privacy Policy — how we collect, use, and protect your data and your customers' data.",
+    "canonical": "https://www.reviewping.pro/privacy",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/terms": {
+    "title": "Terms of Service · ReviewPing",
+    "desc": "ReviewPing Terms of Service — the legal agreement governing your use of the ReviewPing review request platform.",
+    "canonical": "https://www.reviewping.pro/terms",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/refund": {
+    "title": "Refund Policy · ReviewPing",
+    "desc": "ReviewPing Refund Policy — details on our 14-day free trial, monthly and annual subscription refunds, and how to cancel.",
+    "canonical": "https://www.reviewping.pro/refund",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/tools/review-link-generator": {
+    "title": "Free Review Link Generator · ReviewPing",
+    "desc": "Generate your Google Review link for free. No sign-up required.",
+    "canonical": "https://www.reviewping.pro/tools/review-link-generator",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/tools/review-response-generator": {
+    "title": "Free Review Response Generator · ReviewPing",
+    "desc": "Generate AI-powered responses to your Google reviews for free.",
+    "canonical": "https://www.reviewping.pro/tools/review-response-generator",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/podium-alternative": {
+    "title": "Podium Alternative: ReviewPing at ₹599/mo vs Podium at $449+/mo · ReviewPing",
+    "desc": "Ditch the $449/mo Podium bill. ReviewPing gives you automated email and WhatsApp review requests for ₹599/mo — no setup fees, no overages, no enterprise bloat.",
+    "canonical": "https://www.reviewping.pro/podium-alternative",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/industry/restaurants": {
+    "title": "ReviewPing for Restaurants · ReviewPing",
+    "desc": "Turn every happy table into a 5-star Google review. Automate review requests after every dining experience.",
+    "canonical": "https://www.reviewping.pro/industry/restaurants",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/industry/clinics": {
+    "title": "ReviewPing for Medical & Dental Clinics · ReviewPing",
+    "desc": "Build patient trust with more Google reviews. Automate follow-ups after every appointment.",
+    "canonical": "https://www.reviewping.pro/industry/clinics",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/industry/salons": {
+    "title": "ReviewPing for Salons & Spas · ReviewPing",
+    "desc": "Get more Google reviews from every satisfied client. Perfect for salons, barbershops, spas, and beauty studios.",
+    "canonical": "https://www.reviewping.pro/industry/salons",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/industry/ecommerce": {
+    "title": "ReviewPing for E-Commerce · ReviewPing",
+    "desc": "Get more product reviews and build social proof. Automate review requests after every delivery.",
+    "canonical": "https://www.reviewping.pro/industry/ecommerce",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/vs/birdeye": {
+    "title": "ReviewPing vs Birdeye: The ₹599/mo Alternative · ReviewPing",
+    "desc": "Compare ReviewPing (₹599/mo) vs Birdeye ($299+/mo per location). Save 90% on review management with AI-powered features and no long-term contracts.",
+    "canonical": "https://www.reviewping.pro/vs/birdeye",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/vs/grade-us": {
+    "title": "ReviewPing vs Grade.us: Which Review Platform Wins? · ReviewPing",
+    "desc": "Compare ReviewPing (₹599/mo) vs Grade.us ($40-$110/seat/mo). See why ReviewPing offers better value with AI features and unlimited users.",
+    "canonical": "https://www.reviewping.pro/vs/grade-us",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/vs/nicejob": {
+    "title": "ReviewPing vs Nicejob: Honest Comparison (2026) · ReviewPing",
+    "desc": "Compare ReviewPing (₹599/mo) vs Nicejob ($75-$125/mo). See how ReviewPing's AI features and affordable pricing stack up against Nicejob's review automation.",
+    "canonical": "https://www.reviewping.pro/vs/nicejob",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/vs/podium": {
+    "title": "ReviewPing vs Podium: The ₹599/mo Alternative · ReviewPing",
+    "desc": "Compare ReviewPing (₹599/mo) vs Podium ($400+/mo). Same core review request functionality at 95% less cost. Built for small businesses.",
+    "canonical": "https://www.reviewping.pro/vs/podium",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/vs/truereview": {
+    "title": "ReviewPing vs TrueReview: Best Budget Review Tool? · ReviewPing",
+    "desc": "Compare ReviewPing (₹599/mo) vs TrueReview ($49/mo). ReviewPing offers more features and a lower starting price than TrueReview.",
+    "canonical": "https://www.reviewping.pro/vs/truereview",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": false
+  },
+  "/blog/reviewping-vs-birdeye-comparison": {
+    "title": "ReviewPing vs Birdeye: The Honest Comparison for Small Business (2026) · ReviewPing",
+    "desc": "Birdeye charges $299-449+/month per location with $500-1,500 onboarding fees. ReviewPing delivers the same core review request features for ₹599/month. Here's the honest comparison.",
+    "canonical": "https://www.reviewping.pro/blog/reviewping-vs-birdeye-comparison",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "ReviewPing vs Birdeye: The Honest Comparison for Small Business (2026)",
+        "description": "Birdeye charges $299-449+/month per location with $500-1,500 onboarding fees. ReviewPing delivers the same core review request features for ₹599/month. Here's the honest comparison.",
+        "datePublished": "2026-07-15",
+        "dateModified": "2026-07-15",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/reviewping-vs-birdeye-comparison",
+        "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/whatsapp-review-requests-guide": {
+    "title": "WhatsApp Review Requests: Complete Guide for 2026 · ReviewPing",
+    "desc": "WhatsApp has 2 billion+ users, 98% open rates, and a 4.8% review completion rate. Here's exactly how to send review requests via WhatsApp to get more Google reviews.",
+    "canonical": "https://www.reviewping.pro/blog/whatsapp-review-requests-guide",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "WhatsApp Review Requests: Complete Guide for 2026",
+        "description": "WhatsApp has 2 billion+ users, 98% open rates, and a 4.8% review completion rate. Here's exactly how to send review requests via WhatsApp to get more Google reviews.",
+        "datePublished": "2026-07-15",
+        "dateModified": "2026-07-15",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/whatsapp-review-requests-guide",
+        "image": "https://images.unsplash.com/photo-1611746872915-64382b5c76da?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1611746872915-64382b5c76da?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/best-review-request-automation-software-2026": {
+    "title": "6 Best Review Request Automation Software for Small Business (2026) · ReviewPing",
+    "desc": "We compared the top review request automation platforms — ReviewPing, Podium, Birdeye, Widewail, Reputation, Grade.us — with real 2026 pricing. Find the best tool to automate getting Google reviews.",
+    "canonical": "https://www.reviewping.pro/blog/best-review-request-automation-software-2026",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "6 Best Review Request Automation Software for Small Business (2026)",
+        "description": "We compared the top review request automation platforms — ReviewPing, Podium, Birdeye, Widewail, Reputation, Grade.us — with real 2026 pricing. Find the best tool to automate getting Google reviews.",
+        "datePublished": "2026-07-15",
+        "dateModified": "2026-07-15",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/best-review-request-automation-software-2026",
+        "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/review-request-automation-statistics-2026": {
+    "title": "Review Request Automation Statistics: 2026 Data From 7,400+ Businesses · ReviewPing",
+    "desc": "Hard data on automated review requests: 97% of consumers read reviews, WhatsApp converts at 8-15%, businesses with 50+ reviews get 266% more Local Pack visibility. Full 2026 dataset inside.",
+    "canonical": "https://www.reviewping.pro/blog/review-request-automation-statistics-2026",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Review Request Automation Statistics: 2026 Data From 7,400+ Businesses",
+        "description": "Hard data on automated review requests: 97% of consumers read reviews, WhatsApp converts at 8-15%, businesses with 50+ reviews get 266% more Local Pack visibility. Full 2026 dataset inside.",
+        "datePublished": "2026-07-15",
+        "dateModified": "2026-07-15",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/review-request-automation-statistics-2026",
+        "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/what-is-review-request-automation": {
+    "title": "What Is Review Request Automation? Complete Guide (2026) · ReviewPing",
+    "desc": "Review request automation sends automatic email or WhatsApp messages to customers after a service, asking them to leave a Google review. Learn how it works, why it matters, and how to set it up in 2026.",
+    "canonical": "https://www.reviewping.pro/blog/what-is-review-request-automation",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "What Is Review Request Automation? Complete Guide (2026)",
+        "description": "Review request automation sends automatic email or WhatsApp messages to customers after a service, asking them to leave a Google review. Learn how it works, why it matters, and how to set it up in 2026.",
+        "datePublished": "2026-07-15",
+        "dateModified": "2026-07-15",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/what-is-review-request-automation",
+        "image": "https://images.unsplash.com/photo-1553729459-afe8f2e0bd2b?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1553729459-afe8f2e0bd2b?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/why-google-reviews-matter-for-small-business": {
+    "title": "Why Google Reviews Matter for Small Business (2026) · ReviewPing",
+    "desc": "Learn why Google Reviews are the #1 trust signal for local businesses and how automating review requests can 10x your review count.",
+    "canonical": "https://www.reviewping.pro/blog/why-google-reviews-matter-for-small-business",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Why Google Reviews Matter for Small Business (2026)",
+        "description": "Learn why Google Reviews are the #1 trust signal for local businesses and how automating review requests can 10x your review count.",
+        "datePublished": "2026-05-20",
+        "dateModified": "2026-05-20",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/why-google-reviews-matter-for-small-business",
+        "image": "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/how-to-respond-to-negative-google-reviews": {
+    "title": "How to Respond to Negative Google Reviews (Updated Templates for 2026) · ReviewPing",
+    "desc": "A bad review doesn't have to hurt your business. Learn the exact framework for turning negative reviews into trust-building moments with ready-to-use templates for restaurants, clinics, salons, and home services.",
+    "canonical": "https://www.reviewping.pro/blog/how-to-respond-to-negative-google-reviews",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "How to Respond to Negative Google Reviews (Updated Templates for 2026)",
+        "description": "A bad review doesn't have to hurt your business. Learn the exact framework for turning negative reviews into trust-building moments with ready-to-use templates for restaurants, clinics, salons, and home services.",
+        "datePublished": "2026-07-15",
+        "dateModified": "2026-07-15",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/how-to-respond-to-negative-google-reviews",
+        "image": "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/review-management-for-restaurants": {
+    "title": "Review Management for Restaurants: A Complete Guide · ReviewPing",
+    "desc": "Restaurants live and die by reviews. Learn how top-rated restaurants automate review requests, respond to feedback, and use reviews to fill tables.",
+    "canonical": "https://www.reviewping.pro/blog/review-management-for-restaurants",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Review Management for Restaurants: A Complete Guide",
+        "description": "Restaurants live and die by reviews. Learn how top-rated restaurants automate review requests, respond to feedback, and use reviews to fill tables.",
+        "datePublished": "2026-04-28",
+        "dateModified": "2026-04-28",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/review-management-for-restaurants",
+        "image": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/google-business-profile-optimization-checklist": {
+    "title": "Google Business Profile Optimization Checklist (2026) · ReviewPing",
+    "desc": "Your Google Business Profile is the most important local SEO asset you have. Here's the complete checklist to rank higher and get more reviews.",
+    "canonical": "https://www.reviewping.pro/blog/google-business-profile-optimization-checklist",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Google Business Profile Optimization Checklist (2026)",
+        "description": "Your Google Business Profile is the most important local SEO asset you have. Here's the complete checklist to rank higher and get more reviews.",
+        "datePublished": "2026-04-20",
+        "dateModified": "2026-04-20",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/google-business-profile-optimization-checklist",
+        "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/reviewping-vs-podium-comparison": {
+    "title": "ReviewPing vs Podium: The Honest Comparison for Small Business (2026) · ReviewPing",
+    "desc": "Podium now costs $449+/month minimum with annual contracts. ReviewPing delivers the same core review request features for ₹599/month with no contracts. Here's the honest comparison with 2026 pricing.",
+    "canonical": "https://www.reviewping.pro/blog/reviewping-vs-podium-comparison",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "ReviewPing vs Podium: The Honest Comparison for Small Business (2026)",
+        "description": "Podium now costs $449+/month minimum with annual contracts. ReviewPing delivers the same core review request features for ₹599/month with no contracts. Here's the honest comparison with 2026 pricing.",
+        "datePublished": "2026-07-15",
+        "dateModified": "2026-07-15",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/reviewping-vs-podium-comparison",
+        "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/how-to-automate-google-review-requests": {
+    "title": "How to Automate Google Review Requests in 5 Minutes · ReviewPing",
+    "desc": "Stop asking for reviews manually. Here's exactly how to set up automated Google review requests via email and WhatsApp — and start getting 5-star reviews on autopilot.",
+    "canonical": "https://www.reviewping.pro/blog/how-to-automate-google-review-requests",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "How to Automate Google Review Requests in 5 Minutes",
+        "description": "Stop asking for reviews manually. Here's exactly how to set up automated Google review requests via email and WhatsApp — and start getting 5-star reviews on autopilot.",
+        "datePublished": "2026-06-02",
+        "dateModified": "2026-06-02",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/how-to-automate-google-review-requests",
+        "image": "https://images.unsplash.com/photo-1553729459-afe8f2e0bd2b?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1553729459-afe8f2e0bd2b?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/podium-pricing-2026": {
+    "title": "Podium Pricing 2026: The Real Cost Breakdown ($449-$1,199+/mo) · ReviewPing",
+    "desc": "Podium now costs $449+/month minimum with annual contracts required. Here's the complete 2026 pricing breakdown — including hidden fees, add-on costs, and why most small businesses overpaying.",
+    "canonical": "https://www.reviewping.pro/blog/podium-pricing-2026",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Podium Pricing 2026: The Real Cost Breakdown ($449-$1,199+/mo)",
+        "description": "Podium now costs $449+/month minimum with annual contracts required. Here's the complete 2026 pricing breakdown — including hidden fees, add-on costs, and why most small businesses overpaying.",
+        "datePublished": "2026-07-15",
+        "dateModified": "2026-07-15",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/podium-pricing-2026",
+        "image": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/google-review-request-templates": {
+    "title": "15 Google Review Request Templates That Actually Work (2026) · ReviewPing",
+    "desc": "Stop guessing what to say. Here are 15 proven Google review request templates for email and WhatsApp — tested across restaurants, clinics, salons, and more.",
+    "canonical": "https://www.reviewping.pro/blog/google-review-request-templates",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "15 Google Review Request Templates That Actually Work (2026)",
+        "description": "Stop guessing what to say. Here are 15 proven Google review request templates for email and WhatsApp — tested across restaurants, clinics, salons, and more.",
+        "datePublished": "2026-06-21",
+        "dateModified": "2026-06-21",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/google-review-request-templates",
+        "image": "https://images.unsplash.com/photo-1611746872915-64382b5c76da?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1611746872915-64382b5c76da?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/how-to-get-5-star-google-reviews": {
+    "title": "How to Get 5-Star Google Reviews: A 5-Step System That Works · ReviewPing",
+    "desc": "Stop hoping for 5-star reviews. This proven 5-step system helps local businesses generate 15-25 new Google reviews every month — automatically.",
+    "canonical": "https://www.reviewping.pro/blog/how-to-get-5-star-google-reviews",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "How to Get 5-Star Google Reviews: A 5-Step System That Works",
+        "description": "Stop hoping for 5-star reviews. This proven 5-step system helps local businesses generate 15-25 new Google reviews every month — automatically.",
+        "datePublished": "2026-06-20",
+        "dateModified": "2026-06-20",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/how-to-get-5-star-google-reviews",
+        "image": "https://images.unsplash.com/photo-1553729459-afe8f2e0bd2b?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1553729459-afe8f2e0bd2b?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/qr-code-review-gateway": {
+    "title": "QR Review Gateway 2026: Double Your 5-Star Reviews Without a Single 1-Star Going Public · ReviewPing",
+    "desc": "Get 3x more Google reviews with a simple QR code that routes happy customers to Google and unhappy ones to private feedback. The smartest review strategy of 2026 — explained step by step.",
+    "canonical": "https://www.reviewping.pro/blog/qr-code-review-gateway",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "QR Review Gateway 2026: Double Your 5-Star Reviews Without a Single 1-Star Going Public",
+        "description": "Get 3x more Google reviews with a simple QR code that routes happy customers to Google and unhappy ones to private feedback. The smartest review strategy of 2026 — explained step by step.",
+        "datePublished": "2026-07-25",
+        "dateModified": "2026-07-25",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/qr-code-review-gateway",
+        "image": "https://images.unsplash.com/photo-1595079676339-1534801ad6cf?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1595079676339-1534801ad6cf?w=800&q=80",
+    "noindex": false
+  },
+  "/blog/how-to-reply-to-google-reviews-professionally": {
+    "title": "How to Reply to Google Reviews Professionally (10 Templates) · ReviewPing",
+    "desc": "Learn how to respond to Google reviews like a pro. Includes 10 ready-to-use templates for positive, negative, and neutral reviews — plus the golden rules of review responses.",
+    "canonical": "https://www.reviewping.pro/blog/how-to-reply-to-google-reviews-professionally",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "How to Reply to Google Reviews Professionally (10 Templates)",
+        "description": "Learn how to respond to Google reviews like a pro. Includes 10 ready-to-use templates for positive, negative, and neutral reviews — plus the golden rules of review responses.",
+        "datePublished": "2026-06-19",
+        "dateModified": "2026-06-19",
+        "author": {
+          "@type": "Organization",
+          "name": "ReviewPing",
+          "url": "https://www.reviewping.pro"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "ReviewPing"
+        },
+        "mainEntityOfPage": "https://www.reviewping.pro/blog/how-to-reply-to-google-reviews-professionally",
+        "image": "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80"
+      }
+    ],
+    "ogImage": "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80",
+    "noindex": false
+  },
+  "/login": {
+    "title": "login · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/login",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/signup": {
+    "title": "signup · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/signup",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/forgot-password": {
+    "title": "forgot-password · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/forgot-password",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/auth/callback": {
+    "title": "auth/callback · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/auth/callback",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/onboarding": {
+    "title": "onboarding · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/onboarding",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/verify": {
+    "title": "verify · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/verify",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/settings": {
+    "title": "settings · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/settings",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/billing": {
+    "title": "billing · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/billing",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/invite": {
+    "title": "invite · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/invite",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/dashboard": {
+    "title": "dashboard · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/dashboard",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/404": {
+    "title": "404 · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/404",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/changelog": {
+    "title": "changelog · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/changelog",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/help": {
+    "title": "help · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/help",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  },
+  "/referral": {
+    "title": "referral · ReviewPing",
+    "desc": "ReviewPing",
+    "canonical": "https://www.reviewping.pro/referral",
+    "jsonLd": null,
+    "ogImage": null,
+    "noindex": true
+  }
+}

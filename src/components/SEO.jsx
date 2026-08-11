@@ -13,7 +13,7 @@ export default function SEO({
     : "ReviewPing — Get 30+ Google Reviews/Month Automatically";
   const fullDesc =
     description ||
-    "Get 30+ new Google reviews every month automatically. AI-personalised Email & WhatsApp review requests. Free plan available. No contracts. Set up in 2 minutes.";
+    "Get 30+ new Google reviews every month automatically with AI-personalised email and WhatsApp review requests. No contracts. Set up in 2 minutes.";
   const url = `${BASE_URL}${path}`;
   const image = ogImage.startsWith("http") ? ogImage : `${BASE_URL}${ogImage}`;
 

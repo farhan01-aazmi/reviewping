@@ -521,7 +521,7 @@ export default function VSBirdeyePage({ onSignup, onLogin, onBack }) {
       birdeye: <Cross />,
       ping: (
         <>
-          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span>
+          <Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Premium+</span>
         </>
       ),
     },
@@ -557,7 +557,7 @@ export default function VSBirdeyePage({ onSignup, onLogin, onBack }) {
       ),
     },
     {
-      feature: "Free Plan",
+      feature: "14-Day Free Trial",
       birdeye: <Cross />,
       ping: <Check />,
     },
@@ -777,7 +777,7 @@ export default function VSBirdeyePage({ onSignup, onLogin, onBack }) {
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
               </tr>
               <tr>
-                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Free plan available</td>
+                <td style={{...styles.detailTd, ...styles.detailTdFeature}}>14-day free trial</td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /></td>
               </tr>
@@ -789,7 +789,7 @@ export default function VSBirdeyePage({ onSignup, onLogin, onBack }) {
               <tr>
                 <td style={{...styles.detailTd, ...styles.detailTdFeature}}>WhatsApp integration</td>
                 <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Cross /></td>
-                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Growth+</span></td>
+                <td style={{...styles.detailTd, ...styles.detailTdCenter}}><Check /> <span style={{ fontSize: 13, color: G.mutedLo }}>Premium+</span></td>
               </tr>
               <tr style={styles.detailRowAlt}>
                 <td style={{...styles.detailTd, ...styles.detailTdFeature}}>Month-to-month contracts</td>
@@ -813,7 +813,7 @@ export default function VSBirdeyePage({ onSignup, onLogin, onBack }) {
           practices, and retail stores will save over <strong>90%</strong>
           by choosing ReviewPing's <strong>₹599/month</strong> plan over
           Birdeye's $299+/month starting point. Multi-location operators
-          benefit from our flat-rate Agency plan that covers unlimited
+          benefit from our flat-rate Agency plan that covers up to 5
           locations — no per-location surcharges. And any business that
           values month-to-month flexibility over annual lock-in will find
           ReviewPing's no-contract approach refreshingly straightforward.
@@ -851,11 +851,11 @@ export default function VSBirdeyePage({ onSignup, onLogin, onBack }) {
             Most businesses save <strong>90% or more</strong>. Birdeye
             starts at approximately $299/month per location and often
             requires annual contracts. ReviewPing starts at just
-            <strong> ₹599/month</strong> with a free plan available. A
+            <strong> ₹599/month</strong> with a 14-day free trial. A
             single-location business switching from Birdeye to ReviewPing
             saves over <strong>$3,200 per year</strong>. Multi-location
             operators save significantly more since ReviewPing's Agency
-            plan at ₹1,499/month covers unlimited locations with no
+            plan at ₹1,499/month covers up to 5 locations with no
             per-location surcharges.
           </p>
         </div>
@@ -865,8 +865,8 @@ export default function VSBirdeyePage({ onSignup, onLogin, onBack }) {
             Does ReviewPing integrate with Google and Facebook reviews?
           </h3>
           <p style={styles.faqAnswer}>
-            Yes. ReviewPing connects directly with Google Business Profile
-            and Facebook to send review requests, track new reviews, and
+            Yes. ReviewPing connects directly with your Google Business Profile
+            to send review requests, track new reviews, and
             manage your online reputation from a single dashboard. You can
             automate the entire workflow — from post-service follow-up to
             review publishing — without ever leaving the ReviewPing
